@@ -3,9 +3,6 @@
     <ProjectGuid>877dcf29-c85a-4571-a659-118df32af090</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
-    <Script Include="jsconfig.json" />
-    <Script Include="package.json" />
-    <Script Include="webpack.*.js" />
-    <Script Include="src\**" />
+    <Script Include="**" Exclude="*.esproj;**\node_modules\**;**\dist\**;*.lock" />
   </ItemGroup>
 </Project>
