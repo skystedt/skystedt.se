@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.1.0-alpha">
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>877dcf29-c85a-4571-a659-118df32af090</ProjectGuid>
+  </PropertyGroup>
+  <ItemGroup>
+    <Script Include="jsconfig.json" />
+    <Script Include="package.json" />
+    <Script Include="webpack.*.js" />
+    <Script Include="src\**" />
+  </ItemGroup>
+</Project>
