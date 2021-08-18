@@ -1,19 +1,15 @@
-using Microsoft.Azure.Cosmos.Table;
-#if NET5
-using Microsoft.Azure.Functions.Worker;
-using Microsoft.Azure.Functions.Worker.Http;
-#elif NETCOREAPP3_1
 using Microsoft.AspNetCore.Http;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-#endif
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
-namespace api
+namespace Skystedt.Api
 {
-    public static class Test
+    public class Test
     {
         private class TestEntity : TableEntity
         {
@@ -24,19 +20,19 @@ namespace api
             }
         }
 
-#if NET5
-        [Function(nameof(Test))]
-        public static async Task<DateTimeOffset> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req, FunctionContext executionContext)
-        {
-            var logger = executionContext.GetLogger(nameof(Test));
-#elif NETCOREAPP3_1
-        [FunctionName(nameof(Test))]
-        public static async Task<DateTimeOffset> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req, ILogger logger)
-        {
-#endif
-            logger.LogInformation("C# HTTP trigger function processed a request.");
+        private readonly IConfiguration _configuration;
 
-            var connectionString = Environment.GetEnvironmentVariable("StorageAccount");
+        public Test(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        [FunctionName(nameof(Test))]
+        public async Task<DateTimeOffset> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req, ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            var connectionString = _configuration["StorageAccount"];
             var storageAccount = CloudStorageAccount.Parse(connectionString);
             var tableClient = storageAccount.CreateCloudTableClient();
             var table = tableClient.GetTableReference("test");
