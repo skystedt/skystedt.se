@@ -2,17 +2,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+    <RootNamespace>Skystedt.API</RootNamespace>
+    <UserSecretsId>32ea2729-319b-416c-9883-fd42749c0eb5</UserSecretsId>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5' ">
-    <OutputType>Exe</OutputType>
-  </PropertyGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net5' ">
-    <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="2.0.0-preview" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.0.13" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.0.4" OutputItemType="Analyzer" />
-    <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="1.4.0" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
+  <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="2.0.0-preview" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
   </ItemGroup>
