@@ -17,6 +17,7 @@ export default class Display {
     }
   }
 
+  /** @param {PIXI.Renderer | PIXI.AbstractRenderer} renderer */
   constructor(renderer) {
     this.#renderer = renderer;
 
