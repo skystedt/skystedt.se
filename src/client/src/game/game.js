@@ -111,7 +111,7 @@ export default class Game {
     } else if (direction.dx > 0) {
       this.#ship.direction = ShipDirection.Right;
     } else {
-      this.#ship.direction = ShipDirection.Normal;
+      this.#ship.direction = ShipDirection.Straight;
     }
   }
 
