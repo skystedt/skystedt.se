@@ -15,11 +15,14 @@ export default class Game {
   #input;
   #loopState = { lowFpsCheck: 0, logicWait: 0, logicRemaining: 0, backgroundWait: 0, backgroundRemaining: 0, lastTimestamp: 0 };
 
-  #stars;
-  #ship;
+  /** @type {PIXI.Container} */
+  #stars = (/** @type {unknown} */(null));
+  /** @type {Ship} */
+  #ship = (/** @type {unknown} */(null));
 
   get canvas() { return this.#app.view; }
 
+  /** @param {string} id */
   constructor(id) {
     this.#app = new PIXI.Application();
     this.#app.view.id = id;
@@ -27,10 +30,7 @@ export default class Game {
     this.#input = new Input();
 
     Ship.addResources(this.#app.loader);
-    this.#app.loader
-      .load(() => {
-        this.#initialize();
-      });
+    this.#app.loader.load(this.#initialize.bind(this));
   }
 
   #initialize() {
@@ -54,6 +54,7 @@ export default class Game {
     requestAnimationFrame(this.#frameLoop.bind(this));
   }
 
+  /** @param {DOMHighResTimeStamp} timestamp */
   #frameLoop(timestamp) {
     requestAnimationFrame(this.#frameLoop.bind(this));
 
@@ -80,7 +81,7 @@ export default class Game {
       this.#loopState.logicRemaining += elapsed - logicTicks * this.#loopState.logicWait;
 
       backgroundTick = this.#loopState.backgroundRemaining > this.#loopState.backgroundWait;
-      this.#loopState.backgroundRemaining += elapsed - backgroundTick * this.#loopState.backgroundWait;
+      this.#loopState.backgroundRemaining += elapsed - (backgroundTick ? this.#loopState.backgroundWait : 0);
     }
 
     while (logicTicks--) {
@@ -101,12 +102,10 @@ export default class Game {
   }
 
   #updateLogic() {
-    var b = this.#ship.x;
     const shipPosition = this.#ship.absoluteCenterPosition(this.#display.resolution, this.#app.view);
     const direction = this.#input.direction(this.#display.resolution, shipPosition.x, shipPosition.y);
     this.#ship.x = Math.max(-1, Math.min(this.#ship.x + direction.dx, this.#display.width - this.#ship.width + 1));
     this.#ship.y = Math.max(0, Math.min(this.#ship.y + direction.dy, this.#display.height - this.#ship.height));
-    var a = this.#ship.x;
     if (direction.dx < 0) {
       this.#ship.direction = ShipDirection.Left;
     } else if (direction.dx > 0) {
@@ -114,13 +113,12 @@ export default class Game {
     } else {
       this.#ship.direction = ShipDirection.Normal;
     }
-
-    this.#ship.position
   }
 
   #updateBackground() {
     for (const star of this.#stars.children) {
-      star.move();
+      /** @type {Star} */
+      (star).move();
     }
   }
 }

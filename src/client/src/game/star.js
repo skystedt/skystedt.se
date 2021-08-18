@@ -4,6 +4,7 @@ export default class Star extends PIXI.Graphics {
   #screenWidth;
   #screenHeight;
 
+  /** @param {number} screenWidth, @param {number} screenHeight */
   constructor(screenWidth, screenHeight) {
     super();
     this.#screenWidth = screenWidth;
@@ -14,8 +15,9 @@ export default class Star extends PIXI.Graphics {
     this.#newY();
   }
 
+  /** @param {PIXI.Container} stage, @param {number} numberOfStars, @param {number} screenWidth, @param {number} screenHeight */
   static container(stage, numberOfStars, screenWidth, screenHeight) {
-    const container = new PIXI.Container(numberOfStars);
+    const container = new PIXI.Container();
     for (let i = 0; i < numberOfStars; i++) {
       container.addChild(new Star(screenWidth, screenHeight));
     }

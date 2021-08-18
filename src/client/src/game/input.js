@@ -2,6 +2,7 @@ import './input.css';
 
 export default class Input {
   #keys = { left: false, up: false, right: false, down: false };
+  /** @type {{ id: number, timestamp: DOMHighResTimeStamp, x: number, y: number }[]} */
   #touches = [];
   #mouse = { down: false, x: 0, y: 0 };
 
@@ -18,6 +19,7 @@ export default class Input {
     window.addEventListener('mouseup', this.#mouseup.bind(this));
   }
 
+  /** @param {FocusEvent} event */
   #blur(event) {
     this.#keys.left = false;
     this.#keys.up = false;
@@ -27,6 +29,7 @@ export default class Input {
     this.#mouse.down = false;
   }
 
+  /** @param {KeyboardEvent} event */
   #keydown(event) {
     switch (event.keyCode) {
       case 37: this.#keys.left = true; break;
@@ -38,6 +41,7 @@ export default class Input {
     event.preventDefault();
   }
 
+  /** @param {KeyboardEvent} event */
   #keyup(event) {
     switch (event.keyCode) {
       case 37: this.#keys.left = false; break;
@@ -49,12 +53,14 @@ export default class Input {
     event.preventDefault();
   }
 
+  /** @param {TouchEvent} event */
   #touchstart(event) {
     for (const touch of event.changedTouches) {
-      this.#addTouch(touch);
+      this.#addTouch(touch, event.timeStamp);
     }
   }
 
+  /** @param {TouchEvent} event */
   #touchmove(event) {
     for (const touch of event.changedTouches) {
       const foundTouch = this.#touches.find(t => t.id === touch.identifier);
@@ -62,11 +68,12 @@ export default class Input {
         foundTouch.x = touch.clientX;
         foundTouch.y = touch.clientY;
       } else {
-        this.#addTouch(touch);
+        this.#addTouch(touch, event.timeStamp);
       }
     }
   }
 
+  /** @param {TouchEvent} event */
   #touchend(event) {
     for (const touch of event.changedTouches) {
       this.#deleteTouch(touch);
@@ -74,36 +81,42 @@ export default class Input {
     event.preventDefault();
   }
 
+  /** @param {TouchEvent} event */
   #touchcancel(event) {
     for (const touch of event.changedTouches) {
       this.#deleteTouch(touch);
     }
   }
 
-  #addTouch(touch) {
-    this.#touches.push({
-      id: touch.identifier,
-      timestamp: event.timeStamp,
-      x: touch.clientX,
-      y: touch.clientY
-    });
-  }
-
+  /** @param {MouseEvent} event */
   #mousedown(event) {
     this.#mouse.down = true;
     this.#mouse.x = event.clientX;
     this.#mouse.y = event.clientY;
   }
 
+  /** @param {MouseEvent} event */
   #mousemove(event) {
     this.#mouse.x = event.clientX;
     this.#mouse.y = event.clientY;
   }
 
+  /** @param {MouseEvent} event */
   #mouseup(event) {
     this.#mouse.down = false;
   }
 
+  /** @param {Touch} touch, @param {DOMHighResTimeStamp} timestamp */
+  #addTouch(touch, timestamp) {
+    this.#touches.push({
+      id: touch.identifier,
+      timestamp: timestamp,
+      x: touch.clientX,
+      y: touch.clientY
+    });
+  }
+
+  /** @param {Touch} touch */
   #deleteTouch(touch) {
     const index = this.#touches.findIndex(t => t.id === touch.identifier);
     if (index > -1) {
@@ -111,10 +124,12 @@ export default class Input {
     }
   }
 
+  /** @param {any[]} array, @param {(element: any) => number} by */
   static #minBy(array, by) {
     return array.reduce((best, next) => !best ? next : Math.min(by(best), by(next)) === by(best) ? best : next, null)
   }
 
+  /** @param {number} inputX, @param {number} inputY, @param {number} relativeX, @param {number} relativeY, @param {number} resolution */
   static #relativeDirection(inputX, inputY, relativeX, relativeY, resolution) {
     const directionX = inputX - relativeX;
     const directionY = inputY - relativeY;
@@ -124,6 +139,7 @@ export default class Input {
     return { dx, dy };
   }
 
+  /** @param {number} resolution, @param {number} relativeX, @param {number} relativeY */
   direction(resolution, relativeX, relativeY) {
     const touch = Input.#minBy(this.#touches, t => t.timestamp);
     if (touch) {

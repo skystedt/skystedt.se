@@ -3,10 +3,11 @@ import ShipImage from './ship.png';
 import ShipLeftImage from './ship_left.png';
 import ShipRightImage from './ship_right.png';
 
-export class ShipDirection {
-  static Normal = new ShipDirection();
-  static Left = new ShipDirection();
-  static Right = new ShipDirection();
+/** @enum {number} */
+export const ShipDirection = {
+  Normal: 0,
+  Left: 1,
+  Right: 2,
 }
 
 const NAME_SHIP_NORMAL = 'ship_normal';
@@ -21,6 +22,7 @@ export class Ship {
   #spriteRight;
   #normalDelay = 0;
 
+  /** @param {PIXI.Loader} loader */
   static addResources(loader) {
     loader
       .add(NAME_SHIP_NORMAL, ShipImage)
@@ -28,8 +30,9 @@ export class Ship {
       .add(NAME_SHIP_RIGHT, ShipRightImage);
   }
 
-  constructor(loaderResources, stage, screenWidth, screenHeight) {
-    this.#container = new PIXI.Container(3);
+  /** @param {PIXI.utils.Dict<PIXI.LoaderResource>} loaderResources, @param {PIXI.Container} stage, @param {number} gameWidth, @param {number} gameHeight */
+  constructor(loaderResources, stage, gameWidth, gameHeight) {
+    this.#container = new PIXI.Container();
     this.#spriteNormal = new PIXI.Sprite(loaderResources[NAME_SHIP_NORMAL].texture);
     this.#spriteLeft = new PIXI.Sprite(loaderResources[NAME_SHIP_LEFT].texture);
     this.#spriteRight = new PIXI.Sprite(loaderResources[NAME_SHIP_RIGHT].texture);
@@ -39,8 +42,8 @@ export class Ship {
     this.#container.addChild(this.#spriteRight);
 
     this.direction = ShipDirection.Normal;
-    this.x = (screenWidth - this.width) / 2;
-    this.y = (screenHeight - this.height) / 2;
+    this.x = (gameWidth - this.width) / 2;
+    this.y = (gameHeight - this.height) / 2;
 
     stage.addChild(this.#container);
   }
@@ -61,6 +64,7 @@ export class Ship {
     this.#container.y = y;
   }
 
+  /** @param {ShipDirection} direction */
   set direction(direction) {
     if (direction === ShipDirection.Left) {
       this.#spriteNormal.visible = false;
@@ -83,6 +87,7 @@ export class Ship {
     }
   }
 
+  /** @param {number} resolution, @param {HTMLCanvasElement} gameView */
   absoluteCenterPosition(resolution, gameView) {
     const rect = gameView.getBoundingClientRect();
     const style = getComputedStyle(gameView);
