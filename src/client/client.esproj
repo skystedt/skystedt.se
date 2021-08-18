@@ -3,6 +3,7 @@
     <ProjectGuid>877dcf29-c85a-4571-a659-118df32af090</ProjectGuid>
   </PropertyGroup>
   <ItemGroup>
-    <Script Include="**" Exclude="*.esproj;**\node_modules\**;**\dist\**;*.lock" />
+    <Script Include="*" Exclude="*.esproj;*.lock" Link="configuration\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Script Include="src\**" />
   </ItemGroup>
 </Project>
