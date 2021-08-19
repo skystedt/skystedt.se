@@ -1,12 +1,20 @@
 import './input.css';
+import { AbsolutePosition, Movement } from './primitives.js';
+/** @typedef { import("./primitives.js").DisplayPosition } DisplayPosition */
+/** @typedef { import("./primitives.js").GamePosition } GamePosition */
+/** @typedef { import("./display.js").default } Display */
 
 export default class Input {
+  #display;
   #keys = { left: false, up: false, right: false, down: false };
-  /** @type {{ id: number, timestamp: DOMHighResTimeStamp, x: number, y: number }[]} */
+  /** @type {{ id: number, timestamp: DOMHighResTimeStamp, position: AbsolutePosition }[]} */
   #touches = [];
-  #mouse = { down: false, x: 0, y: 0 };
+  /** @type {AbsolutePosition?} */
+  #mouse = null;
 
-  constructor() {
+  /** @param {Display} display */
+  constructor(display) {
+    this.#display = display;
     window.addEventListener('blur', this.#blur.bind(this));
     window.addEventListener('keydown', this.#keydown.bind(this));
     window.addEventListener('keyup', this.#keyup.bind(this));
@@ -26,7 +34,7 @@ export default class Input {
     this.#keys.right = false;
     this.#keys.down = false;
     this.#touches = [];
-    this.#mouse.down = false;
+    this.#mouse = null;
   }
 
   /** @param {KeyboardEvent} event */
@@ -65,8 +73,7 @@ export default class Input {
     for (const touch of event.changedTouches) {
       const foundTouch = this.#touches.find(t => t.id === touch.identifier);
       if (foundTouch) {
-        foundTouch.x = touch.clientX;
-        foundTouch.y = touch.clientY;
+        foundTouch.position = new AbsolutePosition(touch.clientX, touch.clientY);
       } else {
         this.#addTouch(touch, event.timeStamp);
       }
@@ -90,20 +97,21 @@ export default class Input {
 
   /** @param {MouseEvent} event */
   #mousedown(event) {
-    this.#mouse.down = true;
-    this.#mouse.x = event.clientX;
-    this.#mouse.y = event.clientY;
+    if ((event.buttons & (1 + 2)) != 0) {
+      this.#mouse = new AbsolutePosition(event.clientX, event.clientY);
+    }
   }
 
   /** @param {MouseEvent} event */
   #mousemove(event) {
-    this.#mouse.x = event.clientX;
-    this.#mouse.y = event.clientY;
+    if ((event.buttons & (1 + 2)) != 0) {
+      this.#mouse = new AbsolutePosition(event.clientX, event.clientY);
+    }
   }
 
   /** @param {MouseEvent} event */
   #mouseup(event) {
-    this.#mouse.down = false;
+    this.#mouse = null;
   }
 
   /** @param {Touch} touch, @param {DOMHighResTimeStamp} timestamp */
@@ -111,8 +119,7 @@ export default class Input {
     this.#touches.push({
       id: touch.identifier,
       timestamp: timestamp,
-      x: touch.clientX,
-      y: touch.clientY
+      position: new AbsolutePosition(touch.clientX, touch.clientY)
     });
   }
 
@@ -129,27 +136,29 @@ export default class Input {
     return array.reduce((best, next) => !best ? next : Math.min(by(best), by(next)) === by(best) ? best : next, null)
   }
 
-  /** @param {number} inputX, @param {number} inputY, @param {number} relativeX, @param {number} relativeY, @param {number} resolution */
-  static #relativeDirection(inputX, inputY, relativeX, relativeY, resolution) {
-    const directionX = inputX - relativeX;
-    const directionY = inputY - relativeY;
+  /** @param {AbsolutePosition} position, @param {GamePosition} relativeTo */
+  #relativeDirection(position, relativeTo) {
+    const absolutePosition = this.#display.convert.gameToAbsolute(relativeTo);
+    const directionX = position.x - absolutePosition.x;
+    const directionY = position.y - absolutePosition.y;
     const max = Math.max(Math.abs(directionX), Math.abs(directionY));
-    const dx = Math.abs(directionX) > resolution ? directionX / max : 0;
-    const dy = Math.abs(directionY) > resolution ? directionY / max : 0;
-    return { dx, dy };
+    // the condition for larger than resolution is to prevent "flip-flopping" movements (jumping back and forth)
+    const dx = Math.abs(directionX) > this.#display.resolution ? directionX / max : 0;
+    const dy = Math.abs(directionY) > this.#display.resolution ? directionY / max : 0;
+    return new Movement(dx, dy);
   }
 
-  /** @param {number} resolution, @param {number} relativeX, @param {number} relativeY */
-  direction(resolution, relativeX, relativeY) {
+  /** @param {GamePosition} relativeTo */
+  movement(relativeTo) {
     const touch = Input.#minBy(this.#touches, t => t.timestamp);
     if (touch) {
-      return Input.#relativeDirection(touch.x, touch.y, relativeX, relativeY, resolution);
-    } else if (this.#mouse.down) {
-      return Input.#relativeDirection(this.#mouse.x, this.#mouse.y, relativeX, relativeY, resolution);
+      return this.#relativeDirection(touch.position, relativeTo);
+    } else if (this.#mouse) {
+      return this.#relativeDirection(this.#mouse, relativeTo);
     } else {
       const dx = (this.#keys.left ? -1 : 0) + (this.#keys.right ? 1 : 0);
       const dy = (this.#keys.up ? -1 : 0) + (this.#keys.down ? 1 : 0);
-      return { dx, dy };
+      return new Movement(dx, dy);
     }
   }
 }

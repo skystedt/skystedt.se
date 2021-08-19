@@ -1,28 +1,27 @@
 import * as PIXI from './pixi.js';
+/** @typedef { import("./primitives.js").Size } Size */
 
 export default class Star extends PIXI.Graphics {
-  #screenWidth;
-  #screenHeight;
+  #gameSize;
 
-  /** @param {number} screenWidth, @param {number} screenHeight */
-  constructor(screenWidth, screenHeight) {
+  /** @param {PIXI.Container} stage, @param {number} numberOfStars, @param {Size} gameSize */
+  static container(stage, numberOfStars, gameSize) {
+    const container = new PIXI.Container();
+    for (let i = 0; i < numberOfStars; i++) {
+      container.addChild(new Star(gameSize));
+    }
+    stage.addChild(container);
+    return container;
+  }
+
+  /** @param {Size} gameSize */
+  constructor(gameSize) {
     super();
-    this.#screenWidth = screenWidth;
-    this.#screenHeight = screenHeight;
+    this.#gameSize = gameSize;
 
     this.#newColor();
     this.#newX();
     this.#newY();
-  }
-
-  /** @param {PIXI.Container} stage, @param {number} numberOfStars, @param {number} screenWidth, @param {number} screenHeight */
-  static container(stage, numberOfStars, screenWidth, screenHeight) {
-    const container = new PIXI.Container();
-    for (let i = 0; i < numberOfStars; i++) {
-      container.addChild(new Star(screenWidth, screenHeight));
-    }
-    stage.addChild(container);
-    return container;
   }
 
   #newColor() {
@@ -37,16 +36,16 @@ export default class Star extends PIXI.Graphics {
   }
 
   #newX() {
-    this.x = Math.floor(Math.random() * this.#screenWidth);
+    this.x = Math.floor(Math.random() * this.#gameSize.width);
   }
 
   #newY() {
-    this.y = Math.floor(Math.random() * this.#screenHeight);
+    this.y = Math.floor(Math.random() * this.#gameSize.height);
   }
 
   move() {
     this.y++;
-    if (this.y >= this.#screenHeight) {
+    if (this.y >= this.#gameSize.height) {
       this.y = Math.floor(Math.random() * -10) - 1;
       this.#newColor();
       this.#newX();

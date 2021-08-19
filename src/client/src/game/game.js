@@ -1,18 +1,21 @@
+import { Size } from './primitives.js';
 import * as PIXI from './pixi.js';
 import Display from './display.js';
 import Input from './input.js';
-import { Ship, ShipDirection } from './ship.js';
+import Ship, { ShipDirection } from './ship.js';
 import Star from './star.js';
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;
 
 const STARS = 100;
+const SHIP_ALLOWED_OUTSIDE_SIZE = new Size(1, 0);
 
 export default class Game {
   #app;
   #display;
   #input;
+
   #loopState = { lowFpsCheck: 0, logicWait: 0, logicRemaining: 0, backgroundWait: 0, backgroundRemaining: 0, lastTimestamp: 0 };
 
   /** @type {PIXI.Container} */
@@ -22,12 +25,11 @@ export default class Game {
 
   get canvas() { return this.#app.view; }
 
-  /** @param {string} id */
-  constructor(id) {
+  constructor() {
+    PIXI.utils.skipHello();
     this.#app = new PIXI.Application();
-    this.#app.view.id = id;
-    this.#display = new Display(this.#app.renderer);
-    this.#input = new Input();
+    this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas);
+    this.#input = new Input(this.#display);
 
     Ship.addResources(this.#app.loader);
     this.#app.loader.load(this.#initialize.bind(this));
@@ -35,8 +37,8 @@ export default class Game {
 
   #initialize() {
     try {
-      this.#stars = Star.container(this.#app.stage, STARS, this.#display.width, this.#display.height);
-      this.#ship = new Ship(this.#app.loader.resources, this.#app.stage, this.#display.width, this.#display.height);
+      this.#stars = Star.container(this.#app.stage, STARS, this.#display.gameSize);
+      this.#ship = new Ship(this.#app.loader.resources, this.#app.stage, this.#display.gameSize);
       this.#startFrameLoop();
     } catch (e) {
       console.error(e);
@@ -49,7 +51,6 @@ export default class Game {
     this.#loopState.logicRemaining = 0;
     this.#loopState.backgroundWait = 1000 / BACKGROUND_FPS;
     this.#loopState.backgroundRemaining = 0;
-    this.#loopState.lastTimestamp = performance.now();
     this.#loopState.lowFpsCheck = this.#loopState.lastTimestamp + 1000;
     requestAnimationFrame(this.#frameLoop.bind(this));
   }
@@ -58,14 +59,11 @@ export default class Game {
   #frameLoop(timestamp) {
     requestAnimationFrame(this.#frameLoop.bind(this));
 
+    if (!this.#loopState.lastTimestamp) {
+      this.#loopState.lastTimestamp = timestamp;
+    }
     const elapsed = timestamp - this.#loopState.lastTimestamp;
     this.#loopState.lastTimestamp = timestamp;
-
-    if (elapsed < 0) {
-      // can happen for the first iteration when there is other queued calls to requestAnimationFrame
-      console.warn('timestamp in the past', elapsed);
-      return;
-    }
 
     let logicTicks;
     let backgroundTick;
@@ -102,13 +100,11 @@ export default class Game {
   }
 
   #updateLogic() {
-    const shipPosition = this.#ship.absoluteCenterPosition(this.#display.resolution, this.#app.view);
-    const direction = this.#input.direction(this.#display.resolution, shipPosition.x, shipPosition.y);
-    this.#ship.x = Math.max(-1, Math.min(this.#ship.x + direction.dx, this.#display.width - this.#ship.width + 1));
-    this.#ship.y = Math.max(0, Math.min(this.#ship.y + direction.dy, this.#display.height - this.#ship.height));
-    if (direction.dx < 0) {
+    const movement = this.#input.movement(this.#ship.centerPosition);
+    this.#ship.position = this.#display.restrictGamePositionToDisplay(this.#ship.position, movement, this.#ship.size, SHIP_ALLOWED_OUTSIDE_SIZE);
+    if (movement.dx < 0) {
       this.#ship.direction = ShipDirection.Left;
-    } else if (direction.dx > 0) {
+    } else if (movement.dx > 0) {
       this.#ship.direction = ShipDirection.Right;
     } else {
       this.#ship.direction = ShipDirection.Straight;

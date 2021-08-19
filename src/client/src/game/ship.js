@@ -1,7 +1,13 @@
+import { GamePosition, Size } from './primitives.js';
 import * as PIXI from './pixi.js';
 import ShipStraightImage from './ship.png';
 import ShipLeftImage from './ship_left.png';
 import ShipRightImage from './ship_right.png';
+
+const NAME_SHIP_STRAIGHT = 'ship_straight';
+const NAME_SHIP_LEFT = 'ship_left';
+const NAME_SHIP_RIGHT = 'ship_right';
+const TURN_STRAIGHT_DELAY = 10;
 
 /** @enum {number} */
 export const ShipDirection = {
@@ -10,12 +16,7 @@ export const ShipDirection = {
   Right: 2,
 }
 
-const NAME_SHIP_STRAIGHT = 'ship_straight';
-const NAME_SHIP_LEFT = 'ship_left';
-const NAME_SHIP_RIGHT = 'ship_right';
-const TURN_STRAIGHT_DELAY = 10;
-
-export class Ship {
+export default class Ship {
   #container;
   #spriteStraight;
   #spriteLeft;
@@ -30,8 +31,8 @@ export class Ship {
       .add(NAME_SHIP_RIGHT, ShipRightImage);
   }
 
-  /** @param {PIXI.utils.Dict<PIXI.LoaderResource>} loaderResources, @param {PIXI.Container} stage, @param {number} gameWidth, @param {number} gameHeight */
-  constructor(loaderResources, stage, gameWidth, gameHeight) {
+  /** @param {PIXI.utils.Dict<PIXI.LoaderResource>} loaderResources, @param {PIXI.Container} stage, @param {Size} gameSize */
+  constructor(loaderResources, stage, gameSize) {
     this.#container = new PIXI.Container();
     this.#spriteStraight = new PIXI.Sprite(loaderResources[NAME_SHIP_STRAIGHT].texture);
     this.#spriteLeft = new PIXI.Sprite(loaderResources[NAME_SHIP_LEFT].texture);
@@ -42,28 +43,20 @@ export class Ship {
     this.#container.addChild(this.#spriteRight);
 
     this.direction = ShipDirection.Straight;
-    this.x = (gameWidth - this.width) / 2;
-    this.y = (gameHeight - this.height) / 2;
+    this.position = new GamePosition((gameSize.width - this.size.width) / 2, (gameSize.height - this.size.height) / 2);
     this.#straightDelay = 0;
 
     stage.addChild(this.#container);
   }
 
-  get width() { return this.#container.width; }
+  get size() { return new Size(this.#container.width, this.#container.height); }
 
-  get height() { return this.#container.height; }
+  get position() { return new GamePosition(this.#container.x, this.#container.y); }
 
-  get x() { return this.#container.x; }
+  /** @param {GamePosition} position */
+  set position(position) { this.#container.position.set(position.x, position.y); }
 
-  get y() { return this.#container.y; }
-
-  set x(x) {
-    this.#container.x = x;
-  }
-
-  set y(y) {
-    this.#container.y = y;
-  }
+  get centerPosition() { return new GamePosition(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2); }
 
   /** @param {ShipDirection} direction */
   set direction(direction) {
@@ -86,17 +79,5 @@ export class Ship {
         this.#straightDelay--;
       }
     }
-  }
-
-  /** @param {number} resolution, @param {HTMLCanvasElement} gameView */
-  absoluteCenterPosition(resolution, gameView) {
-    const rect = gameView.getBoundingClientRect();
-    const style = getComputedStyle(gameView);
-    const borderLeft = parseInt(style.getPropertyValue('border-left-width'), 10);
-    const borderTop = parseInt(style.getPropertyValue('border-top-width'), 10);
-
-    const x = (this.x + this.width / 2) * resolution + rect.x + borderLeft;
-    const y = (this.y + this.height / 2) * resolution + rect.y + borderTop;
-    return { x, y };
   }
 }
