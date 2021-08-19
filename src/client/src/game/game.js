@@ -1,7 +1,7 @@
-import { Size, UnknownNull } from './primitives.js';
-import * as PIXI from './pixi.js';
 import Display from './display.js';
 import Input from './input.js';
+import * as PIXI from './pixi.js';
+import { Size, UnknownNull } from './primitives.js';
 import Ship, { ShipDirection } from './ship.js';
 import Star from './star.js';
 

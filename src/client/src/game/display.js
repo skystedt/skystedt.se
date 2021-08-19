@@ -1,5 +1,5 @@
-import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Offset, Size } from './primitives.js';
 import * as PIXI from './pixi.js';
+import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Offset, Size } from './primitives.js';
 /** @typedef { import("./primitives.js").Movement } Movement */
 
 const WIDTH = 380;
