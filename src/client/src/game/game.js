@@ -1,4 +1,4 @@
-import { Size } from './primitives.js';
+import { Size, UnknownNull } from './primitives.js';
 import * as PIXI from './pixi.js';
 import Display from './display.js';
 import Input from './input.js';
@@ -19,16 +19,17 @@ export default class Game {
   #loopState = { lowFpsCheck: 0, logicWait: 0, logicRemaining: 0, backgroundWait: 0, backgroundRemaining: 0, lastTimestamp: 0 };
 
   /** @type {PIXI.Container} */
-  #stars = (/** @type {unknown} */(null));
+  #stars = (UnknownNull);
   /** @type {Ship} */
-  #ship = (/** @type {unknown} */(null));
+  #ship = (UnknownNull);
 
   get canvas() { return this.#app.view; }
 
   constructor() {
     PIXI.utils.skipHello();
+
     this.#app = new PIXI.Application();
-    this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas);
+    this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas, true);
     this.#input = new Input(this.#display);
 
     Ship.addResources(this.#app.loader);
