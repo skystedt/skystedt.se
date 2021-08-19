@@ -1,14 +1,15 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
-const APP_DIR = path.resolve(__dirname, './src');
-const BUILD_DIR = path.resolve(__dirname, './dist');
+const APP_DIR = path.resolve(__dirname, 'src');
+const BUILD_DIR = path.resolve(__dirname, 'dist');
 
 const config = {
-  entry: APP_DIR + '/index.js',
+  entry: path.resolve(APP_DIR, 'index.js'),
   output: {
     filename: '[name].[contenthash].js',
     path: BUILD_DIR,
@@ -17,16 +18,27 @@ const config = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: APP_DIR + '/index.html',
-      favicon: APP_DIR + '/favicon.ico'
+      template: path.resolve(APP_DIR, 'index.html')
+    }),
+    new CopyPlugin({
+      patterns: [
+        path.resolve(APP_DIR, 'favicon.ico')
+      ]
     }),
     new MiniCssExtractPlugin({
-      filename: "[name].[contenthash].css",
-      chunkFilename: "[id].css",
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[id].css',
     })
   ],
   module: {
     rules: [
+      {
+        test: /\.js/i,
+        exclude: [
+          path.resolve(APP_DIR, 'game', 'pixi.js')
+        ],
+        sideEffects: false
+      },
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/inline'
