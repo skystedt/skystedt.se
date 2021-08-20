@@ -14,32 +14,18 @@ const GAMEPAD_BUTTON_DOWN = 13;
 const GAMEPAD_BUTTON_LEFT = 14;
 const GAMEPAD_BUTTON_RIGHT = 15;
 
-const GAMEPAD_AXIS_MINIMUM_VALUE = 0.1;
-
-class AbsoluteDirections {
-  up;
-  right;
-  down;
-  left;
-  /** @param {boolean} up, @param {boolean} right, @param {boolean} down, @param {boolean} left */
-  constructor(up = false, right = false, down = false, left = false) {
-    this.up = up;
-    this.right = right;
-    this.down = down;
-    this.left = left;
-  }
-}
+const GAMEPAD_AXIS_MINIMUM_VALUE = 0.2;
 
 export default class Input {
   #display;
 
-  #keys = new AbsoluteDirections();
+  #keys = { up: false, right: false, down: false, left: false};
   /** @type {{ id: number, timestamp: DOMHighResTimeStamp, position: AbsolutePosition }[]} */
   #touches = [];
   /** @type {AbsolutePosition?} */
   #mouse = null;
-  /** @type {Gamepad?} */
-  #gamepad = null;
+  /** @type {number?} */
+  #gamepadIndex = null;
 
   /** @param {any[]} array, @param {(element: any) => number} by */
   static #minBy(array, by) {
@@ -157,15 +143,15 @@ export default class Input {
 
   /** @param {GamepadEvent} event */
   #gamepadconnected(event) {
-    if (!this.#gamepad) {
-      this.#gamepad = event.gamepad;
+    if (!this.#gamepadIndex) {
+      this.#gamepadIndex = event.gamepad.index;
     }
   }
 
   /** @param {GamepadEvent} event */
   #gamepaddisconnected(event) {
-    if (this.#gamepad && this.#gamepad.index === event.gamepad.index) {
-      this.#gamepad = null;
+    if (this.#gamepadIndex === event.gamepad.index) {
+      this.#gamepadIndex = null;
     }
   }
 
@@ -187,24 +173,39 @@ export default class Input {
   }
 
   #gamepadInput() {
-    const axes = /** @type {Gamepad} */ (this.#gamepad).axes;
-    for (let i = 0; i < axes.length; i += 2) {
-      if (axes[i] >= GAMEPAD_AXIS_MINIMUM_VALUE || axes[i + 1] >= GAMEPAD_AXIS_MINIMUM_VALUE) {
-        return new Movement(axes[i], axes[i + 1]);
+    if (!navigator.getGamepads) {
+      return null;
+    }
+
+    let gamepad = null;
+    const gamepads = navigator.getGamepads();
+    for (gamepad of gamepads) {
+      if (gamepad?.index === this.#gamepadIndex) {
+        break;
       }
     }
-    const buttons = /** @type {Gamepad} */ (this.#gamepad).buttons;
-    return this.#absolutDirection(this.#gamepadButtons(buttons));
-  }
+    if (!gamepad) {
+      return null;
+    }
 
-  /** @param {readonly GamepadButton[]} buttons */
-  #gamepadButtons(buttons) {
-    return new AbsoluteDirections(
-      buttons[GAMEPAD_BUTTON_UP].pressed || buttons[GAMEPAD_BUTTON_UP].value > 0,
-      buttons[GAMEPAD_BUTTON_RIGHT].pressed || buttons[GAMEPAD_BUTTON_RIGHT].value > 0,
-      buttons[GAMEPAD_BUTTON_DOWN].pressed || buttons[GAMEPAD_BUTTON_DOWN].value > 0,
-      buttons[GAMEPAD_BUTTON_LEFT].pressed || buttons[GAMEPAD_BUTTON_LEFT].value > 0,
-    );
+    // axes take precedence over buttons
+    for (let i = 0; i < gamepad.axes.length; i += 2) {
+      const dx = gamepad.axes[i];
+      const dy = gamepad.axes[i + 1];
+      if (Math.abs(dx) >= GAMEPAD_AXIS_MINIMUM_VALUE || Math.abs(dy) >= GAMEPAD_AXIS_MINIMUM_VALUE) {
+        return new Movement(dx, dy);
+      }
+    }
+
+    const up = gamepad.buttons[GAMEPAD_BUTTON_UP]?.pressed;
+    const right = gamepad.buttons[GAMEPAD_BUTTON_RIGHT]?.pressed;
+    const down = gamepad.buttons[GAMEPAD_BUTTON_DOWN]?.pressed;
+    const left = gamepad.buttons[GAMEPAD_BUTTON_LEFT]?.pressed;
+    if (up || right || down || left) {
+      return this.#absolutDirection(up, right, down, left );
+    }
+
+    return null;
   }
 
   /** @param {AbsolutePosition} position, @param {GamePosition} relativeTo */
@@ -219,17 +220,18 @@ export default class Input {
     return new Movement(dx, dy);
   }
 
-  /** @param {AbsoluteDirections} directions */
-  #absolutDirection(directions) {
-    const dx = (directions.left ? -1 : 0) + (directions.right ? 1 : 0);
-    const dy = (directions.up ? -1 : 0) + (directions.down ? 1 : 0);
+  /** @param {boolean} up, @param {boolean} right, @param {boolean} down, @param {boolean} left */
+  #absolutDirection(up, right, down, left) {
+    const dx = (left ? -1 : 0) + (right ? 1 : 0);
+    const dy = (up ? -1 : 0) + (down ? 1 : 0);
     return new Movement(dx, dy);
   }
 
   /** @param {GamePosition} relativeTo */
   movement(relativeTo) {
-    if (this.#gamepad) {
-      return this.#gamepadInput();
+    const gamepad = this.#gamepadInput();
+    if (gamepad) {
+      return gamepad;
     }
 
     const touch = Input.#minBy(this.#touches, t => t.timestamp);
@@ -241,6 +243,6 @@ export default class Input {
       return this.#relativeDirection(this.#mouse, relativeTo);
     }
 
-    return this.#absolutDirection(this.#keys);
+    return this.#absolutDirection(this.#keys.up, this.#keys.right, this.#keys.down, this.#keys.left);
   }
 }
