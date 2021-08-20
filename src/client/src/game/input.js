@@ -4,27 +4,68 @@ import { AbsolutePosition, Movement } from './primitives.js';
 /** @typedef { import("./primitives.js").GamePosition } GamePosition */
 /** @typedef { import("./display.js").default } Display */
 
+const KEY_CODE_LEFT = 37;
+const KEY_CODE_UP = 38;
+const KEY_CODE_RIGHT = 39;
+const KEY_CODE_DOWN = 40;
+
+const GAMEPAD_BUTTON_UP = 12;
+const GAMEPAD_BUTTON_DOWN = 13;
+const GAMEPAD_BUTTON_LEFT = 14;
+const GAMEPAD_BUTTON_RIGHT = 15;
+
+const GAMEPAD_AXIS_MINIMUM_VALUE = 0.1;
+
+class AbsoluteDirections {
+  up;
+  right;
+  down;
+  left;
+  /** @param {boolean} up, @param {boolean} right, @param {boolean} down, @param {boolean} left */
+  constructor(up = false, right = false, down = false, left = false) {
+    this.up = up;
+    this.right = right;
+    this.down = down;
+    this.left = left;
+  }
+}
+
 export default class Input {
   #display;
-  #keys = { left: false, up: false, right: false, down: false };
+
+  #keys = new AbsoluteDirections();
   /** @type {{ id: number, timestamp: DOMHighResTimeStamp, position: AbsolutePosition }[]} */
   #touches = [];
   /** @type {AbsolutePosition?} */
   #mouse = null;
+  /** @type {Gamepad?} */
+  #gamepad = null;
+
+  /** @param {any[]} array, @param {(element: any) => number} by */
+  static #minBy(array, by) {
+    return array.reduce((best, next) => !best ? next : Math.min(by(best), by(next)) === by(best) ? best : next, null)
+  }
 
   /** @param {Display} display */
   constructor(display) {
     this.#display = display;
+
     window.addEventListener('blur', this.#blur.bind(this));
+
     window.addEventListener('keydown', this.#keydown.bind(this));
     window.addEventListener('keyup', this.#keyup.bind(this));
+
     window.addEventListener('touchstart', this.#touchstart.bind(this));
     window.addEventListener('touchmove', this.#touchmove.bind(this));
     window.addEventListener('touchend', this.#touchend.bind(this));
     window.addEventListener('touchcancel', this.#touchcancel.bind(this));
+
     window.addEventListener('mousedown', this.#mousedown.bind(this));
     window.addEventListener('mousemove', this.#mousemove.bind(this));
     window.addEventListener('mouseup', this.#mouseup.bind(this));
+
+    window.addEventListener("gamepadconnected", this.#gamepadconnected.bind(this));
+    window.addEventListener("gamepaddisconnected", this.#gamepaddisconnected.bind(this));
   }
 
   /** @param {FocusEvent} event */
@@ -40,10 +81,10 @@ export default class Input {
   /** @param {KeyboardEvent} event */
   #keydown(event) {
     switch (event.keyCode) {
-      case 37: this.#keys.left = true; break;
-      case 38: this.#keys.up = true; break;
-      case 39: this.#keys.right = true; break;
-      case 40: this.#keys.down = true; break;
+      case KEY_CODE_UP: this.#keys.up = true; break;
+      case KEY_CODE_RIGHT: this.#keys.right = true; break;
+      case KEY_CODE_DOWN: this.#keys.down = true; break;
+      case KEY_CODE_LEFT: this.#keys.left = true; break;
       default: return;
     }
     event.preventDefault();
@@ -52,10 +93,10 @@ export default class Input {
   /** @param {KeyboardEvent} event */
   #keyup(event) {
     switch (event.keyCode) {
-      case 37: this.#keys.left = false; break;
-      case 38: this.#keys.up = false; break;
-      case 39: this.#keys.right = false; break;
-      case 40: this.#keys.down = false; break;
+      case KEY_CODE_UP: this.#keys.up = false; break;
+      case KEY_CODE_RIGHT: this.#keys.right = false; break;
+      case KEY_CODE_DOWN: this.#keys.down = false; break;
+      case KEY_CODE_LEFT: this.#keys.left = false; break;
       default: return;
     }
     event.preventDefault();
@@ -114,6 +155,20 @@ export default class Input {
     this.#mouse = null;
   }
 
+  /** @param {GamepadEvent} event */
+  #gamepadconnected(event) {
+    if (!this.#gamepad) {
+      this.#gamepad = event.gamepad;
+    }
+  }
+
+  /** @param {GamepadEvent} event */
+  #gamepaddisconnected(event) {
+    if (this.#gamepad && this.#gamepad.index === event.gamepad.index) {
+      this.#gamepad = null;
+    }
+  }
+
   /** @param {Touch} touch, @param {DOMHighResTimeStamp} timestamp */
   #addTouch(touch, timestamp) {
     this.#touches.push({
@@ -131,9 +186,25 @@ export default class Input {
     }
   }
 
-  /** @param {any[]} array, @param {(element: any) => number} by */
-  static #minBy(array, by) {
-    return array.reduce((best, next) => !best ? next : Math.min(by(best), by(next)) === by(best) ? best : next, null)
+  #gamepadInput() {
+    const axes = /** @type {Gamepad} */ (this.#gamepad).axes;
+    for (let i = 0; i < axes.length; i += 2) {
+      if (axes[i] >= GAMEPAD_AXIS_MINIMUM_VALUE || axes[i + 1] >= GAMEPAD_AXIS_MINIMUM_VALUE) {
+        return new Movement(axes[i], axes[i + 1]);
+      }
+    }
+    const buttons = /** @type {Gamepad} */ (this.#gamepad).buttons;
+    return this.#absolutDirection(this.#gamepadButtons(buttons));
+  }
+
+  /** @param {readonly GamepadButton[]} buttons */
+  #gamepadButtons(buttons) {
+    return new AbsoluteDirections(
+      buttons[GAMEPAD_BUTTON_UP].pressed || buttons[GAMEPAD_BUTTON_UP].value > 0,
+      buttons[GAMEPAD_BUTTON_RIGHT].pressed || buttons[GAMEPAD_BUTTON_RIGHT].value > 0,
+      buttons[GAMEPAD_BUTTON_DOWN].pressed || buttons[GAMEPAD_BUTTON_DOWN].value > 0,
+      buttons[GAMEPAD_BUTTON_LEFT].pressed || buttons[GAMEPAD_BUTTON_LEFT].value > 0,
+    );
   }
 
   /** @param {AbsolutePosition} position, @param {GamePosition} relativeTo */
@@ -148,17 +219,28 @@ export default class Input {
     return new Movement(dx, dy);
   }
 
+  /** @param {AbsoluteDirections} directions */
+  #absolutDirection(directions) {
+    const dx = (directions.left ? -1 : 0) + (directions.right ? 1 : 0);
+    const dy = (directions.up ? -1 : 0) + (directions.down ? 1 : 0);
+    return new Movement(dx, dy);
+  }
+
   /** @param {GamePosition} relativeTo */
   movement(relativeTo) {
+    if (this.#gamepad) {
+      return this.#gamepadInput();
+    }
+
     const touch = Input.#minBy(this.#touches, t => t.timestamp);
     if (touch) {
       return this.#relativeDirection(touch.position, relativeTo);
-    } else if (this.#mouse) {
-      return this.#relativeDirection(this.#mouse, relativeTo);
-    } else {
-      const dx = (this.#keys.left ? -1 : 0) + (this.#keys.right ? 1 : 0);
-      const dy = (this.#keys.up ? -1 : 0) + (this.#keys.down ? 1 : 0);
-      return new Movement(dx, dy);
     }
+
+    if (this.#mouse) {
+      return this.#relativeDirection(this.#mouse, relativeTo);
+    }
+
+    return this.#absolutDirection(this.#keys);
   }
 }
