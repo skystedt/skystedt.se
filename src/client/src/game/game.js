@@ -9,7 +9,6 @@ const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;
 
 const STARS = 100;
-const SHIP_ALLOWED_OUTSIDE_SIZE = new Size(1, 0);
 
 export default class Game {
   #app;
@@ -100,7 +99,7 @@ export default class Game {
 
   #updateLogic() {
     const movement = this.#input.movement(this.#ship.centerPosition);
-    this.#ship.position = this.#display.restrictGamePositionToDisplay(this.#ship.position, movement, this.#ship.size, SHIP_ALLOWED_OUTSIDE_SIZE);
+    this.#ship.position = this.#display.restrictGamePositionToDisplay(this.#ship.position, movement, this.#ship.size);
     if (movement.dx < 0) {
       this.#ship.direction = ShipDirection.Left;
     } else if (movement.dx > 0) {

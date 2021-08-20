@@ -72,13 +72,13 @@ export default class Display {
     return Math.max(min, Math.min(max, value));
   }
 
-  /** @param {GamePosition} gamePosition, @param {Movement} movement, @param {Size} objectSize, @param {Size} allowedOutside */
-  restrictGamePositionToDisplay(gamePosition, movement, objectSize, allowedOutside) {
+  /** @param {GamePosition} gamePosition, @param {Movement} movement, @param {Size} objectSize */
+  restrictGamePositionToDisplay(gamePosition, movement, objectSize) {
     let displayX = gamePosition.x - this.offset.left + movement.dx;
     let displayY = gamePosition.y - this.offset.top + movement.dy;
-    displayX = Display.#clamp(displayX, -allowedOutside.width, this.displaySize.width - objectSize.width + allowedOutside.width);
-    displayY = Display.#clamp(displayY, -allowedOutside.height, this.displaySize.height - objectSize.height + allowedOutside.height);
-    return new GamePosition(displayX + this.offset.left, displayY + + this.offset.top);
+    displayX = Display.#clamp(displayX, 0, this.displaySize.width - objectSize.width);
+    displayY = Display.#clamp(displayY, 0, this.displaySize.height - objectSize.height);
+    return new GamePosition(displayX + this.offset.left, displayY + this.offset.top);
   }
 }
 
