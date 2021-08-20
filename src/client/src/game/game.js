@@ -1,7 +1,7 @@
 import Display from './display.js';
 import Input from './input.js';
 import * as PIXI from './pixi.js';
-import { Size, UnknownNull } from './primitives.js';
+import { Size, Uninitialized } from './primitives.js';
 import Ship, { ShipDirection } from './ship.js';
 import Star from './star.js';
 
@@ -18,10 +18,8 @@ export default class Game {
 
   #loopState = { lowFpsCheck: 0, logicWait: 0, logicRemaining: 0, backgroundWait: 0, backgroundRemaining: 0, lastTimestamp: 0 };
 
-  /** @type {PIXI.Container} */
-  #stars = (UnknownNull);
-  /** @type {Ship} */
-  #ship = (UnknownNull);
+  #stars = /** @type {PIXI.Container} */ (Uninitialized);
+  #ship = /** @type {Ship} */ (Uninitialized);
 
   get canvas() { return this.#app.view; }
 
@@ -38,7 +36,7 @@ export default class Game {
 
   #initialize() {
     try {
-      this.#stars = Star.container(this.#app.stage, STARS, this.#display.gameSize);
+      this.#stars = Star.container(this.#app.stage, this.#display.gameSize, BACKGROUND_FPS, STARS);
       this.#ship = new Ship(this.#app.loader.resources, this.#app.stage, this.#display.gameSize);
       this.#startFrameLoop();
     } catch (e) {

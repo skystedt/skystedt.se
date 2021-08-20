@@ -1,5 +1,5 @@
 /** @type {unknown} */
-export const UnknownNull = null;
+export const Uninitialized = undefined;
 
 /** @abstract */
 class Position {
