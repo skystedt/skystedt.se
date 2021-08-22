@@ -13,8 +13,8 @@ const TURN_STRAIGHT_DELAY = 10;
 export const ShipDirection = {
   Straight: 0,
   Left: 1,
-  Right: 2,
-}
+  Right: 2
+};
 
 export default class Ship {
   #container;
@@ -49,14 +49,22 @@ export default class Ship {
     stage.addChild(this.#container);
   }
 
-  get size() { return new Size(this.#container.width, this.#container.height); }
+  get size() {
+    return new Size(this.#container.width, this.#container.height);
+  }
 
-  get position() { return new GamePosition(this.#container.x, this.#container.y); }
+  get position() {
+    return new GamePosition(this.#container.x, this.#container.y);
+  }
 
   /** @param {GamePosition} position */
-  set position(position) { this.#container.position.set(position.x, position.y); }
+  set position(position) {
+    this.#container.position.set(position.x, position.y);
+  }
 
-  get centerPosition() { return new GamePosition(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2); }
+  get centerPosition() {
+    return new GamePosition(this.position.x + this.size.width / 2, this.position.y + this.size.height / 2);
+  }
 
   /** @param {ShipDirection} direction */
   set direction(direction) {

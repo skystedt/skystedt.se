@@ -22,7 +22,7 @@ export default class Display {
     this.#converter = new DisplayConverter(this, canvas, ignoreBorders);
 
     PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-    canvas.addEventListener('contextmenu', event => event.preventDefault());
+    canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
     this.#gameSize = new Size(WIDTH, HEIGHT);
     this.#displaySize = new Size(WIDTH, HEIGHT);
@@ -32,22 +32,35 @@ export default class Display {
     window.addEventListener('resize', this.#resize.bind(this));
   }
 
-  get convert() { return this.#converter; }
+  get convert() {
+    return this.#converter;
+  }
 
-  get gameSize() { return this.#gameSize; }
+  get gameSize() {
+    return this.#gameSize;
+  }
 
-  get resolution() { return this.#renderer.resolution; }
+  get resolution() {
+    return this.#renderer.resolution;
+  }
 
-  get displaySize() { return this.#displaySize; }
+  get displaySize() {
+    return this.#displaySize;
+  }
 
-  get offset() { return this.#offset; }
+  get offset() {
+    return this.#offset;
+  }
 
   #resize() {
     const previousWidth = this.#displaySize.width;
     const previousHeight = this.#displaySize.height;
 
     this.#renderer.resolution = this.#calculateResolution();
-    this.#displaySize = new Size(Math.floor(window.innerWidth / this.resolution), Math.floor(window.innerHeight / this.resolution));
+    this.#displaySize = new Size(
+      Math.floor(window.innerWidth / this.resolution),
+      Math.floor(window.innerHeight / this.resolution)
+    );
 
     this.#renderer.resize(this.#displaySize.width, this.#displaySize.height);
 
@@ -118,7 +131,10 @@ class DisplayConverter {
 
   /** @param {DisplayPosition} displayPosition */
   displayToGame(displayPosition) {
-    return new GamePosition(displayPosition.x + this.#display.offset.left, displayPosition.y + this.#display.offset.top);
+    return new GamePosition(
+      displayPosition.x + this.#display.offset.left,
+      displayPosition.y + this.#display.offset.top
+    );
   }
 
   /** @param {DisplayPosition} displayPosition */

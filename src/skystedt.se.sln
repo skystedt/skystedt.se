@@ -9,6 +9,7 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Client", "client\Client.esp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution Folder", "{A222E678-9956-4174-87CF-88D3DB440ABF}"
 	ProjectSection(SolutionItems) = preProject
+		..\.editorconfig = ..\.editorconfig
 		..\.gitignore = ..\.gitignore
 		..\.github\workflows\azure-static-web-apps.yml = ..\.github\workflows\azure-static-web-apps.yml
 	EndProjectSection

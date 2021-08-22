@@ -1,4 +1,6 @@
+/* eslint-disable no-undef */
 const path = require('path');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -17,26 +19,23 @@ const config = {
     clean: true
   },
   plugins: [
+    new ESLintPlugin(), // prettier will be added for production
     new HtmlWebpackPlugin({
       template: path.resolve(APP_DIR, 'index.html')
     }),
     new CopyPlugin({
-      patterns: [
-        path.resolve(APP_DIR, 'favicon.ico')
-      ]
+      patterns: [path.resolve(APP_DIR, 'favicon.ico')]
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',
-      chunkFilename: '[id].css',
+      chunkFilename: '[id].css'
     })
   ],
   module: {
     rules: [
       {
         test: /\.js/i,
-        exclude: [
-          path.resolve(APP_DIR, 'game', 'pixi.js')
-        ],
+        exclude: [path.resolve(APP_DIR, 'game', 'pixi.js')],
         sideEffects: false
       },
       {
@@ -61,10 +60,7 @@ const config = {
         }
       }
     },
-    minimizer: [
-      new TerserPlugin(),
-      new CssMinimizerPlugin()
-    ]
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()]
   }
 };
 
