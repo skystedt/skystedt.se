@@ -2,12 +2,13 @@ import * as PIXI from './pixi.js';
 import { Uninitialized } from './primitives.js';
 /** @typedef { import("./primitives.js").Size } Size */
 
-const BLINK_PROBABILITY = 0.0001
+const BLINK_PROBABILITY = 0.0001;
+// prettier-ignore
 const SPEED_PROBABILITIES = [
   { speed: 2.00, p: 0.01 },
   { speed: 1.00, p: 0.15 },
   { speed: 0.75, p: 0.25 },
-  { speed: 0.50, p: 0.59 },
+  { speed: 0.50, p: 0.59 }
 ];
 
 export default class Star extends PIXI.Graphics {
@@ -55,12 +56,12 @@ export default class Star extends PIXI.Graphics {
   #randomSpeed() {
     const random = Math.random();
     let p = 0;
-    for (const sp of SPEED_PROBABILITIES) {
+    SPEED_PROBABILITIES.forEach((sp) => {
       p += sp.p;
       if (random < p) {
         return sp.speed;
       }
-    }
+    });
     return 1;
   }
 

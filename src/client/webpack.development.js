@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const { merge } = require('webpack-merge');
 const { common, BUILD_DIR } = require('./webpack.common.js');
 
@@ -6,6 +7,6 @@ module.exports = merge(common, {
   devtool: 'inline-source-map',
   devServer: {
     contentBase: BUILD_DIR,
-	  port: 8080
+    port: 8080
   }
 });

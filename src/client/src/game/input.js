@@ -19,7 +19,7 @@ const GAMEPAD_AXIS_MINIMUM_VALUE = 0.2;
 export default class Input {
   #display;
 
-  #keys = { up: false, right: false, down: false, left: false};
+  #keys = { up: false, right: false, down: false, left: false };
   /** @type {{ id: number, timestamp: DOMHighResTimeStamp, position: AbsolutePosition }[]} */
   #touches = [];
   /** @type {AbsolutePosition?} */
@@ -29,7 +29,7 @@ export default class Input {
 
   /** @param {any[]} array, @param {(element: any) => number} by */
   static #minBy(array, by) {
-    return array.reduce((best, next) => !best ? next : Math.min(by(best), by(next)) === by(best) ? best : next, null)
+    return array.reduce((best, next) => (!best ? next : Math.min(by(best), by(next)) === by(best) ? best : next), null);
   }
 
   /** @param {Display} display */
@@ -50,12 +50,11 @@ export default class Input {
     window.addEventListener('mousemove', this.#mousemove.bind(this));
     window.addEventListener('mouseup', this.#mouseup.bind(this));
 
-    window.addEventListener("gamepadconnected", this.#gamepadconnected.bind(this));
-    window.addEventListener("gamepaddisconnected", this.#gamepaddisconnected.bind(this));
+    window.addEventListener('gamepadconnected', this.#gamepadconnected.bind(this));
+    window.addEventListener('gamepaddisconnected', this.#gamepaddisconnected.bind(this));
   }
 
-  /** @param {FocusEvent} event */
-  #blur(event) {
+  #blur() {
     this.#keys.left = false;
     this.#keys.up = false;
     this.#keys.right = false;
@@ -66,39 +65,30 @@ export default class Input {
 
   /** @param {KeyboardEvent} event */
   #keydown(event) {
-    switch (event.keyCode) {
-      case KEY_CODE_UP: this.#keys.up = true; break;
-      case KEY_CODE_RIGHT: this.#keys.right = true; break;
-      case KEY_CODE_DOWN: this.#keys.down = true; break;
-      case KEY_CODE_LEFT: this.#keys.left = true; break;
-      default: return;
+    if (this.#keySwitch(event, true)) {
+      event.preventDefault();
     }
-    event.preventDefault();
   }
 
   /** @param {KeyboardEvent} event */
   #keyup(event) {
-    switch (event.keyCode) {
-      case KEY_CODE_UP: this.#keys.up = false; break;
-      case KEY_CODE_RIGHT: this.#keys.right = false; break;
-      case KEY_CODE_DOWN: this.#keys.down = false; break;
-      case KEY_CODE_LEFT: this.#keys.left = false; break;
-      default: return;
+    if (this.#keySwitch(event, false)) {
+      event.preventDefault();
     }
-    event.preventDefault();
   }
 
   /** @param {TouchEvent} event */
   #touchstart(event) {
-    for (const touch of event.changedTouches) {
-      this.#addTouch(touch, event.timeStamp);
+    for (let i = 0; i < event.changedTouches.length; i++) {
+      this.#addTouch(event.changedTouches[i], event.timeStamp);
     }
   }
 
   /** @param {TouchEvent} event */
   #touchmove(event) {
-    for (const touch of event.changedTouches) {
-      const foundTouch = this.#touches.find(t => t.id === touch.identifier);
+    for (let i = 0; i < event.changedTouches.length; i++) {
+      const touch = event.changedTouches[i];
+      const foundTouch = this.#touches.find((t) => t.id === touch.identifier);
       if (foundTouch) {
         foundTouch.position = new AbsolutePosition(touch.clientX, touch.clientY);
       } else {
@@ -109,16 +99,16 @@ export default class Input {
 
   /** @param {TouchEvent} event */
   #touchend(event) {
-    for (const touch of event.changedTouches) {
-      this.#deleteTouch(touch);
+    for (let i = 0; i < event.changedTouches.length; i++) {
+      this.#deleteTouch(event.changedTouches[i]);
     }
     event.preventDefault();
   }
 
   /** @param {TouchEvent} event */
   #touchcancel(event) {
-    for (const touch of event.changedTouches) {
-      this.#deleteTouch(touch);
+    for (let i = 0; i < event.changedTouches.length; i++) {
+      this.#deleteTouch(event.changedTouches[i]);
     }
   }
 
@@ -136,8 +126,7 @@ export default class Input {
     }
   }
 
-  /** @param {MouseEvent} event */
-  #mouseup(event) {
+  #mouseup() {
     this.#mouse = null;
   }
 
@@ -155,6 +144,27 @@ export default class Input {
     }
   }
 
+  /** @param {KeyboardEvent} event, @param {boolean} value */
+  #keySwitch(event, value) {
+    switch (event.keyCode) {
+      case KEY_CODE_UP:
+        this.#keys.up = value;
+        break;
+      case KEY_CODE_RIGHT:
+        this.#keys.right = value;
+        break;
+      case KEY_CODE_DOWN:
+        this.#keys.down = value;
+        break;
+      case KEY_CODE_LEFT:
+        this.#keys.left = value;
+        break;
+      default:
+        return false;
+    }
+    return true;
+  }
+
   /** @param {Touch} touch, @param {DOMHighResTimeStamp} timestamp */
   #addTouch(touch, timestamp) {
     this.#touches.push({
@@ -166,7 +176,7 @@ export default class Input {
 
   /** @param {Touch} touch */
   #deleteTouch(touch) {
-    const index = this.#touches.findIndex(t => t.id === touch.identifier);
+    const index = this.#touches.findIndex((t) => t.id === touch.identifier);
     if (index > -1) {
       this.#touches.splice(index, 1);
     }
@@ -177,13 +187,8 @@ export default class Input {
       return null;
     }
 
-    let gamepad = null;
-    const gamepads = navigator.getGamepads();
-    for (gamepad of gamepads) {
-      if (gamepad?.index === this.#gamepadIndex) {
-        break;
-      }
-    }
+    const gamepads = Array.from(navigator.getGamepads());
+    const gamepad = gamepads.find((gamepad) => gamepad?.index === this.#gamepadIndex);
     if (!gamepad) {
       return null;
     }
@@ -202,7 +207,7 @@ export default class Input {
     const down = gamepad.buttons[GAMEPAD_BUTTON_DOWN]?.pressed;
     const left = gamepad.buttons[GAMEPAD_BUTTON_LEFT]?.pressed;
     if (up || right || down || left) {
-      return this.#absolutDirection(up, right, down, left );
+      return this.#absolutDirection(up, right, down, left);
     }
 
     return null;
@@ -234,7 +239,7 @@ export default class Input {
       return gamepad;
     }
 
-    const touch = Input.#minBy(this.#touches, t => t.timestamp);
+    const touch = Input.#minBy(this.#touches, (t) => t.timestamp);
     if (touch) {
       return this.#relativeDirection(touch.position, relativeTo);
     }

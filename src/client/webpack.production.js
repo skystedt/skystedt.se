@@ -1,20 +1,26 @@
-const { merge } = require('webpack-merge');
+/* eslint-disable no-undef */
+const { mergeWithCustomize, unique } = require('webpack-merge');
 const { common } = require('./webpack.common.js');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
-module.exports = merge(common, {
+module.exports = mergeWithCustomize({
+  customizeArray: unique('plugins', [new ESLintPlugin().key], (plugin) => plugin.constructor && plugin.constructor.name)
+})(common, {
   mode: 'production',
+  plugins: [
+    new ESLintPlugin({
+      baseConfig: {
+        extends: ['plugin:prettier/recommended']
+      }
+    })
+  ],
   module: {
     rules: [
       {
-        test: /\.(js)$/,
+        test: /\.js$/i,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              ['@babel/preset-env', { targets: 'defaults' }]
-            ]
-          }
+          loader: 'babel-loader'
         }
       }
     ]

@@ -1,7 +1,7 @@
 import Display from './display.js';
 import Input from './input.js';
 import * as PIXI from './pixi.js';
-import { Size, Uninitialized } from './primitives.js';
+import { Uninitialized } from './primitives.js';
 import Ship, { ShipDirection } from './ship.js';
 import Star from './star.js';
 
@@ -15,12 +15,21 @@ export default class Game {
   #display;
   #input;
 
-  #loopState = { lowFpsCheck: 0, logicWait: 0, logicRemaining: 0, backgroundWait: 0, backgroundRemaining: 0, lastTimestamp: 0 };
+  #loopState = {
+    lowFpsCheck: 0,
+    logicWait: 0,
+    logicRemaining: 0,
+    backgroundWait: 0,
+    backgroundRemaining: 0,
+    lastTimestamp: 0
+  };
 
   #stars = /** @type {PIXI.Container} */ (Uninitialized);
   #ship = /** @type {Ship} */ (Uninitialized);
 
-  get canvas() { return this.#app.view; }
+  get canvas() {
+    return this.#app.view;
+  }
 
   constructor() {
     PIXI.utils.skipHello();
@@ -66,7 +75,8 @@ export default class Game {
     let logicTicks;
     let backgroundTick;
 
-    if (elapsed >= 200) { // if inactive or lag, don't process all missing time at once
+    // if inactive or lag, don't process all missing time at once
+    if (elapsed >= 200) {
       logicTicks = 1;
       this.#loopState.logicRemaining = 0;
 
@@ -110,9 +120,8 @@ export default class Game {
   }
 
   #updateBackground() {
-    for (const star of this.#stars.children) {
-      /** @type {Star} */
-      (star).move();
-    }
+    this.#stars.children.forEach((star) => {
+      /** @type {Star} */ (star).move();
+    });
   }
 }

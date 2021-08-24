@@ -4,10 +4,12 @@
   "repository": "https://github.com/skystedt/skystedt.se",
   "author": "skystedt",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "production": "webpack --mode production --config webpack.production.js",
     "build": "webpack --mode development --config webpack.development.js",
-    "start": "webpack serve --config webpack.development.js --https --open"
+    "start": "webpack serve --config webpack.development.js --https --open",
+    "prettier-watch": "onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
@@ -16,26 +18,35 @@
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.2.0",
     "css-minimizer-webpack-plugin": "^3.0.2",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-no-for-of-loops": "^1.0.1",
+    "eslint-plugin-no-function-declare-after-return": "^1.1.0",
+    "eslint-plugin-prettier": "^3.4.1",
+    "eslint-webpack-plugin": "^3.0.1",
     "html-webpack-plugin": "^5.3.2",
     "mini-css-extract-plugin": "^2.2.0",
+    "onchange": "^7.1.0",
+    "prettier": "2.3.2",
     "webpack": "^5.49.0",
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@pixi/app": "^6.1.2",
-    "@pixi/constants": "^6.1.2",
-    "@pixi/core": "^6.1.2",
-    "@pixi/display": "^6.1.2",
-    "@pixi/graphics": "^6.1.2",
-    "@pixi/loaders": "^6.1.2",
-    "@pixi/math": "^6.1.2",
-    "@pixi/runner": "^6.1.2",
-    "@pixi/settings": "^6.1.2",
-    "@pixi/sprite": "^6.1.2",
-    "@pixi/ticker": "^6.1.2",
-    "@pixi/utils": "^6.1.2"
+    "@pixi/app": "6.1.2",
+    "@pixi/constants": "6.1.2",
+    "@pixi/core": "6.1.2",
+    "@pixi/display": "6.1.2",
+    "@pixi/graphics": "6.1.2",
+    "@pixi/loaders": "6.1.2",
+    "@pixi/math": "6.1.2",
+    "@pixi/runner": "6.1.2",
+    "@pixi/settings": "6.1.2",
+    "@pixi/sprite": "6.1.2",
+    "@pixi/ticker": "6.1.2",
+    "@pixi/utils": "6.1.2",
+    "babel-eslint": "^10.1.0"
   },
   "-vs-binding": {
     "BeforeBuild": [
