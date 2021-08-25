@@ -1,9 +1,18 @@
 {
   "routes": [
     {
+      "route": "/",
+      "headers": {
+        "X-Frame-Options": "DENY",
+        "Content-Security-Policy": "default-src 'none'; script-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-hashes' 'sha256-GuF7QdiA1irkzkfHUdnSkF0LEgS72AYBYMTfTZ+hmfg='; style-src-elem 'self'; style-src-attr 'unsafe-hashes' 'sha256-GuF7QdiA1irkzkfHUdnSkF0LEgS72AYBYMTfTZ+hmfg='",
+        "Permissions-Policy": "fullscreen=(self)"
+      }
+    },
+    {
       "route": "/*.{js,css,png,svg,jpg,jpeg,gif}",
       "headers": {
-        "cache-control": "public,max-age=31536000"
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "ETag": ""
       }
     }
   ]
