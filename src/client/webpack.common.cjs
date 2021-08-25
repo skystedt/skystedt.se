@@ -27,7 +27,7 @@ const config = {
       template: path.resolve(dir.src, 'index.html')
     }),
     new CopyPlugin({
-      patterns: [path.resolve(dir.src, 'favicon.ico')]
+      patterns: [path.resolve(dir.src, 'favicon.ico'), path.resolve(dir.src, 'manifest.json')]
     }),
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css',

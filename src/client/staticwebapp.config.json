@@ -4,7 +4,7 @@
       "route": "/",
       "headers": {
         "X-Frame-Options": "DENY",
-        "Content-Security-Policy": "default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-hashes' 'sha256-GuF7QdiA1irkzkfHUdnSkF0LEgS72AYBYMTfTZ+hmfg='; style-src-elem 'self'; style-src-attr 'unsafe-hashes' 'sha256-GuF7QdiA1irkzkfHUdnSkF0LEgS72AYBYMTfTZ+hmfg='",
+        "Content-Security-Policy": "default-src 'none'; manifest-src: 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-hashes' 'sha256-GuF7QdiA1irkzkfHUdnSkF0LEgS72AYBYMTfTZ+hmfg='; style-src-elem 'self'; style-src-attr 'unsafe-hashes' 'sha256-GuF7QdiA1irkzkfHUdnSkF0LEgS72AYBYMTfTZ+hmfg='",
         "Permissions-Policy": "fullscreen=(self)"
       }
     },

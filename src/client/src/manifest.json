@@ -1,0 +1,15 @@
+{
+  "name": "Skystedt",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "black",
+  "theme_color": "black",
+  "start_url": "."
+}
