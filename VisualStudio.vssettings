@@ -1,0 +1,12 @@
+<UserSettings>
+	<ApplicationIdentity version="0.0"/>
+	<ToolsOptions>
+		<ToolsOptionsCategory name="TextEditor" RegisteredName="TextEditor">
+			<ToolsOptionsSubCategory name="TypeScript Specific" RegisteredName="TypeScript Specific">
+				<PropertyValue name="ShowJSSyntaxErrors">true</PropertyValue>
+				<PropertyValue name="IsLinterEnabled">true</PropertyValue>
+				<PropertyValue name="LintClosedFiles">true</PropertyValue>
+			</ToolsOptionsSubCategory>
+		</ToolsOptionsCategory>
+	</ToolsOptions>
+</UserSettings>
