@@ -1,8 +1,8 @@
 import './input.css';
-import { AbsolutePosition, Movement } from './primitives.js';
-/** @typedef { import("./primitives.js").DisplayPosition } DisplayPosition */
-/** @typedef { import("./primitives.js").GamePosition } GamePosition */
-/** @typedef { import("./display.js").default } Display */
+import { AbsolutePosition, Movement } from './primitives';
+/** @typedef { import("./primitives").DisplayPosition } DisplayPosition */
+/** @typedef { import("./primitives").GamePosition } GamePosition */
+/** @typedef { import("./display").default } Display */
 
 const KEY_CODE_LEFT = 37;
 const KEY_CODE_UP = 38;
