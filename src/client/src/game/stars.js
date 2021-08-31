@@ -1,6 +1,6 @@
-import * as PIXI from './pixi.js';
-import { Uninitialized } from './primitives.js';
-/** @typedef { import("./primitives.js").Size } Size */
+import * as PIXI from './pixi';
+import { Uninitialized } from './primitives';
+/** @typedef { import("./primitives").Size } Size */
 
 const BLINK_PROBABILITY = 0.0001;
 // prettier-ignore
@@ -11,22 +11,29 @@ const SPEED_PROBABILITIES = [
   { speed: 0.50, p: 0.59 }
 ];
 
-export default class Star extends PIXI.Graphics {
+export default class Stars extends PIXI.Container {
+  /** @param {PIXI.Container} stage, @param {Size} gameSize, @param {number} updatesPerSecond, @param {number} numberOfStars */
+  constructor(stage, gameSize, updatesPerSecond, numberOfStars) {
+    super();
+    for (let i = 0; i < numberOfStars; i++) {
+      this.addChild(new Star(gameSize, updatesPerSecond));
+    }
+    stage.addChild(this);
+  }
+
+  move() {
+    for (let star of this.children) {
+      /** @type {Star} */ (star).move();
+    }
+  }
+}
+
+export class Star extends PIXI.Graphics {
   #gameSize;
   #updatesPerSecond;
   #speed = /** @type {number} */ (Uninitialized);
   #blinking = /** @type {number} */ (Uninitialized);
   #originalColor = /** @type {number} */ (Uninitialized);
-
-  /** @param {PIXI.Container} stage, @param {Size} gameSize, @param {number} updatesPerSecond, @param {number} numberOfStars */
-  static container(stage, gameSize, updatesPerSecond, numberOfStars) {
-    const container = new PIXI.Container();
-    for (let i = 0; i < numberOfStars; i++) {
-      container.addChild(new Star(gameSize, updatesPerSecond));
-    }
-    stage.addChild(container);
-    return container;
-  }
 
   /** @param {Size} gameSize, @param {number} updatesPerSecond */
   constructor(gameSize, updatesPerSecond) {
@@ -56,12 +63,12 @@ export default class Star extends PIXI.Graphics {
   #randomSpeed() {
     const random = Math.random();
     let p = 0;
-    SPEED_PROBABILITIES.forEach((sp) => {
+    for (let sp of SPEED_PROBABILITIES) {
       p += sp.p;
       if (random < p) {
         return sp.speed;
       }
-    });
+    }
     return 1;
   }
 

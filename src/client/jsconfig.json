@@ -2,7 +2,7 @@
  * Uses JavaScript Language Service (Salsa): https://github.com/microsoft/TypeScript/wiki/JavaScript-Language-Service-in-Visual-Studio
  * IntelliSense based on JSDoc: https://github.com/microsoft/TypeScript/wiki/JSDoc-support-in-JavaScript/a9f5313810385ed9f6b0b5172d9a4f1f145158da
  * Config reference: https://www.typescriptlang.org/tsconfig
-*/
+ */
 {
   "$schema": "https://json.schemastore.org/jsconfig.json",
   // prettier-ignore

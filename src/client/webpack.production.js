@@ -26,7 +26,7 @@ module.exports = mergeWithCustomize({
     ]
   },
   performance: {
-    maxAssetSize: 307200,
-    maxEntrypointSize: 307200
+    maxAssetSize: 350 * 1024,
+    maxEntrypointSize: 350 * 1024
   }
 });

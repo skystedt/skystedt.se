@@ -1,5 +1,5 @@
-import * as PIXI from './pixi.js';
-import { GamePosition, Size } from './primitives.js';
+import * as PIXI from './pixi';
+import { GamePosition, Size } from './primitives';
 import ShipStraightImage from './ship.png';
 import ShipLeftImage from './ship_left.png';
 import ShipRightImage from './ship_right.png';
@@ -21,7 +21,8 @@ export default class Ship {
   #spriteStraight;
   #spriteLeft;
   #spriteRight;
-  #straightDelay;
+  #startPosition;
+  #straightDelay = 0;
 
   /** @param {PIXI.Loader} loader */
   static addResources(loader) {
@@ -42,9 +43,11 @@ export default class Ship {
     this.#container.addChild(this.#spriteLeft);
     this.#container.addChild(this.#spriteRight);
 
-    this.direction = ShipDirection.Straight;
-    this.position = new GamePosition((gameSize.width - this.size.width) / 2, (gameSize.height - this.size.height) / 2);
-    this.#straightDelay = 0;
+    this.#startPosition = new GamePosition(
+      (gameSize.width - this.size.width) / 2,
+      (gameSize.height - this.size.height) / 2
+    );
+    this.reset();
 
     stage.addChild(this.#container);
   }
@@ -87,5 +90,11 @@ export default class Ship {
         this.#straightDelay--;
       }
     }
+  }
+
+  reset() {
+    this.direction = ShipDirection.Straight;
+    this.position = this.#startPosition;
+    this.#straightDelay = 0;
   }
 }
