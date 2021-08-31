@@ -15,7 +15,7 @@
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/plugin-transform-runtime": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
+    "@babel/runtime-corejs3": "^7.15.3",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^9.0.1",
@@ -48,7 +48,7 @@
     "@pixi/settings": "6.1.2",
     "@pixi/sprite": "6.1.2",
     "@pixi/ticker": "6.1.2",
-    "@pixi/unsafe-eval": "^6.1.2",
+    "@pixi/unsafe-eval": "6.1.2",
     "@pixi/utils": "6.1.2"
   },
   "-vs-binding": {
