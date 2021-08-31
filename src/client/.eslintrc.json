@@ -7,11 +7,10 @@
     "ecmaVersion": 2016,
     "sourceType": "module"
   },
-  "plugins": ["no-for-of-loops", "no-function-declare-after-return", "prettier"],
+  "plugins": ["no-function-declare-after-return", "prettier"],
   "extends": ["eslint:recommended", "prettier"],
   "rules": {
     "no-var": "error",
-    "no-for-of-loops/no-for-of-loops": "error",
     "no-function-declare-after-return/no-function-declare-after-return": "error"
   }
 }

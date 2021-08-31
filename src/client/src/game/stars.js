@@ -22,9 +22,9 @@ export default class Stars extends PIXI.Container {
   }
 
   move() {
-    this.children.forEach((star) => {
+    for (let star of this.children) {
       /** @type {Star} */ (star).move();
-    });
+    }
   }
 }
 
@@ -63,12 +63,12 @@ export class Star extends PIXI.Graphics {
   #randomSpeed() {
     const random = Math.random();
     let p = 0;
-    SPEED_PROBABILITIES.forEach((sp) => {
+    for (let sp of SPEED_PROBABILITIES) {
       p += sp.p;
       if (random < p) {
         return sp.speed;
       }
-    });
+    }
     return 1;
   }
 

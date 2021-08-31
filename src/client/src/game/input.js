@@ -79,15 +79,14 @@ export default class Input {
 
   /** @param {TouchEvent} event */
   #touchstart(event) {
-    for (let i = 0; i < event.changedTouches.length; i++) {
-      this.#addTouch(event.changedTouches[i], event.timeStamp);
+    for (let touch of event.changedTouches) {
+      this.#addTouch(touch, event.timeStamp);
     }
   }
 
   /** @param {TouchEvent} event */
   #touchmove(event) {
-    for (let i = 0; i < event.changedTouches.length; i++) {
-      const touch = event.changedTouches[i];
+    for (let touch of event.changedTouches) {
       const foundTouch = this.#touches.find((t) => t.id === touch.identifier);
       if (foundTouch) {
         foundTouch.position = new AbsolutePosition(touch.clientX, touch.clientY);
@@ -99,16 +98,16 @@ export default class Input {
 
   /** @param {TouchEvent} event */
   #touchend(event) {
-    for (let i = 0; i < event.changedTouches.length; i++) {
-      this.#deleteTouch(event.changedTouches[i]);
+    for (let touch of event.changedTouches) {
+      this.#deleteTouch(touch);
     }
     event.preventDefault();
   }
 
   /** @param {TouchEvent} event */
   #touchcancel(event) {
-    for (let i = 0; i < event.changedTouches.length; i++) {
-      this.#deleteTouch(event.changedTouches[i]);
+    for (let touch of event.changedTouches) {
+      this.#deleteTouch(touch);
     }
   }
 
