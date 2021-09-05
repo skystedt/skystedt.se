@@ -1,6 +1,6 @@
-import * as PIXI from './pixi';
-import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Offset, Size } from './primitives';
-/** @typedef { import("./primitives").Movement } Movement */
+import * as PIXI from './pixi.js';
+import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Offset, Size } from './primitives.js';
+/** @typedef { import("./primitives.js").Movement } Movement */
 
 const WIDTH = 380;
 const HEIGHT = 200;
@@ -12,7 +12,7 @@ export default class Display {
   #converter;
   #gameSize;
   #displaySize;
-  #offset;
+  #gameOutsideDisplay;
 
   /** @param {PIXI.Renderer | PIXI.AbstractRenderer} renderer, @param {PIXI.Container} stage, @param {HTMLCanvasElement} canvas */
   constructor(renderer, stage, canvas, ignoreBorders = false) {
@@ -26,7 +26,7 @@ export default class Display {
 
     this.#gameSize = new Size(WIDTH, HEIGHT);
     this.#displaySize = new Size(WIDTH, HEIGHT);
-    this.#offset = new Offset(0, 0);
+    this.#gameOutsideDisplay = new Offset(0, 0);
     this.#resize();
 
     window.addEventListener('resize', this.#resize.bind(this));
@@ -48,8 +48,8 @@ export default class Display {
     return this.#displaySize;
   }
 
-  get offset() {
-    return this.#offset;
+  get gameOutsideDisplay() {
+    return this.#gameOutsideDisplay;
   }
 
   #resize() {
@@ -64,9 +64,9 @@ export default class Display {
 
     this.#renderer.resize(this.#displaySize.width, this.#displaySize.height);
 
-    const offsetX = this.#offset.left + (previousWidth - this.#displaySize.width) / 2;
-    const offsetY = this.#offset.top + (previousHeight - this.#displaySize.height) / 2;
-    this.#offset = new Offset(offsetX, offsetY);
+    const offsetX = this.#gameOutsideDisplay.left + (previousWidth - this.#displaySize.width) / 2;
+    const offsetY = this.#gameOutsideDisplay.top + (previousHeight - this.#displaySize.height) / 2;
+    this.#gameOutsideDisplay = new Offset(offsetX, offsetY);
     this.#stage.position.set(-offsetX, -offsetY);
   }
 
@@ -87,11 +87,11 @@ export default class Display {
 
   /** @param {GamePosition} gamePosition, @param {Movement} movement, @param {Size} objectSize */
   restrictGamePositionToDisplay(gamePosition, movement, objectSize) {
-    let displayX = gamePosition.x - this.offset.left + movement.dx;
-    let displayY = gamePosition.y - this.offset.top + movement.dy;
+    let displayX = gamePosition.x - this.gameOutsideDisplay.left + movement.dx;
+    let displayY = gamePosition.y - this.gameOutsideDisplay.top + movement.dy;
     displayX = Display.#clamp(displayX, 0, this.displaySize.width - objectSize.width);
     displayY = Display.#clamp(displayY, 0, this.displaySize.height - objectSize.height);
-    return new GamePosition(displayX + this.offset.left, displayY + this.offset.top);
+    return new GamePosition(displayX + this.gameOutsideDisplay.left, displayY + this.gameOutsideDisplay.top);
   }
 }
 
@@ -121,7 +121,10 @@ class DisplayConverter {
 
   /** @param {GamePosition} gamePosition */
   gameToDisplay(gamePosition) {
-    return new DisplayPosition(gamePosition.x - this.#display.offset.left, gamePosition.y - this.#display.offset.top);
+    return new DisplayPosition(
+      gamePosition.x - this.#display.gameOutsideDisplay.left,
+      gamePosition.y - this.#display.gameOutsideDisplay.top
+    );
   }
 
   /** @param {GamePosition} gamePosition */
@@ -132,8 +135,8 @@ class DisplayConverter {
   /** @param {DisplayPosition} displayPosition */
   displayToGame(displayPosition) {
     return new GamePosition(
-      displayPosition.x + this.#display.offset.left,
-      displayPosition.y + this.#display.offset.top
+      displayPosition.x + this.#display.gameOutsideDisplay.left,
+      displayPosition.y + this.#display.gameOutsideDisplay.top
     );
   }
 
@@ -141,8 +144,8 @@ class DisplayConverter {
   displayToAbsolute(displayPosition) {
     const canvasPosition = this.#canvas.getBoundingClientRect();
     const borders = this.#borders();
-    const x = displayPosition.x * this.#display.resolution + canvasPosition.x + borders.left;
-    const y = displayPosition.y * this.#display.resolution + canvasPosition.y + borders.top;
+    const x = displayPosition.x * this.#display.resolution + canvasPosition.left + borders.left;
+    const y = displayPosition.y * this.#display.resolution + canvasPosition.top + borders.top;
     return new AbsolutePosition(x, y);
   }
 }

@@ -2,15 +2,18 @@
   "env": {
     "browser": true
   },
-  "parser": "babel-eslint",
+  "parser": "babel-eslint", // visual studio does not work with @babel/eslint-parser
   "parserOptions": {
     "ecmaVersion": 2016,
     "sourceType": "module"
   },
-  "plugins": ["no-function-declare-after-return", "prettier"],
-  "extends": ["eslint:recommended", "prettier"],
+  "plugins": ["prettier"],
+  "extends": ["eslint:recommended", "plugin:compat/recommended", "prettier"],
+  "settings": {
+    "polyfills": ["fetch"]
+  },
   "rules": {
     "no-var": "error",
-    "no-function-declare-after-return/no-function-declare-after-return": "error"
+    "compat/compat": "warn"
   }
 }

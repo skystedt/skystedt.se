@@ -1,5 +1,5 @@
-import * as PIXI from './pixi';
-import { GamePosition, Size } from './primitives';
+import * as PIXI from './pixi.js';
+import { GamePosition, Size } from './primitives.js';
 import ShipStraightImage from './ship.png';
 import ShipLeftImage from './ship_left.png';
 import ShipRightImage from './ship_right.png';

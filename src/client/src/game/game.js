@@ -1,9 +1,9 @@
-import Display from './display';
-import Input from './input';
-import * as PIXI from './pixi';
-import { Uninitialized } from './primitives';
-import Ship, { ShipDirection } from './ship';
-import Stars from './stars';
+import Display from './display.js';
+import Input from './input.js';
+import * as PIXI from './pixi.js';
+import { Uninitialized } from './primitives.js';
+import Ship, { ShipDirection } from './ship.js';
+import Stars from './stars.js';
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;

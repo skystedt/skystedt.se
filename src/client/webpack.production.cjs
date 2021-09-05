@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 const { mergeWithCustomize, unique } = require('webpack-merge');
-const { common } = require('./webpack.common.js');
+const { common } = require('./webpack.common.cjs');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = mergeWithCustomize({
@@ -14,19 +14,11 @@ module.exports = mergeWithCustomize({
       }
     })
   ],
-  module: {
-    rules: [
-      {
-        test: /\.js$/i,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader'
-        }
-      }
-    ]
+  optimization: {
+    minimize: true
   },
   performance: {
-    maxAssetSize: 350 * 1024,
-    maxEntrypointSize: 350 * 1024
+    maxAssetSize: 300 * 1024,
+    maxEntrypointSize: 400 * 1024
   }
 });
