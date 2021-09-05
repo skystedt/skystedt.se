@@ -1,5 +1,11 @@
-//Generated with https://pixijs.io/customize/
+import 'core-js/features/string/starts-with.js'; // Missing polyfill for IE11, https://github.com/pixijs/pixijs/issues/7775
 
+// https://pixijs.io/docs/
+// https://github.com/pixijs/pixijs/tree/dev/packages
+
+// Generated with https://pixijs.io/customize/
+
+import '@pixi/polyfill';
 export * from '@pixi/constants';
 export * from '@pixi/math';
 export * from '@pixi/runner';

@@ -1,21 +1,22 @@
 {
   "name": "skystedt.se",
-  "version": "1.0.0",
+  "version": "0.3.0",
   "repository": "https://github.com/skystedt/skystedt.se",
   "author": "skystedt",
   "license": "MIT",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "webpack --config webpack.development.js",
-    "production": "webpack --config webpack.production.js",
-    "start": "webpack serve --config webpack.development.js --https --open",
+    "build": "webpack --config webpack.development.cjs",
+    "production": "webpack --config webpack.production.cjs",
+    "start": "webpack serve --config webpack.development.cjs --https --open",
     "prettier-watch": "onchange -i \"src/**/*\" \"*\" -- prettier --write --ignore-unknown {{changed}}",
-    "bundle-report": "webpack --config webpack.production.js --profile --json > reports/stats.json && webpack-bundle-analyzer reports/stats.json"
+    "bundle-report": "webpack --config webpack.production.js --profile --json > reports/stats.json && webpack-bundle-analyzer reports/stats.json",
+    "browserslist": "browserslist"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
-    "@babel/plugin-transform-runtime": "^7.15.0",
-    "@babel/runtime-corejs3": "^7.15.3",
+    "@babel/preset-env": "^7.15.4",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^9.0.1",
@@ -23,7 +24,7 @@
     "css-minimizer-webpack-plugin": "^3.0.2",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-no-function-declare-after-return": "^1.1.0",
+    "eslint-plugin-compat": "^3.13.0",
     "eslint-plugin-prettier": "^3.4.1",
     "eslint-webpack-plugin": "^3.0.1",
     "html-webpack-plugin": "^5.3.2",
@@ -37,19 +38,10 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@pixi/app": "6.1.2",
-    "@pixi/constants": "6.1.2",
-    "@pixi/core": "6.1.2",
-    "@pixi/display": "6.1.2",
-    "@pixi/graphics": "6.1.2",
-    "@pixi/loaders": "6.1.2",
-    "@pixi/math": "6.1.2",
-    "@pixi/runner": "6.1.2",
-    "@pixi/settings": "6.1.2",
-    "@pixi/sprite": "6.1.2",
-    "@pixi/ticker": "6.1.2",
     "@pixi/unsafe-eval": "6.1.2",
-    "@pixi/utils": "6.1.2"
+    "core-js": "3.17.2",
+    "pixi.js": "6.1.2",
+    "unfetch": "^4.2.0"
   },
   "-vs-binding": {
     "BeforeBuild": [

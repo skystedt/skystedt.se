@@ -1,6 +1,6 @@
-import * as PIXI from './pixi';
-import { Uninitialized } from './primitives';
-/** @typedef { import("./primitives").Size } Size */
+import * as PIXI from './pixi.js';
+import { Uninitialized } from './primitives.js';
+/** @typedef { import("./primitives.js").Size } Size */
 
 const BLINK_PROBABILITY = 0.0001;
 // prettier-ignore

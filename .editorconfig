@@ -1,4 +1,4 @@
-# editorconfig.org
+# https://editorconfig.org
 
 [*]
 charset = utf-8
@@ -9,7 +9,7 @@ trim_trailing_whitespace = true
 
 [*.cs]
 
-[*.js]
+[*.js, *.cjs, *.mjs]
 indent_size = 2
 
 [*.{html,css}]

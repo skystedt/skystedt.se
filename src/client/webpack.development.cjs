@@ -1,15 +1,18 @@
 /* eslint-disable no-undef */
 const { merge } = require('webpack-merge');
-const { common, BUILD_DIR } = require('./webpack.common.js');
+const { common, dir } = require('./webpack.common.cjs');
 
 module.exports = merge(common, {
   mode: 'development',
   devtool: 'inline-source-map',
   devServer: {
-    contentBase: BUILD_DIR,
+    contentBase: dir.dist,
     port: 8080,
     proxy: {
       '/api': 'http://localhost:8081'
     }
+  },
+  optimization: {
+    minimize: false
   }
 });
