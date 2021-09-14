@@ -12,13 +12,13 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
-
+  
 jobs:
   build_and_deploy_job:
     if: >
       github.event_name == 'push'
-      || (github.event.action != 'closed' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]')
-      || (github.event.action != 'closed' && github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]') 
+      || (github.event.action != 'closed' && github.event_name == 'pull_request' && !contains(fromJSON('["dependabot[bot]"]'), github.actor))
+      || (github.event.action != 'closed' && github.event_name == 'pull_request_target' && contains(fromJSON('["dependabot[bot]"]'), github.actor)) 
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
@@ -38,9 +38,7 @@ jobs:
           app_build_command: "npm run production"
 
   close_pull_request_job:
-    if: >
-      (github.event.action == 'closed' && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]')
-      || (github.event.action == 'closed' && github.event_name == 'pull_request_target' && github.actor == 'dependabot[bot]')
+    if: github.event.action == 'closed' && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     name: Close Pull Request Job
     steps:
