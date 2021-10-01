@@ -9,7 +9,7 @@ trim_trailing_whitespace = true
 
 [*.cs]
 
-[*.js, *.cjs, *.mjs]
+[*.{js,cjs,mjs}]
 indent_size = 2
 
 [*.{html,css}]
