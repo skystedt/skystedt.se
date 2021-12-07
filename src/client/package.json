@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "@pixi/unsafe-eval": "6.2.0",
-    "core-js": "3.19.2",
+    "core-js": "3.19.3",
     "pixi.js": "6.2.0",
     "unfetch": "^4.2.0"
   },
