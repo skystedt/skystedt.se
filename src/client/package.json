@@ -45,7 +45,7 @@
     "@pixi/graphics": "6.2.0",
     "@pixi/loaders": "6.2.0",
     "@pixi/math": "6.2.0",
-    "@pixi/polyfill": "6.2.0",
+    "@pixi/polyfill": "6.2.1",
     "@pixi/runner": "6.2.0",
     "@pixi/settings": "6.2.0",
     "@pixi/sprite": "6.2.0",
