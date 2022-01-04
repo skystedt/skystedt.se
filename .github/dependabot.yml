@@ -5,19 +5,21 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-      time: "12:00"
+      time: "17:00"
       timezone: "Europe/Stockholm"
 
   - package-ecosystem: "nuget"
     directory: "/src/api"
     schedule:
       interval: "daily"
-      time: "12:00"
+      time: "17:00"
       timezone: "Europe/Stockholm"
+    open-pull-requests-limit: 100
 
   - package-ecosystem: "npm"
     directory: "/src/client"
     schedule:
       interval: "daily"
-      time: "12:00"
+      time: "17:00"
       timezone: "Europe/Stockholm"
+    open-pull-requests-limit: 100
