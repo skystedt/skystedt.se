@@ -52,7 +52,7 @@
     "@pixi/ticker": "6.2.0",
     "@pixi/unsafe-eval": "6.2.0",
     "@pixi/utils": "6.2.0",
-    "core-js": "3.20.1",
+    "core-js": "3.20.2",
     "unfetch": "^4.2.0"
   },
   "-vs-binding": {
