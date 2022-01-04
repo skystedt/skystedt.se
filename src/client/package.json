@@ -1,6 +1,6 @@
 {
   "name": "skystedt.se",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "repository": "https://github.com/skystedt/skystedt.se",
   "author": "skystedt",
   "license": "MIT",
@@ -16,13 +16,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
+    "@babel/eslint-parser": "^7.16.3",
     "@babel/preset-env": "^7.15.4",
-    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "copy-webpack-plugin": "^10.0.0",
     "css-loader": "^6.2.0",
     "css-minimizer-webpack-plugin": "^3.0.2",
-    "eslint": "^7.32.0",
+    "eslint": "^8.6.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-compat": "^4.0.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -38,9 +38,21 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "@pixi/unsafe-eval": "6.2.1",
+    "@pixi/app": "6.2.0",
+    "@pixi/constants": "6.2.0",
+    "@pixi/core": "6.2.0",
+    "@pixi/display": "6.2.0",
+    "@pixi/graphics": "6.2.0",
+    "@pixi/loaders": "6.2.0",
+    "@pixi/math": "6.2.0",
+    "@pixi/polyfill": "6.2.0",
+    "@pixi/runner": "6.2.0",
+    "@pixi/settings": "6.2.0",
+    "@pixi/sprite": "6.2.0",
+    "@pixi/ticker": "6.2.0",
+    "@pixi/unsafe-eval": "6.2.0",
+    "@pixi/utils": "6.2.0",
     "core-js": "3.20.1",
-    "pixi.js": "6.2.1",
     "unfetch": "^4.2.0"
   },
   "-vs-binding": {
