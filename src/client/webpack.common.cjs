@@ -88,7 +88,7 @@ const config = {
               case 'unfetch':
               case 'promise-polyfill':
               case 'object-assign':
-                return 'polyfills';
+                return 'polyfill';
               default:
                 return 'vendors';
             }

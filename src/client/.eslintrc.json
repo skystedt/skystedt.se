@@ -2,7 +2,7 @@
   "env": {
     "browser": true
   },
-  "parser": "babel-eslint", // visual studio does not work with @babel/eslint-parser
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
     "ecmaVersion": 2016,
     "sourceType": "module"
