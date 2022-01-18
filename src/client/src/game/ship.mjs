@@ -1,5 +1,5 @@
-import * as PIXI from './pixi.js';
-import { GamePosition, Size } from './primitives.js';
+import * as PIXI from './pixi.mjs';
+import { GamePosition, Size } from './primitives.mjs';
 import ShipStraightImage from './ship.png';
 import ShipLeftImage from './ship_left.png';
 import ShipRightImage from './ship_right.png';
@@ -32,7 +32,11 @@ export default class Ship {
       .add(NAME_SHIP_RIGHT, ShipRightImage);
   }
 
-  /** @param {PIXI.utils.Dict<PIXI.LoaderResource>} loaderResources, @param {PIXI.Container} stage, @param {Size} gameSize */
+  /**
+   * @param {PIXI.utils.Dict<PIXI.LoaderResource>} loaderResources
+   * @param {PIXI.Container} stage
+   * @param {Size} gameSize
+   */
   constructor(loaderResources, stage, gameSize) {
     this.#container = new PIXI.Container();
     this.#spriteStraight = new PIXI.Sprite(loaderResources[NAME_SHIP_STRAIGHT].texture);

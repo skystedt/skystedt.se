@@ -1,7 +1,8 @@
 # https://github.com/browserslist/browserslist
 # https://browserslist.dev/?q=PiAwLjUlLCBsYXN0IDIgdmVyc2lvbnMsIG5vdCBkZWFkLCBub3Qgb3BfbWluaSBhbGw
 
-> 0.5%
-last 2 versions
-not dead
-not op_mini all
+[modern]
+last 2 versions and not dead and > 0.01% or > 0.2% and supports es6-module
+
+[legacy]
+last 2 versions and not dead and > 0.01% or > 0.2% and not supports es6-module

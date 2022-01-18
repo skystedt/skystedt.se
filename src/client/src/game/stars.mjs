@@ -1,6 +1,6 @@
-import * as PIXI from './pixi.js';
-import { Uninitialized } from './primitives.js';
-/** @typedef { import("./primitives.js").Size } Size */
+import * as PIXI from './pixi.mjs';
+import { Uninitialized } from './primitives.mjs';
+/** @typedef { import("./primitives.mjs").Size } Size */
 
 const BLINK_PROBABILITY = 0.0001;
 // prettier-ignore
@@ -12,7 +12,12 @@ const SPEED_PROBABILITIES = [
 ];
 
 export default class Stars extends PIXI.Container {
-  /** @param {PIXI.Container} stage, @param {Size} gameSize, @param {number} updatesPerSecond, @param {number} numberOfStars */
+  /**
+   * @param {PIXI.Container} stage
+   * @param {Size} gameSize
+   * @param {number} updatesPerSecond
+   * @param {number} numberOfStars
+   */
   constructor(stage, gameSize, updatesPerSecond, numberOfStars) {
     super();
     for (let i = 0; i < numberOfStars; i++) {
@@ -35,7 +40,10 @@ export class Star extends PIXI.Graphics {
   #blinking = /** @type {number} */ (Uninitialized);
   #originalColor = /** @type {number} */ (Uninitialized);
 
-  /** @param {Size} gameSize, @param {number} updatesPerSecond */
+  /**
+   * @param {Size} gameSize
+   * @param {number} updatesPerSecond
+   */
   constructor(gameSize, updatesPerSecond) {
     super();
     this.#gameSize = gameSize;

@@ -1,3 +1,4 @@
+/* eslint-disable-line jsdoc/no-undefined-types */
 /** @type {unknown} */
 export const Uninitialized = undefined;
 
@@ -12,7 +13,10 @@ class Position {
     return this.#y;
   }
 
-  /** @param {number} x, @param {number} y */
+  /**
+   * @param {number} x
+   * @param {number} y
+   */
   constructor(x, y) {
     this.#x = x;
     this.#y = y;
@@ -39,7 +43,10 @@ export class Movement {
     return this.#dy;
   }
 
-  /** @param {number} dx, @param {number} dy */
+  /**
+   * @param {number} dx
+   * @param {number} dy
+   */
   constructor(dx, dy) {
     this.#dx = dx;
     this.#dy = dy;
@@ -56,7 +63,10 @@ export class Size {
     return this.#height;
   }
 
-  /** @param {number} width, @param {number} height */
+  /**
+   * @param {number} width
+   * @param {number} height
+   */
   constructor(width, height) {
     this.#width = width;
     this.#height = height;
@@ -73,7 +83,10 @@ export class Offset {
     return this.#top;
   }
 
-  /** @param {number} left, @param {number} top */
+  /**
+   * @param {number} left
+   * @param {number} top
+   */
   constructor(left, top) {
     this.#left = left;
     this.#top = top;
@@ -98,7 +111,12 @@ export class Borders {
     return this.#left;
   }
 
-  /** @param {number} top, @param {number} right, @param {number} bottom, @param {number} left */
+  /**
+   * @param {number} top
+   * @param {number} right
+   * @param {number} bottom
+   * @param {number} left
+   */
   constructor(top, right, bottom, left) {
     this.#top = top;
     this.#right = right;

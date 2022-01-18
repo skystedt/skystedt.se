@@ -1,6 +1,6 @@
-import * as PIXI from './pixi.js';
-import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Offset, Size } from './primitives.js';
-/** @typedef { import("./primitives.js").Movement } Movement */
+import * as PIXI from './pixi.mjs';
+import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Offset, Size } from './primitives.mjs';
+/** @typedef { import("./primitives.mjs").Movement } Movement */
 
 const WIDTH = 380;
 const HEIGHT = 200;
@@ -14,7 +14,12 @@ export default class Display {
   #displaySize;
   #gameOutsideDisplay;
 
-  /** @param {PIXI.Renderer | PIXI.AbstractRenderer} renderer, @param {PIXI.Container} stage, @param {HTMLCanvasElement} canvas */
+  /**
+   * @param {PIXI.Renderer | PIXI.AbstractRenderer} renderer
+   * @param {PIXI.Container} stage
+   * @param {HTMLCanvasElement} canvas
+   * @param {boolean} ignoreBorders
+   */
   constructor(renderer, stage, canvas, ignoreBorders = false) {
     this.#renderer = renderer;
     this.#stage = stage;
@@ -80,12 +85,22 @@ export default class Display {
     }
   }
 
-  /** @param {number} value, @param {number} min, @param {number} max */
+  /**
+   * @param {number} value
+   * @param {number} min
+   * @param {number} max
+   * @returns {number}
+   */
   static #clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
   }
 
-  /** @param {GamePosition} gamePosition, @param {Movement} movement, @param {Size} objectSize */
+  /**
+   * @param {GamePosition} gamePosition
+   * @param {Movement} movement
+   * @param {Size} objectSize
+   * @returns {GamePosition}
+   */
   restrictGamePositionToDisplay(gamePosition, movement, objectSize) {
     let displayX = gamePosition.x - this.gameOutsideDisplay.left + movement.dx;
     let displayY = gamePosition.y - this.gameOutsideDisplay.top + movement.dy;
@@ -100,7 +115,11 @@ class DisplayConverter {
   #canvas;
   #ignoreBorders;
 
-  /** @param {Display} display, @param {HTMLCanvasElement} canvas, @param {boolean} ignoreBorders */
+  /**
+   * @param {Display} display
+   * @param {HTMLCanvasElement} canvas
+   * @param {boolean} ignoreBorders
+   */
   constructor(display, canvas, ignoreBorders) {
     this.#display = display;
     this.#canvas = canvas;
@@ -119,7 +138,10 @@ class DisplayConverter {
     return new Borders(top, right, bottom, left);
   }
 
-  /** @param {GamePosition} gamePosition */
+  /**
+   * @param {GamePosition} gamePosition
+   * @returns {DisplayPosition}
+   */
   gameToDisplay(gamePosition) {
     return new DisplayPosition(
       gamePosition.x - this.#display.gameOutsideDisplay.left,
@@ -127,12 +149,18 @@ class DisplayConverter {
     );
   }
 
-  /** @param {GamePosition} gamePosition */
+  /**
+   * @param {GamePosition} gamePosition
+   * @returns {AbsolutePosition}
+   */
   gameToAbsolute(gamePosition) {
     return this.displayToAbsolute(this.gameToDisplay(gamePosition));
   }
 
-  /** @param {DisplayPosition} displayPosition */
+  /**
+   * @param {DisplayPosition} displayPosition
+   * @returns {GamePosition}
+   */
   displayToGame(displayPosition) {
     return new GamePosition(
       displayPosition.x + this.#display.gameOutsideDisplay.left,
@@ -140,7 +168,10 @@ class DisplayConverter {
     );
   }
 
-  /** @param {DisplayPosition} displayPosition */
+  /**
+   * @param {DisplayPosition} displayPosition
+   * @returns {AbsolutePosition}
+   */
   displayToAbsolute(displayPosition) {
     const canvasPosition = this.#canvas.getBoundingClientRect();
     const borders = this.#borders();

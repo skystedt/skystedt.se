@@ -1,8 +1,9 @@
 import './input.css';
-import { AbsolutePosition, Movement } from './primitives.js';
-/** @typedef { import("./primitives.js").DisplayPosition } DisplayPosition */
-/** @typedef { import("./primitives.js").GamePosition } GamePosition */
-/** @typedef { import("./display.js").default } Display */
+import { AbsolutePosition, Movement } from './primitives.mjs';
+/** @typedef { number } DOMHighResTimeStamp */
+/** @typedef { import("./primitives.mjs").DisplayPosition } DisplayPosition */
+/** @typedef { import("./primitives.mjs").GamePosition } GamePosition */
+/** @typedef { import("./display.mjs").default } Display */
 
 const KEY_CODE_LEFT = 37;
 const KEY_CODE_UP = 38;
@@ -27,7 +28,11 @@ export default class Input {
   /** @type {number?} */
   #gamepadIndex = null;
 
-  /** @param {any[]} array, @param {(element: any) => number} by */
+  /**
+   * @param {any[]} array
+   * @param {(element: any) => number} by
+   * @returns {any}
+   */
   static #minBy(array, by) {
     return array.reduce((best, next) => (!best ? next : Math.min(by(best), by(next)) === by(best) ? best : next), null);
   }
@@ -143,7 +148,11 @@ export default class Input {
     }
   }
 
-  /** @param {KeyboardEvent} event, @param {boolean} value */
+  /**
+   * @param {KeyboardEvent} event
+   * @param {boolean} value
+   * @returns {boolean}
+   */
   #keySwitch(event, value) {
     switch (event.keyCode) {
       case KEY_CODE_UP:
@@ -164,7 +173,10 @@ export default class Input {
     return true;
   }
 
-  /** @param {Touch} touch, @param {DOMHighResTimeStamp} timestamp */
+  /**
+   * @param {Touch} touch
+   * @param {DOMHighResTimeStamp} timestamp
+   */
   #addTouch(touch, timestamp) {
     this.#touches.push({
       id: touch.identifier,
@@ -212,7 +224,11 @@ export default class Input {
     return null;
   }
 
-  /** @param {AbsolutePosition} position, @param {GamePosition} relativeTo */
+  /**
+   * @param {AbsolutePosition} position
+   * @param {GamePosition} relativeTo
+   * @returns {Movement}
+   */
   #relativeDirection(position, relativeTo) {
     const absolutePosition = this.#display.convert.gameToAbsolute(relativeTo);
     const directionX = position.x - absolutePosition.x;
@@ -224,14 +240,23 @@ export default class Input {
     return new Movement(dx, dy);
   }
 
-  /** @param {boolean} up, @param {boolean} right, @param {boolean} down, @param {boolean} left */
+  /**
+   * @param {boolean} up
+   * @param {boolean} right
+   * @param {boolean} down
+   * @param {boolean} left
+   * @returns {Movement}
+   */
   #absolutDirection(up, right, down, left) {
     const dx = (left ? -1 : 0) + (right ? 1 : 0);
     const dy = (up ? -1 : 0) + (down ? 1 : 0);
     return new Movement(dx, dy);
   }
 
-  /** @param {GamePosition} relativeTo */
+  /**
+   * @param {GamePosition} relativeTo
+   * @returns {Movement}
+   */
   movement(relativeTo) {
     const gamepad = this.#gamepadInput();
     if (gamepad) {

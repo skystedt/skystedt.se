@@ -4,22 +4,21 @@
    * IntelliSense based on JSDoc: https://github.com/microsoft/TypeScript/wiki/JSDoc-support-in-JavaScript/a9f5313810385ed9f6b0b5172d9a4f1f145158da
    * Config reference: https://www.typescriptlang.org/tsconfig
    */
-  "$schema": "https://json.schemastore.org/jsconfig.json",
-  // prettier-ignore
+  "$schema": "https://json.schemastore.org/jsconfig",
   "compilerOptions": {
-    "target": "es2016",         /* Specify the JavaScript language version for emitted JavaScript: 'es3', 'es5', 'es6', 'es2015' (default), 'es2016', 'es2017', 'es2018', 'es2019', 'es2020' or 'esnext'. */
-    "module": "es2015",         /* Specify what module code is generated: 'none', 'commonJS', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'esnext'. */
-    "checkJs": true,            /* Enable error reporting in type-checked JavaScript files. */
-    "strict": true,             /* Enable all strict type checking options. Equivalent to enabling all of the strict mode options. */
-    "moduleResolution": "node", /* Specify module resolution strategy: 'node' (Node) or 'classic' (TypeScript pre 1.6). */
-    "outDir": "dist",           /* Specifies an output folder for all emited files. */
-    "rootDir": "src"            /* Specifies the root folder within your source files. */
+    "target": "es2016",
+    "module": "es2020",
+    "checkJs": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "rootDir": "src"
   },
   "typeAcquisition": {
-    "enable": true // Enable auto type acquisition (.d.ts).
+    "enable": true
   },
   "include": [
-    "src/**/*",
+    "src",
     "assets.d.ts" // Workaround for TS2307: (JS) Cannot find module '.png' or its corresponding type declarations.
-  ]
+  ],
+  "exclude": ["node_modules"]
 }
