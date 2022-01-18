@@ -1,12 +1,14 @@
-import Display from './display.js';
-import Input from './input.js';
-import * as PIXI from './pixi.js';
-import { Uninitialized } from './primitives.js';
-import Ship, { ShipDirection } from './ship.js';
-import Stars from './stars.js';
+import Display from './display.mjs';
+import Input from './input.mjs';
+import * as PIXI from './pixi.mjs';
+import { Uninitialized } from './primitives.mjs';
+import Ship, { ShipDirection } from './ship.mjs';
+import Stars from './stars.mjs';
+/** @typedef { number } DOMHighResTimeStamp */
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;
+const WAIT_BEFORE_FPS_CHECK = 1000;
 
 const STARS = 100;
 
@@ -59,11 +61,13 @@ export default class Game {
     this.#loopState.logicRemaining = 0;
     this.#loopState.backgroundWait = 1000 / BACKGROUND_FPS;
     this.#loopState.backgroundRemaining = 0;
-    this.#loopState.lowFpsCheck = this.#loopState.lastTimestamp + 1000;
+    this.#loopState.lowFpsCheck = this.#loopState.lastTimestamp + WAIT_BEFORE_FPS_CHECK;
     requestAnimationFrame(this.#frameLoop.bind(this));
   }
 
-  #gameReset() {}
+  #gameReset() {
+    //
+  }
 
   /** @param {DOMHighResTimeStamp} timestamp */
   #frameLoop(timestamp) {
@@ -103,10 +107,15 @@ export default class Game {
 
     if (this.#loopState.lowFpsCheck && timestamp > this.#loopState.lowFpsCheck) {
       this.#loopState.lowFpsCheck = 0;
-      const fps = Math.round(this.#app.ticker.FPS);
-      if (fps < LOGIC_FPS) {
-        console.warn(`Low FPS (target: ${LOGIC_FPS}): ${fps}`);
-      }
+      this.#logFps();
+    }
+  }
+
+  #logFps() {
+    const fps = Math.round(this.#app.ticker.FPS);
+    //TODO: log
+    if (fps < LOGIC_FPS) {
+      console.warn(`Low FPS (target: ${LOGIC_FPS}): ${fps}`);
     }
   }
 

@@ -1,9 +1,10 @@
+/* eslint-disable import/no-duplicates */
+
 // https://pixijs.io/docs/
 // https://github.com/pixijs/pixijs/tree/dev/packages
 
 // Generated with https://pixijs.io/customize/
 
-import '@pixi/polyfill';
 export * from '@pixi/constants';
 export * from '@pixi/math';
 export * from '@pixi/runner';

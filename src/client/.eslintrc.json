@@ -7,13 +7,23 @@
     "ecmaVersion": 2016,
     "sourceType": "module"
   },
-  "plugins": ["prettier"],
-  "extends": ["eslint:recommended", "plugin:compat/recommended", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:import/recommended",
+    "plugin:jsdoc/recommended",
+    "plugin:compat/recommended",
+    "prettier" // disables unnecessary/conflicting rules when using prettier, should be last, https://github.com/prettier/eslint-config-prettier#installation
+  ],
   "settings": {
     "polyfills": ["fetch"]
   },
   "rules": {
+    "curly": ["error", "all"],
     "no-var": "error",
-    "compat/compat": "warn"
+    "import/extensions": ["error", "always"],
+    "compat/compat": "warn",
+    "jsdoc/valid-types": "off",
+    "jsdoc/require-param-description": "off",
+    "jsdoc/require-returns-description": "off"
   }
 }
