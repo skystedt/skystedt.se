@@ -6,7 +6,7 @@
     <UserSecretsId>32ea2729-319b-416c-9883-fd42749c0eb5</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Data.Tables" Version="12.3.0" />
+    <PackageReference Include="Azure.Data.Tables" Version="12.4.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.OpenApi" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.0.1" />
