@@ -162,7 +162,10 @@ function contentSecurityPolicy() {
   const csp = cspHeader
     .split(';')
     .map((value) => value.trim().split(' '))
-    .reduce((map, value) => map.set(value[0], value.slice(1)), new Map());
+    .reduce((map, value) => {
+      map[value[0]] = value.slice(1);
+      return map;
+    }, {});
   return csp;
 }
 
