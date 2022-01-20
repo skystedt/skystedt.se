@@ -19,7 +19,7 @@
     "@babel/eslint-parser": "7.16.5",
     "@babel/preset-env": "7.16.11",
     "babel-loader": "8.2.3",
-    "copy-webpack-plugin": "10.2.0",
+    "copy-webpack-plugin": "10.2.1",
     "create-file-webpack": "1.0.2",
     "csp-html-webpack-plugin": "5.1.0",
     "css-loader": "6.5.1",
