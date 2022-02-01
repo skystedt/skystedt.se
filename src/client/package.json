@@ -46,7 +46,7 @@
     "webpack-dev-server": "4.7.3"
   },
   "dependencies": {
-    "@microsoft/applicationinsights-web": "2.7.2",
+    "@microsoft/applicationinsights-web": "2.7.3",
     "@pixi/app": "6.2.1",
     "@pixi/constants": "6.2.1",
     "@pixi/core": "6.2.1",
