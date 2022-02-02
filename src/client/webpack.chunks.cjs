@@ -12,9 +12,8 @@ const entry = {
 
 /** @type {EntryObject} */
 const entryLegacy = {
-  'polyfills.unfetch': path.resolve(dir.node_modules, 'unfetch', 'polyfill', 'index.js'),
-  'polyfills.pixi': path.resolve(dir.node_modules, '@pixi/polyfill'),
-  app: { dependOn: ['polyfills.unfetch', 'polyfills.pixi'] }
+  polyfills: path.resolve(dir.src, 'polyfills.mjs'),
+  app: { dependOn: 'polyfills' }
 };
 
 /** @type {Configuration} */
@@ -29,24 +28,25 @@ const chunks = {
           chunks: 'all',
           name: 'styles'
         },
-        holder: {
-          test: path.resolve(dir.src, 'holder.mjs'),
-          priority: 75,
-          name: 'holder',
+        insights: {
+          test: path.resolve(dir.src, 'insights'),
+          type: wildcardMatch('javascript/*'),
+          priority: 80,
+          name: 'insights',
+          chunks: 'all'
+        },
+        polyfills: {
+          test: path.resolve(dir.src, 'polyfills.mjs'),
+          type: wildcardMatch('javascript/*'),
+          priority: 60,
+          name: 'polyfills',
           chunks: 'all'
         },
         game: {
           test: path.resolve(dir.src, 'game'),
           type: wildcardMatch('javascript/*', 'asset/inline'),
-          priority: 50,
+          priority: 20,
           name: 'game',
-          chunks: 'all'
-        },
-        insights: {
-          test: path.resolve(dir.src, 'insights'),
-          type: wildcardMatch('javascript/*'),
-          priority: 50,
-          name: 'insights',
           chunks: 'all'
         },
         vendor: {
@@ -78,11 +78,12 @@ const chunks = {
               case '@pixi/polyfill':
               case 'promise-polyfill':
               case 'object-assign':
-                return 'polyfills.pixi';
+                return 'polyfills';
               case 'core-js':
               case 'regenerator-runtime':
+                return 'polyfills';
               case 'unfetch-polyfill':
-                return 'polyfills.vendor';
+                return 'polyfills';
               case '@microsoft/applicationinsights-web':
               case '@microsoft/applicationinsights-common':
               case '@microsoft/applicationinsights-channel-js':
