@@ -11,6 +11,7 @@ const CreateFileWebpack = require('create-file-webpack');
 const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
 const { dir, browsers, ScriptsHtmlWebpackPlugin, mergeBabelRules, mergeCssRules } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
+/** @typedef { import("@babel/preset-env").Options } BabelOptions */
 
 // print the browsers so it's possible to compare browsers between builds without having the dist
 console.log('browsers', browsers);
@@ -23,13 +24,13 @@ const shared = {
     rules: [
       {
         test: /\.m?js$/i,
-        include: [dir.src],
-        exclude: [path.resolve(dir.src, 'game', 'pixi.mjs')],
+        include: dir.src,
+        exclude: [path.resolve(dir.src, 'polyfills.mjs'), path.resolve(dir.src, 'game', 'pixi.mjs')],
         sideEffects: false
       },
       {
         test: /\.m?js$/i,
-        exclude: dir.node_modules,
+        include: dir.src,
         use: {
           loader: 'babel-loader',
           options: require('./babel.config.json')
@@ -50,6 +51,7 @@ const shared = {
     runtimeChunk: false,
     splitChunks: {
       minSize: 0,
+      minSizeReduction: 0,
       cacheGroups: splitChunks.cacheGroups
     },
     minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
@@ -105,13 +107,13 @@ const modern = {
         test: /\.m?js$/i,
         use: {
           loader: 'babel-loader',
-          options: {
+          options: /** @type {BabelOptions} */ ({
             browserslistEnv: 'modern',
             exclude: [
-              'web.dom-collections.iterator', // added when using any for-of, but is not needed if not used on DOM collections, https://github.com/zloirock/core-js/issues/1003
-              'es.string.replace' // added to standardize string.replace, but is not needed, https://github.com/zloirock/core-js/issues/817
+              'web.dom-collections.iterator', // added when using any for-of, but is not needed if not useing for-of on DOM collections, https://github.com/zloirock/core-js/issues/1003
+              'es.string.replace' // added when using string.replace, to standardize, but is not needed, https://github.com/zloirock/core-js/issues/817
             ]
-          }
+          })
         }
       }
     ]
@@ -135,9 +137,9 @@ const legacy = {
         test: /\.m?js$/i,
         use: {
           loader: 'babel-loader',
-          options: {
+          options: /** @type {BabelOptions} */ ({
             browserslistEnv: 'legacy'
-          }
+          })
         }
       },
       {
