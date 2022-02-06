@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.17.0",
-    "@babel/eslint-parser": "7.16.5",
+    "@babel/eslint-parser": "7.17.0",
     "@babel/preset-env": "7.16.11",
     "babel-loader": "8.2.3",
     "copy-webpack-plugin": "10.2.4",
