@@ -105,6 +105,33 @@ class ScriptsHtmlWebpackPlugin {
   }
 }
 
+class ThrowOnAssetsEmitedWebpackPlugin {
+  #patterns;
+
+  /** @param {...string} patterns */
+  constructor(...patterns) {
+    this.#patterns = [].concat(patterns || []);
+  }
+
+  /** @param {Compiler} compiler */
+  apply(compiler) {
+    compiler.hooks.afterEmit.tap('ThrowOnAssetsEmitedWebpackPlugin', () => {
+      const found = [];
+      for (const pattern of this.#patterns) {
+        const files = glob.sync(pattern, { cwd: dir.dist });
+        if (files.length) {
+          found.push(files);
+        }
+      }
+      if (found.length) {
+        throw new Error(
+          `ThrowOnAssetsEmitedWebpackPlugin - Following assets are not permitted to be emited \n${found.join('\n')}`
+        );
+      }
+    });
+  }
+}
+
 /**
  * @param {RuleSetRule[]} existingRules
  * @param {RuleSetRule[]} updateRules
@@ -173,6 +200,7 @@ module.exports = {
   dir,
   browsers,
   ScriptsHtmlWebpackPlugin,
+  ThrowOnAssetsEmitedWebpackPlugin,
   mergeBabelRules,
   mergeCssRules,
   wildcardMatch,
