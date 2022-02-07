@@ -15,6 +15,7 @@ const { mergeBabelRules, mergeCssRules } = require('./webpack.helpers.cjs');
 /** @typedef { import("@babel/preset-env").Options } BabelOptions */
 
 // print the browsers so it's possible to compare browsers between builds without having the dist
+// eslint-disable-next-line no-console
 console.log('browsers', browsers);
 
 /** @returns {Configuration} */
