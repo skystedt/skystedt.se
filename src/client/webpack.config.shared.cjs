@@ -9,7 +9,8 @@ const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CreateFileWebpack = require('create-file-webpack');
 const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
-const { dir, browsers, ScriptsHtmlWebpackPlugin, mergeBabelRules, mergeCssRules } = require('./webpack.helpers.cjs');
+const { dir, browsers, ScriptsHtmlWebpackPlugin, ThrowOnAssetsEmitedWebpackPlugin } = require('./webpack.helpers.cjs');
+const { mergeBabelRules, mergeCssRules } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("@babel/preset-env").Options } BabelOptions */
 
@@ -89,6 +90,7 @@ const modern = {
         { path: 'legacy/*.js', type: 'nomodule', defer: true }
       ]
     }),
+    new ThrowOnAssetsEmitedWebpackPlugin('polyfills.*.mjs'),
     new CopyPlugin({
       patterns: [path.resolve(dir.src, 'favicon.ico')]
     }),
