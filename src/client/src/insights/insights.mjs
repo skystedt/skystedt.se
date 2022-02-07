@@ -16,3 +16,4 @@ const appInsights = new ApplicationInsights({
 });
 appInsights.loadAppInsights();
 appInsights.trackPageView();
+/** @type {any} */ (window).insights = appInsights;

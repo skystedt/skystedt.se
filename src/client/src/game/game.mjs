@@ -5,10 +5,12 @@ import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Stars from './stars.mjs';
 /** @typedef { number } DOMHighResTimeStamp */
+/** @typedef { import("@microsoft/applicationinsights-web").ApplicationInsights } ApplicationInsights */
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;
 const WAIT_BEFORE_FPS_CHECK = 1000;
+const MAX_LOG_METRIC_RETRIES = 10;
 
 const STARS = 100;
 
@@ -107,15 +109,31 @@ export default class Game {
 
     if (this.#loopState.lowFpsCheck && timestamp > this.#loopState.lowFpsCheck) {
       this.#loopState.lowFpsCheck = 0;
-      this.#logFps();
+      this.#checkFps();
     }
   }
 
-  #logFps() {
+  #checkFps() {
     const fps = Math.round(this.#app.ticker.FPS);
-    //TODO: log
+
+    this.#logFpsMetric(fps, 0);
+
     if (fps < LOGIC_FPS) {
       console.warn(`Low FPS (target: ${LOGIC_FPS}): ${fps}`);
+    }
+  }
+
+  /**
+   * @param {number} fps
+   * @param {number} logTry
+   */
+  #logFpsMetric(fps, logTry) {
+    const insights = /** @type {ApplicationInsights} */ (/** @type {any} */ (window).insights);
+
+    if (insights) {
+      insights.trackMetric({ name: 'fps', average: fps });
+    } else if (logTry < MAX_LOG_METRIC_RETRIES) {
+      setTimeout(this.#logFpsMetric.bind(this), 1000, fps, ++logTry);
     }
   }
 
