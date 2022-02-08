@@ -20,6 +20,7 @@
   "rules": {
     "curly": ["error", "all"],
     "no-var": "error",
+    "no-console": ["error", { "allow": ["warn", "error"] }],
     "import/extensions": ["error", "always"],
     "compat/compat": "warn",
     "jsdoc/valid-types": "off",
