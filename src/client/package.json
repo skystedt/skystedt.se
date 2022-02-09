@@ -28,7 +28,7 @@
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-compat": "4.0.2",
     "eslint-plugin-import": "2.25.4",
-    "eslint-plugin-jsdoc": "37.7.0",
+    "eslint-plugin-jsdoc": "37.8.1",
     "eslint-plugin-prettier": "4.0.0",
     "eslint-webpack-plugin": "3.1.1",
     "glob": "7.2.0",
