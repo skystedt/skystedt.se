@@ -17,8 +17,8 @@
     "enable": true
   },
   "include": [
-    "src",
+    "src/**/*",
     "assets.d.ts" // Workaround for TS2307: (JS) Cannot find module '.png' or its corresponding type declarations.
   ],
-  "exclude": ["node_modules"]
+  "exclude": [ "node_modules", "src/polyfills.mjs" ]
 }
