@@ -18,22 +18,15 @@ const dir = {
   node_modules: path.resolve(__dirname, 'node_modules')
 };
 
+// resolve babel -> browserslist -> caniuse-lite
+// in case there are nested modules
+const caniuseVersion = resolveNestedVersion('@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite');
+
 const browsers = {
-  version: caniuseVersion(),
+  version: caniuseVersion,
   modern: babelTargets({}, { browserslistEnv: 'modern' }),
   legacy: babelTargets({}, { browserslistEnv: 'legacy' })
 };
-
-/** @returns {string} */
-function caniuseVersion() {
-  // resolve babel -> browserslist -> caniuse-lite
-  // in case there are nested modules
-  const resolver = resolve.create.sync({ mainFiles: ['package'], extensions: ['.json'], enforceExtension: true });
-  const browserslist = resolver(path.resolve(dir.node_modules, '@babel/helper-compilation-targets'), 'browserslist');
-  const caniuse = resolver(browserslist, 'caniuse-lite');
-  const packageJson = require(caniuse);
-  return packageJson.version;
-}
 
 class ScriptsHtmlWebpackPlugin {
   /** @typedef {{ path: string, directory: string }} AddScript */
@@ -133,6 +126,29 @@ class ThrowOnAssetsEmitedWebpackPlugin {
 }
 
 /**
+ * @param {...string} modules
+ * @returns {string}
+ */
+function resolveNestedVersion(...modules) {
+  let current = dir.node_modules;
+  if (modules.length === 1) {
+    current = path.resolve(current, modules[0], 'package.json');
+  } else if (modules.length >= 1) {
+    const resolver = resolve.create.sync({ mainFiles: ['package'], extensions: ['.json'], enforceExtension: true });
+    const [firstModule, ...otherModules] = modules;
+    current = path.resolve(current, firstModule);
+    for (const module of otherModules) {
+      current = resolver(current, module);
+    }
+  }
+  const packageJson = require(current);
+  if (!packageJson) {
+    throw new Error(`Module not found: ${modules.join(', ')}`);
+  }
+  return packageJson.version;
+}
+
+/**
  * @param {RuleSetRule[]} existingRules
  * @param {RuleSetRule[]} updateRules
  */
@@ -201,6 +217,7 @@ module.exports = {
   browsers,
   ScriptsHtmlWebpackPlugin,
   ThrowOnAssetsEmitedWebpackPlugin,
+  resolveNestedVersion,
   mergeBabelRules,
   mergeCssRules,
   wildcardMatch,

@@ -10,9 +10,13 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CreateFileWebpack = require('create-file-webpack');
 const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
 const { dir, browsers, ScriptsHtmlWebpackPlugin, ThrowOnAssetsEmitedWebpackPlugin } = require('./webpack.helpers.cjs');
-const { mergeBabelRules, mergeCssRules } = require('./webpack.helpers.cjs');
+const { resolveNestedVersion, mergeBabelRules, mergeCssRules } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("@babel/preset-env").Options } BabelOptions */
+
+// https://github.com/zloirock/core-js#babelpreset-env
+// "Recommended to specify used minor core-js version"
+const corejsVersion = resolveNestedVersion('core-js');
 
 // print the browsers so it's possible to compare browsers between builds without having the dist
 // eslint-disable-next-line no-console
@@ -112,9 +116,12 @@ const modern = {
           loader: 'babel-loader',
           options: /** @type {BabelOptions} */ ({
             browserslistEnv: 'modern',
+            corejs: corejsVersion,
             exclude: [
-              'web.dom-collections.iterator', // added when using any for-of, but is not needed if not useing for-of on DOM collections, https://github.com/zloirock/core-js/issues/1003
-              'es.string.replace' // added when using string.replace, to standardize, but is not needed, https://github.com/zloirock/core-js/issues/817
+              'web.dom-collections.iterator', // added when using any for-of, but is not needed if not using for-of on DOM collections, https://github.com/zloirock/core-js/issues/1003
+              'es.string.replace', // added when using string.replace, to standardize, but is not needed, https://github.com/zloirock/core-js/issues/817
+              'es.error.cause', // newer option that can be used with Error, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+              'es.array.reduce' // Chrome 80-82 has a bug, but we don't support those versions https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/es.array.reduce.js#L9
             ]
           })
         }
@@ -141,7 +148,8 @@ const legacy = {
         use: {
           loader: 'babel-loader',
           options: /** @type {BabelOptions} */ ({
-            browserslistEnv: 'legacy'
+            browserslistEnv: 'legacy',
+            corejs: corejsVersion
           })
         }
       },
