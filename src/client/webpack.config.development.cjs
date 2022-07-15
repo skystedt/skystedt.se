@@ -2,8 +2,7 @@
 const webpack = require('webpack');
 const update = require('immutability-helper');
 const ESLintPlugin = require('eslint-webpack-plugin');
-const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
-const { dir, contentSecurityPolicy } = require('./webpack.helpers.cjs');
+const { dir } = require('./webpack.helpers.cjs');
 const { sharedLegacy, sharedModern } = require('./webpack.config.shared.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 
@@ -38,13 +37,6 @@ const developmentModern = {
       extensions: '.mjs',
       failOnError: false,
       failOnWarning: false
-    }),
-    new CspHtmlWebpackPlugin(contentSecurityPolicy(), {
-      nonceEnabled: {
-        // disable nonce to mimic production
-        'script-src': false,
-        'style-src': false
-      }
     })
   ]
 };
