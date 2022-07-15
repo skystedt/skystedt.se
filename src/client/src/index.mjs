@@ -6,6 +6,7 @@ import './index.css';
 
   const game = new Game();
   document.body.appendChild(game.canvas);
+  document.body.appendChild(document.createTextNode('FCP'));
 
   const { default: Backend } = await import('./test_backend.mjs');
   Backend.test();
