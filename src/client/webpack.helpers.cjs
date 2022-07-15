@@ -98,6 +98,39 @@ class ScriptsHtmlWebpackPlugin {
   }
 }
 
+class StylesAsyncHtmlWebpackPlugin {
+  /** @type {string | string[]} */
+  #paths;
+
+  /** @param {string | string[]} paths */
+  constructor(paths) {
+    this.#paths = [].concat(paths || []);
+  }
+
+  /** @param {Compiler} compiler */
+  apply(compiler) {
+    compiler.hooks.compilation.tap('StylesAsyncHtmlWebpackPlugin', (compilation) => {
+      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('StylesAsyncHtmlWebpackPlugin', (data, cb) => {
+        this.#makeAsync(data.assetTags.styles);
+        cb(null, data);
+      });
+    });
+  }
+
+  /** @param {HtmlTagObject[]} styles */
+  #makeAsync(styles) {
+    for (const style of styles) {
+      for (const path of this.#paths) {
+        if (minimatch(style.attributes.href, path)) {
+          // https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use
+          style.attributes.media = 'print';
+          style.attributes.onload = "this.media='all'; this.onload=null;";
+        }
+      }
+    }
+  }
+}
+
 class ThrowOnAssetsEmitedWebpackPlugin {
   #patterns;
 
@@ -202,6 +235,7 @@ module.exports = {
   dir,
   browsers,
   ScriptsHtmlWebpackPlugin,
+  StylesAsyncHtmlWebpackPlugin,
   ThrowOnAssetsEmitedWebpackPlugin,
   resolveNestedVersion,
   mergeBabelRules,
