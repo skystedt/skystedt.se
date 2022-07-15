@@ -198,20 +198,6 @@ function wildcardMatch(...patterns) {
   return (value) => patterns.some((pattern) => minimatch(value, pattern));
 }
 
-/** @returns {CspPolicy} */
-function contentSecurityPolicy() {
-  const staticWebAppConfig = require('./staticwebapp.config.json');
-  const cspHeader = staticWebAppConfig.routes.find((value) => value.route === '/').headers['Content-Security-Policy'];
-  const csp = cspHeader
-    .split(';')
-    .map((value) => value.trim().split(' '))
-    .reduce((map, value) => {
-      map[value[0]] = value.slice(1);
-      return map;
-    }, {});
-  return csp;
-}
-
 module.exports = {
   dir,
   browsers,
@@ -220,6 +206,5 @@ module.exports = {
   resolveNestedVersion,
   mergeBabelRules,
   mergeCssRules,
-  wildcardMatch,
-  contentSecurityPolicy
+  wildcardMatch
 };

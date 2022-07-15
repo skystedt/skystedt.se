@@ -3,6 +3,7 @@ const path = require('path');
 const update = require('immutability-helper');
 const structuredClone = require('core-js/stable/structured-clone.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -83,6 +84,12 @@ const modern = {
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
       scriptLoading: 'module'
+    }),
+    new CspHtmlWebpackPlugin(require('./content-security-policy.json'), {
+      nonceEnabled: {
+        'script-src': false,
+        'style-src': false
+      }
     }),
     new ScriptsHtmlWebpackPlugin({
       add: [
@@ -172,7 +179,7 @@ const rules = (configuration) => {
     module: {
       rules: {
         $apply: (rules) => {
-          const updatedRules = structuredClone(rules); // needed because we require babel.config.json
+          const updatedRules = structuredClone(rules); // needed because we load babel.config.json via require
           mergeBabelRules(updatedRules, configuration.module.rules);
           mergeCssRules(updatedRules, configuration.module.rules);
           return updatedRules;
