@@ -2,7 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-    <RootNamespace>Skystedt.API</RootNamespace>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Skystedt.Api</RootNamespace>
     <UserSecretsId>32ea2729-319b-416c-9883-fd42749c0eb5</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>

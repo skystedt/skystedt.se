@@ -34,8 +34,6 @@ namespace Skystedt.Api
             var connectionString = _configuration["StorageAccount"];
             var tableClient = new TableClient(connectionString, "test");
 
-            await tableClient.CreateIfNotExistsAsync();
-
             var entity = new TableEntity("test", Guid.NewGuid().ToString());
             var response = await tableClient.AddEntityAsync(entity);
 

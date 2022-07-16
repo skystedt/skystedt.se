@@ -12,8 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution
 		..\.editorconfig = ..\.editorconfig
 		..\.gitignore = ..\.gitignore
 		..\.github\workflows\azure-static-web-apps.yml = ..\.github\workflows\azure-static-web-apps.yml
-		client\staticwebapp.config.json = client\staticwebapp.config.json
 		..\.github\dependabot.yml = ..\.github\dependabot.yml
+		client\staticwebapp.config.json = client\staticwebapp.config.json
 	EndProjectSection
 EndProject
 Global
