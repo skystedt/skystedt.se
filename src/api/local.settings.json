@@ -1,10 +1,10 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet",
 
     "APPINSIGHTS_INSTRUMENTATIONKEY": "1ef798fd-96b6-4e8b-a8c0-ea41a23d05b8",
-    "StorageAccount": "<user secret>"
+    "StorageAccount": "<secret>"
   }
 }
