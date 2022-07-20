@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 const path = require('path');
+const minimatch = require('minimatch');
 const { dir, wildcardMatch } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("webpack").EntryObject } EntryObject */
@@ -50,7 +51,18 @@ const chunks = {
           chunks: 'all'
         },
         vendor: {
-          test: dir.node_modules,
+          test: (module) =>
+            module.resource &&
+            minimatch(module.resource, path.resolve(dir.node_modules, '**'), { windowsPathsNoEscape: true }) &&
+            // when using output = module then node modules only used with local dev server will break local development if included in cacheGroups
+            ![
+              'webpack',
+              'webpack-dev-server',
+              'ansi-html-community',
+              'html-entities',
+              'events',
+              'mini-css-extract-plugin'
+            ].includes(module.resourceResolveData.descriptionFileData.name),
           type: wildcardMatch('javascript/*'),
           priority: 10,
           name: (module) => {
@@ -94,13 +106,6 @@ const chunks = {
               case '@microsoft/applicationinsights-shims':
               case '@microsoft/dynamicproto-js':
                 return 'insights';
-              case 'webpack':
-              case 'webpack-dev-server':
-              case 'ansi-html-community':
-              case 'html-entities':
-              case 'events':
-              case 'mini-css-extract-plugin':
-                return 'development';
               default:
                 throw Error(
                   'Unspecified cache group for node_modules package: ' +
