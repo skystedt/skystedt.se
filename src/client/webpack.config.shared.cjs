@@ -3,20 +3,17 @@ const path = require('path');
 const update = require('immutability-helper');
 const structuredClone = require('core-js/stable/structured-clone.js');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
+const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const CreateFileWebpack = require('create-file-webpack');
 const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
-const {
-  dir,
-  browsers,
-  ScriptsHtmlWebpackPlugin,
-  StylesAsyncHtmlWebpackPlugin,
-  ThrowOnAssetsEmitedWebpackPlugin
-} = require('./webpack.helpers.cjs');
+const { dir, browsers } = require('./webpack.helpers.cjs');
+const ScriptsHtmlWebpackPlugin = require('./webpack.helpers.cjs').ScriptsHtmlWebpackPlugin;
+const ExtendedCspHtmlWebpackPlugin = require('./webpack.helpers.cjs').ExtendedCspHtmlWebpackPlugin;
+const ThrowOnAssetsEmitedWebpackPlugin = require('./webpack.helpers.cjs').ThrowOnAssetsEmitedWebpackPlugin;
 const { resolveNestedVersion, mergeBabelRules, mergeCssRules } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("@babel/preset-env").Options } BabelOptions */
@@ -106,8 +103,16 @@ const modern = {
         { path: 'legacy/*.js', type: 'nomodule', defer: true }
       ]
     }),
-    new StylesAsyncHtmlWebpackPlugin('**/*.css'),
-    new CspHtmlWebpackPlugin(require('./content-security-policy.json'), {
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css'
+    }),
+    new HtmlInlineCssWebpackPlugin(),
+    new ExtendedCspHtmlWebpackPlugin(require('./content-security-policy.json'), {
+      hashingMethod: 'sha256',
+      hashEnabled: {
+        'script-src': false,
+        'style-src': true
+      },
       nonceEnabled: {
         'script-src': false,
         'style-src': false
@@ -116,9 +121,6 @@ const modern = {
     new ThrowOnAssetsEmitedWebpackPlugin('polyfills.*.mjs'),
     new CopyPlugin({
       patterns: [path.resolve(dir.src, 'favicon.ico')]
-    }),
-    new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].css'
     }),
     new CreateFileWebpack({
       path: dir.dist,

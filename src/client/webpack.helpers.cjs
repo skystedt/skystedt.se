@@ -3,8 +3,9 @@ const path = require('path');
 const resolve = require('enhanced-resolve');
 const minimatch = require('minimatch');
 const glob = require('glob');
-const { default: babelTargets } = require('@babel/helper-compilation-targets');
+const babelTargets = require('@babel/helper-compilation-targets').default;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 /** @typedef { import("webpack").Compiler } Compiler */
 /** @typedef { import("webpack").RuleSetRule } RuleSetRule */
 /** @typedef { import("@babel/core").TransformOptions } BabelTransformOptions */
@@ -98,36 +99,14 @@ class ScriptsHtmlWebpackPlugin {
   }
 }
 
-class StylesAsyncHtmlWebpackPlugin {
-  /** @type {string | string[]} */
-  #paths;
-
-  /** @param {string | string[]} paths */
-  constructor(paths) {
-    this.#paths = [].concat(paths || []);
-  }
-
-  /** @param {Compiler} compiler */
-  apply(compiler) {
-    compiler.hooks.compilation.tap('StylesAsyncHtmlWebpackPlugin', (compilation) => {
-      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('StylesAsyncHtmlWebpackPlugin', (data, cb) => {
-        this.#makeAsync(data.assetTags.styles);
-        cb(null, data);
-      });
-    });
-  }
-
-  /** @param {HtmlTagObject[]} styles */
-  #makeAsync(styles) {
-    for (const style of styles) {
-      for (const path of this.#paths) {
-        if (minimatch(style.attributes.href, path)) {
-          // https://github.com/filamentgroup/loadCSS/blob/master/README.md#how-to-use
-          style.attributes.media = 'print';
-          style.attributes.onload = "this.media='all'; this.onload=null;";
-        }
-      }
-    }
+class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {
+  /**
+   * @param {string} str
+   * @returns {string}
+   */
+  hash(str) {
+    str = str.replace(/\r/g, ''); // remove carriage returns from hashing
+    return super.hash(str);
   }
 }
 
@@ -235,7 +214,7 @@ module.exports = {
   dir,
   browsers,
   ScriptsHtmlWebpackPlugin,
-  StylesAsyncHtmlWebpackPlugin,
+  ExtendedCspHtmlWebpackPlugin,
   ThrowOnAssetsEmitedWebpackPlugin,
   resolveNestedVersion,
   mergeBabelRules,
