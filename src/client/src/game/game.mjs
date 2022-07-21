@@ -1,3 +1,4 @@
+import './game.css';
 import Display from './display.mjs';
 import Input from './input.mjs';
 import * as PIXI from './pixi.mjs';
