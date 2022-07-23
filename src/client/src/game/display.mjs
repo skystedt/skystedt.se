@@ -63,8 +63,8 @@ export default class Display {
 
     this.#renderer.resolution = this.#calculateResolution();
     this.#displaySize = new Size(
-      Math.floor(window.innerWidth / this.resolution),
-      Math.floor(window.innerHeight / this.resolution)
+      Math.floor(window.innerWidth / this.resolution / 2) * 2,
+      Math.floor(window.innerHeight / this.resolution / 2) * 2
     );
 
     this.#renderer.resize(this.#displaySize.width, this.#displaySize.height);
