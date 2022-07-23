@@ -1,17 +1,18 @@
-/* eslint-disable no-undef */
+/* eslint-env node */
 const path = require('path');
+const structuredClone = require('core-js/stable/structured-clone.js');
 const resolve = require('enhanced-resolve');
 const minimatch = require('minimatch');
 const glob = require('glob');
 const babelTargets = require('@babel/helper-compilation-targets').default;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 /** @typedef { import("webpack").Compiler } Compiler */
 /** @typedef { import("webpack").RuleSetRule } RuleSetRule */
 /** @typedef { import("@babel/core").TransformOptions } BabelTransformOptions */
 /** @typedef { import("html-webpack-plugin").HtmlTagObject } HtmlTagObject */
-/** @typedef { import("html-webpack-plugin").ProcessedOptions } ProcessedOptions */
-/** @typedef { import("csp-html-webpack-plugin").Policy } CspPolicy */
+/** @typedef { import('postcss').PluginCreator } PostcssPluginCreator */
+/** @typedef { import('postcss').Root } PostcssRoot */
+/** @typedef { import('postcss').Node } PostcssNode */
 
 const dir = {
   src: path.resolve(__dirname, 'src'),
@@ -99,17 +100,6 @@ class ScriptsHtmlWebpackPlugin {
   }
 }
 
-class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {
-  /**
-   * @param {string} str
-   * @returns {string}
-   */
-  hash(str) {
-    str = str.replace(/\r/g, ''); // remove carriage returns from hashing
-    return super.hash(str);
-  }
-}
-
 class ThrowOnAssetsEmitedWebpackPlugin {
   #patterns;
 
@@ -161,42 +151,31 @@ function resolveNestedVersion(...modules) {
 }
 
 /**
- * @param {RuleSetRule[]} existingRules
- * @param {RuleSetRule[]} updateRules
+ * @param {RuleSetRule[]} rules
  */
-function mergeBabelRules(existingRules, updateRules) {
-  for (const existing of existingRules) {
-    for (const update of updateRules) {
+function mergeBabelRules(rules) {
+  for (let i = 0; i < rules.length; ++i) {
+    for (let j = 0; j < rules.length; ++j) {
       // check for equal <test> and <use.loader> is for babel
       if (
-        String(existing.test) === String(update.test) &&
-        existing.use?.loader?.includes('babel') &&
-        update.use?.loader?.includes('babel')
+        i != j &&
+        rules[i].use?.loader?.includes('babel-loader') &&
+        rules[j].use?.loader?.includes('babel-loader') &&
+        String(rules[i].test) === String(rules[j].test)
       ) {
+        rules[i] = structuredClone(rules[i]);
+
         /** @type {BabelTransformOptions} */
-        const options = existing.use.options;
+        const options = rules[i].use.options;
         // add <updateRule.use.options> to every babel.PluginOption in <existingRule.use.options.presets>
         for (const preset of options?.presets || []) {
           if (Array.isArray(preset) && preset.length >= 2) {
-            preset[1] = Object.assign(preset[1], update.use.options);
+            preset[1] = Object.assign(preset[1], rules[j].use.options);
           }
         }
-      }
-    }
-  }
-}
 
-/**
- * @param {RuleSetRule[]} existingRules
- * @param {RuleSetRule[]} updateRules
- */
-function mergeCssRules(existingRules, updateRules) {
-  for (const existing of existingRules) {
-    for (const update of updateRules) {
-      // check for equal <use.test> is for css
-      if (existing.test?.toString()?.includes('\\.css') && update.test?.toString()?.includes('\\.css')) {
-        // replace <existingRule.use> with <updateRule.use>
-        existing.use = update.use;
+        rules.splice(j, 1);
+        return;
       }
     }
   }
@@ -210,14 +189,45 @@ function wildcardMatch(...patterns) {
   return (value) => patterns.some((pattern) => minimatch(value, pattern));
 }
 
+/** @type {PostcssPluginCreator} */
+function postcssRemoveCarriageReturn() {
+  /** @param {PostcssNode} node */
+  const removeCarriageReturn = (node) => {
+    const replace = (str) => str.replace(/\r/g, '');
+    // prettier-ignore
+    const props = node.type === 'atrule' ? ['params']
+        : node.type === 'rule' ? ['selector']
+        : node.type === 'decl' ? ['prop', 'value']
+        : node.type === 'comment' ? ['text']
+        : [];
+    props.forEach((prop) => {
+      node[prop] = replace(node[prop]);
+    });
+    Object.entries(node.raws).forEach(([key, value]) => {
+      if (typeof value === 'string') {
+        node.raws[key] = replace(value);
+      }
+    });
+  };
+
+  return {
+    postcssPlugin: 'remove-carriage-return',
+    /** @param {PostcssRoot} root */
+    OnceExit(root) {
+      removeCarriageReturn(root);
+      root.walk(removeCarriageReturn);
+    }
+  };
+}
+postcssRemoveCarriageReturn.postcss = true;
+
 module.exports = {
   dir,
   browsers,
   ScriptsHtmlWebpackPlugin,
-  ExtendedCspHtmlWebpackPlugin,
   ThrowOnAssetsEmitedWebpackPlugin,
   resolveNestedVersion,
   mergeBabelRules,
-  mergeCssRules,
-  wildcardMatch
+  wildcardMatch,
+  postcssRemoveCarriageReturn
 };

@@ -1,6 +1,8 @@
-/* Neutralization of HTML elements */
-/* https://github.com/twbs/bootstrap/blob/main/scss/_reboot.scss */
-/* https://github.com/necolas/normalize.css/blob/master/normalize.css */
+/*
+ Neutralization of HTML elements
+ https://github.com/twbs/bootstrap/blob/main/scss/_reboot.scss 
+ https://github.com/necolas/normalize.css/blob/master/normalize.css
+*/
 
 *,
 *::before,
@@ -10,8 +12,4 @@
 
 body {
   margin: 0;
-}
-
-canvas {
-  vertical-align: middle;
 }

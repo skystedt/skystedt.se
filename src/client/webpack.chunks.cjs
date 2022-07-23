@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+/* eslint-env node */
 const path = require('path');
 const minimatch = require('minimatch');
 const { dir, wildcardMatch } = require('./webpack.helpers.cjs');
@@ -66,20 +66,13 @@ const chunks = {
           type: wildcardMatch('javascript/*'),
           priority: 10,
           name: (module) => {
+            if (module.resourceResolveData.descriptionFileData.name.startsWith('@pixi/')) {
+              return 'pixi';
+            }
+            if (module.resourceResolveData.descriptionFileData.name.startsWith('@microsoft/applicationinsights-')) {
+              return 'insights';
+            }
             switch (module.resourceResolveData.descriptionFileData.name) {
-              case '@pixi/constants':
-              case '@pixi/math':
-              case '@pixi/runner':
-              case '@pixi/settings':
-              case '@pixi/ticker':
-              case '@pixi/utils':
-              case '@pixi/display':
-              case '@pixi/core':
-              case '@pixi/unsafe-eval':
-              case '@pixi/loaders':
-              case '@pixi/sprite':
-              case '@pixi/app':
-              case '@pixi/graphics':
               case 'earcut':
               case 'eventemitter3':
               case 'ismobilejs':
@@ -96,14 +89,6 @@ const chunks = {
                 return 'polyfills';
               case 'unfetch-polyfill':
                 return 'polyfills';
-              case '@microsoft/applicationinsights-web':
-              case '@microsoft/applicationinsights-common':
-              case '@microsoft/applicationinsights-channel-js':
-              case '@microsoft/applicationinsights-properties-js':
-              case '@microsoft/applicationinsights-dependencies-js':
-              case '@microsoft/applicationinsights-core-js':
-              case '@microsoft/applicationinsights-analytics-js':
-              case '@microsoft/applicationinsights-shims':
               case '@microsoft/dynamicproto-js':
                 return 'insights';
               default:

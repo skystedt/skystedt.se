@@ -6,3 +6,6 @@ last 2 versions and not dead and > 0.01% or > 0.2% and supports es6-module
 
 [legacy]
 last 2 versions and not dead and > 0.01% or > 0.2% and not supports es6-module
+
+[styles]
+last 2 versions and not dead and > 0.01% or > 0.2%
