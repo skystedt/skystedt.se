@@ -1,7 +1,8 @@
-/* eslint-disable no-undef */
+/* eslint-env node */
 const webpack = require('webpack');
 const update = require('immutability-helper');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const StylelintPlugin = require('stylelint-webpack-plugin');
 const { dir } = require('./webpack.helpers.cjs');
 const { sharedLegacy, sharedModern } = require('./webpack.config.shared.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
@@ -35,6 +36,11 @@ const developmentModern = {
   plugins: [
     new ESLintPlugin({
       extensions: '.mjs',
+      failOnError: false,
+      failOnWarning: false
+    }),
+    new StylelintPlugin({
+      extensions: '.css',
       failOnError: false,
       failOnWarning: false
     })

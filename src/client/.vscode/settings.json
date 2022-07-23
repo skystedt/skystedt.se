@@ -7,5 +7,7 @@
   },
   "eslint.enable": true,
   "eslint.useESLintClass": true,
-  "eslint.codeActionsOnSave.rules": ["curly", "no-var"]
+  "eslint.codeActionsOnSave.rules": ["curly", "no-var"],
+  "css.validate": false,
+  "stylelint.validate": ["css"]
 }

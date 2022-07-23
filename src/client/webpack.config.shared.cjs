@@ -1,20 +1,23 @@
-/* eslint-disable no-undef */
+/* eslint-env node */
 const path = require('path');
 const update = require('immutability-helper');
-const structuredClone = require('core-js/stable/structured-clone.js');
+const browserslist = require('browserslist');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
-const CopyPlugin = require('copy-webpack-plugin');
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 const CreateFileWebpack = require('create-file-webpack');
+const postcssPresetEnv = require('postcss-preset-env');
+const postcssMergeRules = require('postcss-merge-rules');
 const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
 const { dir, browsers } = require('./webpack.helpers.cjs');
 const ScriptsHtmlWebpackPlugin = require('./webpack.helpers.cjs').ScriptsHtmlWebpackPlugin;
-const ExtendedCspHtmlWebpackPlugin = require('./webpack.helpers.cjs').ExtendedCspHtmlWebpackPlugin;
 const ThrowOnAssetsEmitedWebpackPlugin = require('./webpack.helpers.cjs').ThrowOnAssetsEmitedWebpackPlugin;
-const { resolveNestedVersion, mergeBabelRules, mergeCssRules } = require('./webpack.helpers.cjs');
+const postcssRemoveCarriageReturn = require('./webpack.helpers.cjs').postcssRemoveCarriageReturn;
+const { resolveNestedVersion, mergeBabelRules } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("@babel/preset-env").Options } BabelOptions */
 
@@ -49,10 +52,6 @@ const shared = {
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/inline'
-      },
-      {
-        test: /\.css$/i,
-        use: [MiniCssExtractPlugin.loader, 'css-loader']
       }
     ]
   },
@@ -107,7 +106,7 @@ const modern = {
       filename: '[name].[contenthash].css'
     }),
     new HtmlInlineCssWebpackPlugin(),
-    new ExtendedCspHtmlWebpackPlugin(require('./content-security-policy.json'), {
+    new CspHtmlWebpackPlugin(require('./content-security-policy.json'), {
       hashingMethod: 'sha256',
       hashEnabled: {
         'script-src': false,
@@ -144,6 +143,30 @@ const modern = {
             ]
           })
         }
+      },
+      {
+        test: /\.css$/i,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  postcssRemoveCarriageReturn(),
+                  postcssMergeRules(),
+                  postcssPresetEnv({
+                    browsers: browserslist(null, { env: 'styles' }),
+                    features: {
+                      'nesting-rules': true
+                    }
+                  })
+                ]
+              }
+            }
+          }
+        ]
       }
     ]
   }
@@ -192,10 +215,9 @@ const rules = (configuration) => {
     module: {
       rules: {
         $apply: (rules) => {
-          const updatedRules = structuredClone(rules); // needed because we load babel.config.json via require
-          mergeBabelRules(updatedRules, configuration.module.rules);
-          mergeCssRules(updatedRules, configuration.module.rules);
-          return updatedRules;
+          rules = [...(rules || []), ...(configuration.module.rules || [])];
+          mergeBabelRules(rules);
+          return rules;
         }
       }
     }

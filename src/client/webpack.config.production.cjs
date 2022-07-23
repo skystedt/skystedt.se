@@ -1,7 +1,8 @@
-/* eslint-disable no-undef */
+/* eslint-env node */
 const webpack = require('webpack');
 const update = require('immutability-helper');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const StylelintPlugin = require('stylelint-webpack-plugin');
 const { sharedLegacy, sharedModern } = require('./webpack.config.shared.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 
@@ -35,6 +36,11 @@ const productionModern = {
         // should be last, https://github.com/prettier/eslint-plugin-prettier#recommended-configuration
         extends: ['plugin:prettier/recommended']
       }
+    }),
+    new StylelintPlugin({
+      extensions: '.css',
+      failOnError: true,
+      failOnWarning: true
     })
   ]
 };
