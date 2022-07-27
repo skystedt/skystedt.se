@@ -5,5 +5,7 @@
   "script-src": "'self'",
   "connect-src": ["'self'", "https://dc.services.visualstudio.com"],
   "img-src": ["'self'", "data:"],
-  "style-src": "'self'"
+  "style-src": "'self'",
+  "trusted-types": "webpack",
+  "require-trusted-types-for": "'script'"
 }

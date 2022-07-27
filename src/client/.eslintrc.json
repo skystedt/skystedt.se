@@ -9,6 +9,7 @@
   },
   "extends": [
     "eslint:recommended",
+    "plugin:no-unsanitized/DOM",
     "plugin:import/recommended",
     "plugin:jsdoc/recommended",
     "plugin:compat/recommended",
