@@ -66,13 +66,8 @@ const chunks = {
           type: wildcardMatch('javascript/*'),
           priority: 10,
           name: (module) => {
-            if (module.resourceResolveData.descriptionFileData.name.startsWith('@pixi/')) {
-              return 'pixi';
-            }
-            if (module.resourceResolveData.descriptionFileData.name.startsWith('@microsoft/applicationinsights-')) {
-              return 'insights';
-            }
-            switch (module.resourceResolveData.descriptionFileData.name) {
+            const moduleName = module.resourceResolveData.descriptionFileData.name;
+            switch (moduleName) {
               case 'earcut':
               case 'eventemitter3':
               case 'ismobilejs':
@@ -91,12 +86,14 @@ const chunks = {
                 return 'polyfills';
               case '@microsoft/dynamicproto-js':
                 return 'insights';
-              default:
-                throw Error(
-                  'Unspecified cache group for node_modules package: ' +
-                    module.resourceResolveData.descriptionFileData.name
-                );
             }
+            switch (true) {
+              case moduleName.startsWith('@pixi/'):
+                return 'pixi';
+              case moduleName.startsWith('@microsoft/applicationinsights-'):
+                return 'insights';
+            }
+            throw Error('Unspecified cache group for node_modules package: ' + moduleName);
           },
           chunks: 'all'
         }

@@ -11,7 +11,7 @@
       }
     },
     {
-      "route": "/*.{js,css,png,svg,jpg,jpeg,gif}",
+      "route": "/*.{mjs,js,css,png,svg,jpg,jpeg,gif,ico}",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable",
         "ETag": ""
