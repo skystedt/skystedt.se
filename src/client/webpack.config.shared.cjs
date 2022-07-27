@@ -78,6 +78,7 @@ const modern = {
     filename: '[name].[contenthash].mjs',
     path: dir.dist,
     publicPath: '/',
+    trustedTypes: 'webpack',
     clean: {
       keep: 'legacy'
     }
