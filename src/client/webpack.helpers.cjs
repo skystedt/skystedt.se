@@ -10,9 +10,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 /** @typedef { import("webpack").RuleSetRule } RuleSetRule */
 /** @typedef { import("@babel/core").TransformOptions } BabelTransformOptions */
 /** @typedef { import("html-webpack-plugin").HtmlTagObject } HtmlTagObject */
-/** @typedef { import('postcss').PluginCreator } PostcssPluginCreator */
-/** @typedef { import('postcss').Root } PostcssRoot */
-/** @typedef { import('postcss').Node } PostcssNode */
+/** @typedef { import("postcss").PluginCreator } PostcssPluginCreator */
+/** @typedef { import("postcss").Root } PostcssRoot */
+/** @typedef { import("postcss").Node } PostcssNode */
 
 const dir = {
   src: path.resolve(__dirname, 'src'),
@@ -181,14 +181,6 @@ function mergeBabelRules(rules) {
   }
 }
 
-/**
- * @param {string[]} patterns
- * @returns {(string) => boolean}
- */
-function wildcardMatch(...patterns) {
-  return (value) => patterns.some((pattern) => minimatch(value, pattern));
-}
-
 /** @type {PostcssPluginCreator} */
 function postcssRemoveCarriageReturn() {
   /** @param {PostcssNode} node */
@@ -228,6 +220,5 @@ module.exports = {
   ThrowOnAssetsEmitedWebpackPlugin,
   resolveNestedVersion,
   mergeBabelRules,
-  wildcardMatch,
   postcssRemoveCarriageReturn
 };

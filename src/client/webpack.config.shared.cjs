@@ -80,8 +80,7 @@ const modern = {
     publicPath: '/',
     clean: {
       keep: 'legacy'
-    },
-    module: true
+    }
   },
   experiments: {
     outputModule: true

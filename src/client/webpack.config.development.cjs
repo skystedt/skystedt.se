@@ -23,6 +23,9 @@ const development = {
 
 /** @type {Configuration} */
 const developmentModern = {
+  output: {
+    module: false // HMR is not implemented for module chunk format yet
+  },
   devServer: {
     static: {
       directory: dir.dist
@@ -58,6 +61,7 @@ const rules = (configuration) => {
 
 const rulesModern = (configuration) => {
   return {
+    output: { $merge: configuration.output },
     devServer: { $set: configuration.devServer },
     plugins: { $push: configuration.plugins }
   };

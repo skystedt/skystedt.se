@@ -1,10 +1,10 @@
 {
   "env": {
-    "browser": true
+    "browser": true,
+    "es2016": true
   },
   "parser": "@babel/eslint-parser",
   "parserOptions": {
-    "ecmaVersion": 2016,
     "sourceType": "module"
   },
   "extends": [
