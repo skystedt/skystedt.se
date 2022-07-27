@@ -1,5 +1,6 @@
 /* eslint-env node */
 const webpack = require('webpack');
+const minimatch = require('minimatch');
 const update = require('immutability-helper');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const StylelintPlugin = require('stylelint-webpack-plugin');
@@ -18,13 +19,20 @@ const production = {
     minimize: true
   },
   performance: {
-    maxAssetSize: 300 * 1024,
-    maxEntrypointSize: 500 * 1024
+    assetFilter: (assetFilename) => {
+      if (minimatch(assetFilename, 'pixi.*.*js')) {
+        return false;
+      }
+      return true;
+    }
   }
 };
 
 /** @type {Configuration} */
 const productionModern = {
+  output: {
+    module: true
+  },
   plugins: [
     new ESLintPlugin({
       extensions: '.mjs',
@@ -56,6 +64,7 @@ const rules = (configuration) => {
 
 const rulesModern = (configuration) => {
   return {
+    output: { $merge: configuration.output },
     plugins: { $push: configuration.plugins }
   };
 };

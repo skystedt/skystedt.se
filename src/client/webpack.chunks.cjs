@@ -1,7 +1,7 @@
 /* eslint-env node */
 const path = require('path');
 const minimatch = require('minimatch');
-const { dir, wildcardMatch } = require('./webpack.helpers.cjs');
+const { dir } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("webpack").EntryObject } EntryObject */
 
@@ -16,6 +16,14 @@ const entryLegacy = {
   polyfills: path.resolve(dir.src, 'polyfills.mjs'),
   app: { dependOn: 'polyfills' }
 };
+
+/**
+ * @param {string[]} patterns
+ * @returns {(string) => boolean}
+ */
+function wildcardMatch(...patterns) {
+  return (value) => patterns.some((pattern) => minimatch(value, pattern));
+}
 
 /** @type {Configuration} */
 const chunks = {

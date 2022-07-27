@@ -21,7 +21,7 @@ export default class Game {
   #input;
 
   #loopState = {
-    lowFpsCheck: 0,
+    fpsCheck: 0,
     logicWait: 0,
     logicRemaining: 0,
     backgroundWait: 0,
@@ -64,7 +64,7 @@ export default class Game {
     this.#loopState.logicRemaining = 0;
     this.#loopState.backgroundWait = 1000 / BACKGROUND_FPS;
     this.#loopState.backgroundRemaining = 0;
-    this.#loopState.lowFpsCheck = this.#loopState.lastTimestamp + WAIT_BEFORE_FPS_CHECK;
+    this.#loopState.fpsCheck = this.#loopState.lastTimestamp + WAIT_BEFORE_FPS_CHECK;
     requestAnimationFrame(this.#frameLoop.bind(this));
   }
 
@@ -108,8 +108,8 @@ export default class Game {
       this.#updateBackground();
     }
 
-    if (this.#loopState.lowFpsCheck && timestamp > this.#loopState.lowFpsCheck) {
-      this.#loopState.lowFpsCheck = 0;
+    if (this.#loopState.fpsCheck && timestamp > this.#loopState.fpsCheck) {
+      this.#loopState.fpsCheck = 0;
       this.#checkFps();
     }
   }
@@ -119,7 +119,10 @@ export default class Game {
 
     this.#logFpsMetric(fps, 0);
 
-    if (fps < LOGIC_FPS) {
+    if (fps >= LOGIC_FPS) {
+      // eslint-disable-next-line no-console
+      console.debug(`FPS: ${fps}`);
+    } else {
       console.warn(`Low FPS (target: ${LOGIC_FPS}): ${fps}`);
     }
   }
