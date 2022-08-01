@@ -1,4 +1,5 @@
 html {
+  background-color: black; /* is also set inline, this acts as backup if inline csp is not accepted */
   height: 100%;
   width: 100%;
 }

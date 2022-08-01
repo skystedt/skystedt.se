@@ -1,7 +1,8 @@
 /* eslint-env node */
 const path = require('path');
+const fs = require('fs');
 const structuredClone = require('core-js/stable/structured-clone.js');
-const resolve = require('enhanced-resolve');
+const enchancedResolve = require('enhanced-resolve');
 const minimatch = require('minimatch');
 const glob = require('glob');
 const babelTargets = require('@babel/helper-compilation-targets').default;
@@ -15,6 +16,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 /** @typedef { import("postcss").Node } PostcssNode */
 
 const dir = {
+  root: path.resolve(__dirname),
   src: path.resolve(__dirname, 'src'),
   dist: path.resolve(__dirname, 'dist'),
   node_modules: path.resolve(__dirname, 'node_modules')
@@ -30,11 +32,26 @@ const browsers = {
   legacy: babelTargets({}, { browserslistEnv: 'legacy' })
 };
 
+/**
+ * @param {string} path1
+ * @param {string} path2
+ * @returns {string}
+ */
+function urlJoin(path1, path2) {
+  if (!path2) {
+    return path1;
+  }
+  if (!path1) {
+    return path2;
+  }
+  return path1.replace(/\/+$/, '') + '/' + path2.replace(/^\/+/, '');
+}
+
 class ScriptsHtmlWebpackPlugin {
   /** @typedef {{ path: string, directory: string }} AddScript */
   /** @typedef {{ path: string, defer?: boolean, async?: boolean, type?: "module" | "nomodule" | false }} ScriptAttributes */
 
-  /** @type {string[]} */
+  /** @type {AddScript[]} */
   #add;
 
   /** @type {ScriptAttributes[]} */
@@ -51,8 +68,8 @@ class ScriptsHtmlWebpackPlugin {
     compiler.hooks.compilation.tap('ScriptsAttributesHtmlWebpackPlugin', (compilation) => {
       HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync(
         'ScriptsAttributesHtmlWebpackPlugin',
-        (data, cb) => {
-          this.#addScripts(data.assetTags.scripts);
+        async (data, cb) => {
+          await this.#addScripts(data.publicPath, data.assetTags.scripts);
           this.#updateAttributes(data.assetTags.scripts);
           cb(null, data);
         }
@@ -60,12 +77,16 @@ class ScriptsHtmlWebpackPlugin {
     });
   }
 
-  /** @param {HtmlTagObject[]} scripts */
-  #addScripts(scripts) {
+  /**
+   * @param {string} publicPath
+   * @param {HtmlTagObject[]} scripts
+   */
+  async #addScripts(publicPath, scripts) {
     for (const script of this.#add) {
       const files = glob.sync(script.path, { cwd: script.directory });
       for (const file of files) {
-        const tag = HtmlWebpackPlugin.createHtmlTagObject('script', { src: file });
+        const url = urlJoin(publicPath, file);
+        const tag = HtmlWebpackPlugin.createHtmlTagObject('script', { src: url });
         scripts.push(tag);
       }
     }
@@ -127,6 +148,40 @@ class ThrowOnAssetsEmitedWebpackPlugin {
   }
 }
 
+class CreateFilePlugin {
+  /** @type {string} */
+  #filePath;
+  /** @type {string} */
+  #fileName;
+  /** @type {string | Function<string>} */
+  #content;
+
+  /**
+   * @param {string} filePath
+   * @param {string} fileName
+   * @param {string | Function<string>} content
+   */
+  constructor(filePath, fileName, content) {
+    this.#filePath = filePath;
+    this.#fileName = fileName;
+    this.#content = content;
+  }
+
+  /** @param {Compiler} compiler */
+  apply(compiler) {
+    // the hook needs to execute after HtmlWebpackPlugin's hooks have fully completed
+    compiler.hooks.done.tap('CreateFilePlugin', () => {
+      this.#createFile();
+    });
+  }
+
+  #createFile() {
+    const fullPath = path.join(this.#filePath, this.#fileName);
+    const content = typeof this.#content === 'function' ? this.#content() : this.#content;
+    fs.writeFileSync(fullPath, content);
+  }
+}
+
 /**
  * @param {...string} modules
  * @returns {string}
@@ -136,7 +191,11 @@ function resolveNestedVersion(...modules) {
   if (modules.length === 1) {
     current = path.resolve(current, modules[0], 'package.json');
   } else if (modules.length >= 1) {
-    const resolver = resolve.create.sync({ mainFiles: ['package'], extensions: ['.json'], enforceExtension: true });
+    const resolver = enchancedResolve.create.sync({
+      mainFiles: ['package'],
+      extensions: ['.json'],
+      enforceExtension: true
+    });
     const [firstModule, ...otherModules] = modules;
     current = path.resolve(current, firstModule);
     for (const module of otherModules) {
@@ -150,9 +209,7 @@ function resolveNestedVersion(...modules) {
   return packageJson.version;
 }
 
-/**
- * @param {RuleSetRule[]} rules
- */
+/** @param {RuleSetRule[]} rules */
 function mergeBabelRules(rules) {
   for (let i = 0; i < rules.length; ++i) {
     for (let j = 0; j < rules.length; ++j) {
@@ -218,6 +275,7 @@ module.exports = {
   browsers,
   ScriptsHtmlWebpackPlugin,
   ThrowOnAssetsEmitedWebpackPlugin,
+  CreateFilePlugin,
   resolveNestedVersion,
   mergeBabelRules,
   postcssRemoveCarriageReturn
