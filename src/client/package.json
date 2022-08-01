@@ -70,7 +70,7 @@
     "@pixi/ticker": "6.4.2",
     "@pixi/unsafe-eval": "6.4.2",
     "@pixi/utils": "6.4.2",
-    "core-js": "3.24.0",
+    "core-js": "3.24.1",
     "tslib": "2.4.0",
     "unfetch": "4.2.0"
   }
