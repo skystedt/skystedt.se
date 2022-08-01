@@ -6,6 +6,7 @@
     {
       "route": "/",
       "headers": {
+        "Content-Security-Policy": "{{placeholder}}",
         "X-Frame-Options": "DENY",
         "Permissions-Policy": "fullscreen=(self)"
       }

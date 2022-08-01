@@ -3,23 +3,25 @@ const path = require('path');
 const update = require('immutability-helper');
 const browserslist = require('browserslist');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const SubresourceIntegrityPlugin = require('webpack-subresource-integrity').SubresourceIntegrityPlugin;
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
-const CreateFileWebpack = require('create-file-webpack');
 const postcssPresetEnv = require('postcss-preset-env');
 const postcssMergeRules = require('postcss-merge-rules');
 const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
 const { dir, browsers } = require('./webpack.helpers.cjs');
 const ScriptsHtmlWebpackPlugin = require('./webpack.helpers.cjs').ScriptsHtmlWebpackPlugin;
 const ThrowOnAssetsEmitedWebpackPlugin = require('./webpack.helpers.cjs').ThrowOnAssetsEmitedWebpackPlugin;
+const CreateFilePlugin = require('./webpack.helpers.cjs').CreateFilePlugin;
 const postcssRemoveCarriageReturn = require('./webpack.helpers.cjs').postcssRemoveCarriageReturn;
 const { resolveNestedVersion, mergeBabelRules } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("@babel/preset-env").Options } BabelOptions */
+/** @typedef { import("csp-html-webpack-plugin").Policy } CspPolicy */
 
 // https://github.com/zloirock/core-js#babelpreset-env
 // "Recommended to specify used minor core-js version"
@@ -28,6 +30,9 @@ const corejsVersion = resolveNestedVersion('core-js');
 // print the browsers so it's possible to compare browsers between builds without having the dist
 // eslint-disable-next-line no-console
 console.log('browsers', browsers);
+
+/** @type {CspPolicy} */
+let cspPolicy;
 
 /** @returns {Configuration} */
 const shared = {
@@ -64,6 +69,7 @@ const shared = {
       cacheGroups: splitChunks.cacheGroups
     },
     minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+    realContentHash: true,
     removeAvailableModules: true,
     sideEffects: true
   }
@@ -77,8 +83,9 @@ const modern = {
   output: {
     filename: '[name].[contenthash].mjs',
     path: dir.dist,
-    publicPath: '/',
+    publicPath: '',
     trustedTypes: 'webpack',
+    crossOriginLoading: 'anonymous',
     clean: {
       keep: 'legacy'
     }
@@ -106,8 +113,12 @@ const modern = {
       filename: '[name].[contenthash].css'
     }),
     new HtmlInlineCssWebpackPlugin(),
+    new SubresourceIntegrityPlugin({
+      enabled: 'auto',
+      hashFuncNames: ['sha384']
+    }),
     new CspHtmlWebpackPlugin(require('./content-security-policy.json'), {
-      hashingMethod: 'sha256',
+      hashingMethod: 'sha384',
       hashEnabled: {
         'script-src': false,
         'style-src': true
@@ -115,17 +126,24 @@ const modern = {
       nonceEnabled: {
         'script-src': false,
         'style-src': false
+      },
+      processFn: (builtPolicy, htmlPluginData, $, compilation) => {
+        cspPolicy = builtPolicy;
+        if (compilation.options.mode === 'development') {
+          new CspHtmlWebpackPlugin().opts.processFn(builtPolicy, htmlPluginData, $);
+        }
       }
     }),
     new ThrowOnAssetsEmitedWebpackPlugin('polyfills.*.mjs'),
     new CopyPlugin({
       patterns: [path.resolve(dir.src, 'favicon.ico')]
     }),
-    new CreateFileWebpack({
-      path: dir.dist,
-      fileName: 'browsers.json',
-      content: JSON.stringify(browsers, null, 2)
-    })
+    new CreateFilePlugin(dir.root, 'staticwebapp.config.json', () => {
+      const staticwebapp = require('./staticwebapp.config.template.json');
+      staticwebapp.routes.find((route) => route.route === '/').headers['Content-Security-Policy'] = cspPolicy;
+      return JSON.stringify(staticwebapp, null, 2);
+    }),
+    new CreateFilePlugin(dir.dist, 'browsers.json', JSON.stringify(browsers, null, 2))
   ],
   module: {
     rules: [
@@ -180,7 +198,7 @@ const legacy = {
   output: {
     filename: '[name].[contenthash].js',
     path: path.resolve(dir.dist, 'legacy'),
-    publicPath: '/legacy/',
+    publicPath: 'legacy/',
     clean: true
   },
   module: {
