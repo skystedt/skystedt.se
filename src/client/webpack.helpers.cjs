@@ -5,7 +5,7 @@ const structuredClone = require('core-js/stable/structured-clone.js');
 const enchancedResolve = require('enhanced-resolve');
 const minimatch = require('minimatch');
 const glob = require('glob');
-const babelTargets = require('@babel/helper-compilation-targets').default;
+const { default: babelTargets, prettifyTargets: babelPrettifyTargets } = require('@babel/helper-compilation-targets');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 /** @typedef { import("webpack").Compiler } Compiler */
 /** @typedef { import("webpack").RuleSetRule } RuleSetRule */
@@ -26,10 +26,19 @@ const dir = {
 // in case there are nested modules
 const caniuseVersion = resolveNestedVersion('@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite');
 
+/**
+ * @param {string} env
+ * @returns {{[string]:string}}
+ */
+function resolveBabelTargets(env) {
+  return babelPrettifyTargets(babelTargets({}, { browserslistEnv: env }));
+}
+
 const browsers = {
   version: caniuseVersion,
-  modern: babelTargets({}, { browserslistEnv: 'modern' }),
-  legacy: babelTargets({}, { browserslistEnv: 'legacy' })
+  all: resolveBabelTargets('all'),
+  modern: resolveBabelTargets('modern'),
+  legacy: resolveBabelTargets('legacy')
 };
 
 /**

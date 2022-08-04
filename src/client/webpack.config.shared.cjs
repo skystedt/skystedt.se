@@ -175,7 +175,7 @@ const modern = {
                   postcssRemoveCarriageReturn(),
                   postcssMergeRules(),
                   postcssPresetEnv({
-                    browsers: browserslist(null, { env: 'styles' }),
+                    browsers: browserslist(null, { env: 'all' }),
                     features: {
                       'nesting-rules': true
                     }
