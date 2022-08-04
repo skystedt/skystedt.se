@@ -4,9 +4,6 @@ node_modules
 # Build results
 [Dd]ist/
 
-# Reports
-[Rr]eports/
-
 # Lock files
 *.lock
 package-lock.json
