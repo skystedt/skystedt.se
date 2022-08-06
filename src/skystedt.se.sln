@@ -11,9 +11,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution
 	ProjectSection(SolutionItems) = preProject
 		..\.editorconfig = ..\.editorconfig
 		..\.gitignore = ..\.gitignore
-		..\.github\workflows\azure-static-web-apps.yml = ..\.github\workflows\azure-static-web-apps.yml
-		..\.github\dependabot.yml = ..\.github\dependabot.yml
 		client\staticwebapp.config.template.json = client\staticwebapp.config.template.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{6B47A93C-E1A5-4F38-B886-0EF66488B1E2}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\dependabot.yml = ..\.github\dependabot.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{A22425A5-9CCC-4D94-8F95-E58EF3388B21}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\azure-static-web-apps-build-and-deploy.yml = ..\.github\workflows\azure-static-web-apps-build-and-deploy.yml
+		..\.github\workflows\azure-static-web-apps-close-pull-request.yml = ..\.github\workflows\azure-static-web-apps-close-pull-request.yml
+		..\.github\workflows\dependabot-build.yml = ..\.github\workflows\dependabot-build.yml
+		..\.github\workflows\dependabot-close.yml = ..\.github\workflows\dependabot-close.yml
+		..\.github\workflows\normal-build.yml = ..\.github\workflows\normal-build.yml
+		..\.github\workflows\normal-close.yml = ..\.github\workflows\normal-close.yml
 	EndProjectSection
 EndProject
 Global
@@ -32,6 +45,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6B47A93C-E1A5-4F38-B886-0EF66488B1E2} = {A222E678-9956-4174-87CF-88D3DB440ABF}
+		{A22425A5-9CCC-4D94-8F95-E58EF3388B21} = {6B47A93C-E1A5-4F38-B886-0EF66488B1E2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {73A27D3F-C753-4870-80F4-1DBEBF192C6E}

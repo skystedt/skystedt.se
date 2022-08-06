@@ -1,0 +1,18 @@
+name: Normal Close
+
+concurrency: 
+  group: aswa-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  close_pull_request:
+    name: Close
+    if: github.actor != 'dependabot[bot]'
+    uses: ./.github/workflows/azure-static-web-apps-close-pull-request.yml
+    secrets: inherit
