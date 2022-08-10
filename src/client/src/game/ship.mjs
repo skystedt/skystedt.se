@@ -4,9 +4,6 @@ import ShipStraightImage from './ship.png';
 import ShipLeftImage from './ship_left.png';
 import ShipRightImage from './ship_right.png';
 
-const NAME_SHIP_STRAIGHT = 'ship_straight';
-const NAME_SHIP_LEFT = 'ship_left';
-const NAME_SHIP_RIGHT = 'ship_right';
 const TURN_STRAIGHT_DELAY = 10;
 
 /** @enum {number} */
@@ -24,23 +21,14 @@ export default class Ship {
   #startPosition = /** @type {GamePosition} */ (Uninitialized);
   #straightDelay = 0;
 
-  /** @param {PIXI.Loader} loader */
-  static addResources(loader) {
-    loader
-      .add(NAME_SHIP_STRAIGHT, ShipStraightImage)
-      .add(NAME_SHIP_LEFT, ShipLeftImage)
-      .add(NAME_SHIP_RIGHT, ShipRightImage);
-  }
-
   /**
-   * @param {PIXI.utils.Dict<PIXI.LoaderResource>} loaderResources
    * @param {PIXI.Container} stage
    * @param {Size} gameSize
    */
-  load(loaderResources, stage, gameSize) {
-    const shipStraightTexture = /** @type {PIXI.Texture} */ (loaderResources[NAME_SHIP_STRAIGHT].texture);
-    const shipLeftTexture = /** @type {PIXI.Texture} */ (loaderResources[NAME_SHIP_LEFT].texture);
-    const shipRightTexture = /** @type {PIXI.Texture} */ (loaderResources[NAME_SHIP_RIGHT].texture);
+  async load(stage, gameSize) {
+    const shipStraightTexture = /** @type {PIXI.Texture} */ (await PIXI.Assets.load(ShipStraightImage));
+    const shipLeftTexture = /** @type {PIXI.Texture} */ (await PIXI.Assets.load(ShipLeftImage));
+    const shipRightTexture = /** @type {PIXI.Texture} */ (await PIXI.Assets.load(ShipRightImage));
 
     this.#spriteStraight = PIXI.Sprite.from(shipStraightTexture);
     this.#spriteLeft = PIXI.Sprite.from(shipLeftTexture);

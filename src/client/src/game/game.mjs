@@ -42,19 +42,14 @@ export default class Game {
     this.#app = new PIXI.Application();
   }
 
-  load() {
-    this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas, true);
-    this.#input = new Input(this.#display);
-
-    Ship.addResources(this.#app.loader);
-    this.#app.loader.load(this.#initialize.bind(this));
-  }
-
-  #initialize() {
+  async load() {
     try {
+      this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas, true);
+      this.#input = new Input(this.#display);
+
       this.#stars = new Stars(this.#app.stage, this.#display.gameSize, BACKGROUND_FPS, STARS);
       this.#ship = new Ship();
-      this.#ship.load(this.#app.loader.resources, this.#app.stage, this.#display.gameSize);
+      this.#ship.load(this.#app.stage, this.#display.gameSize);
 
       this.#startFrameLoop();
       this.#gameReset();
