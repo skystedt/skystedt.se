@@ -1,5 +1,5 @@
 import * as PIXI from './pixi.mjs';
-import { GamePosition, Size } from './primitives.mjs';
+import { GamePosition, Size, Uninitialized } from './primitives.mjs';
 import ShipStraightImage from './ship.png';
 import ShipLeftImage from './ship_left.png';
 import ShipRightImage from './ship_right.png';
@@ -17,11 +17,11 @@ export const ShipDirection = {
 };
 
 export default class Ship {
-  #container;
-  #spriteStraight;
-  #spriteLeft;
-  #spriteRight;
-  #startPosition;
+  #container = /** @type {PIXI.Container} */ (Uninitialized);
+  #spriteStraight = /** @type {PIXI.Sprite} */ (Uninitialized);
+  #spriteLeft = /** @type {PIXI.Sprite} */ (Uninitialized);
+  #spriteRight = /** @type {PIXI.Sprite} */ (Uninitialized);
+  #startPosition = /** @type {GamePosition} */ (Uninitialized);
   #straightDelay = 0;
 
   /** @param {PIXI.Loader} loader */
@@ -37,12 +37,16 @@ export default class Ship {
    * @param {PIXI.Container} stage
    * @param {Size} gameSize
    */
-  constructor(loaderResources, stage, gameSize) {
-    this.#container = new PIXI.Container();
-    this.#spriteStraight = new PIXI.Sprite(loaderResources[NAME_SHIP_STRAIGHT].texture);
-    this.#spriteLeft = new PIXI.Sprite(loaderResources[NAME_SHIP_LEFT].texture);
-    this.#spriteRight = new PIXI.Sprite(loaderResources[NAME_SHIP_RIGHT].texture);
+  load(loaderResources, stage, gameSize) {
+    const shipStraightTexture = /** @type {PIXI.Texture} */ (loaderResources[NAME_SHIP_STRAIGHT].texture);
+    const shipLeftTexture = /** @type {PIXI.Texture} */ (loaderResources[NAME_SHIP_LEFT].texture);
+    const shipRightTexture = /** @type {PIXI.Texture} */ (loaderResources[NAME_SHIP_RIGHT].texture);
 
+    this.#spriteStraight = PIXI.Sprite.from(shipStraightTexture);
+    this.#spriteLeft = PIXI.Sprite.from(shipLeftTexture);
+    this.#spriteRight = PIXI.Sprite.from(shipRightTexture);
+
+    this.#container = new PIXI.Container();
     this.#container.addChild(this.#spriteStraight);
     this.#container.addChild(this.#spriteLeft);
     this.#container.addChild(this.#spriteRight);

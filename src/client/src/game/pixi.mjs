@@ -33,3 +33,5 @@ import { AppLoaderPlugin } from '@pixi/loaders';
 Application.registerPlugin(AppLoaderPlugin);
 import { TickerPlugin } from '@pixi/ticker';
 Application.registerPlugin(TickerPlugin);
+
+utils.skipHello();

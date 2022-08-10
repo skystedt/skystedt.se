@@ -17,8 +17,8 @@ const STARS = 100;
 
 export default class Game {
   #app;
-  #display;
-  #input;
+  #display = /** @type {Display} */ (Uninitialized);
+  #input = /** @type {Input} */ (Uninitialized);
 
   #loopState = {
     fpsCheck: 0,
@@ -37,9 +37,12 @@ export default class Game {
   }
 
   constructor() {
-    PIXI.utils.skipHello();
+    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
     this.#app = new PIXI.Application();
+  }
+
+  load() {
     this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas, true);
     this.#input = new Input(this.#display);
 
@@ -50,7 +53,9 @@ export default class Game {
   #initialize() {
     try {
       this.#stars = new Stars(this.#app.stage, this.#display.gameSize, BACKGROUND_FPS, STARS);
-      this.#ship = new Ship(this.#app.loader.resources, this.#app.stage, this.#display.gameSize);
+      this.#ship = new Ship();
+      this.#ship.load(this.#app.loader.resources, this.#app.stage, this.#display.gameSize);
+
       this.#startFrameLoop();
       this.#gameReset();
     } catch (e) {
