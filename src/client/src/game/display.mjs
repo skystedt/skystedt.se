@@ -26,7 +26,6 @@ export default class Display {
 
     this.#converter = new DisplayConverter(this, canvas, ignoreBorders);
 
-    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
     canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
     this.#gameSize = new Size(WIDTH, HEIGHT);
@@ -110,6 +109,7 @@ export default class Display {
   }
 }
 
+/** @private */
 class DisplayConverter {
   #display;
   #canvas;

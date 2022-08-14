@@ -22,6 +22,7 @@ class Position {
     this.#y = y;
   }
 }
+
 // the private methods are to distinguish the classes so they are not evaluated as the same class
 export class AbsolutePosition extends Position {
   #AbsolutePosition() {}

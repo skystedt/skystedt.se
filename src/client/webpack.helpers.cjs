@@ -5,10 +5,12 @@ const structuredClone = require('core-js/stable/structured-clone.js');
 const enchancedResolve = require('enhanced-resolve');
 const minimatch = require('minimatch');
 const glob = require('glob');
+const browserslist = require('browserslist');
 const { default: babelTargets, prettifyTargets: babelPrettifyTargets } = require('@babel/helper-compilation-targets');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 /** @typedef { import("webpack").Compiler } Compiler */
 /** @typedef { import("webpack").RuleSetRule } RuleSetRule */
+/** @typedef { import("webpack").WebpackPluginInstance } WebpackPluginInstance */
 /** @typedef { import("@babel/core").TransformOptions } BabelTransformOptions */
 /** @typedef { import("html-webpack-plugin").HtmlTagObject } HtmlTagObject */
 /** @typedef { import("postcss").PluginCreator } PostcssPluginCreator */
@@ -22,10 +24,6 @@ const dir = {
   node_modules: path.resolve(__dirname, 'node_modules')
 };
 
-// resolve babel -> browserslist -> caniuse-lite
-// in case there are nested modules
-const caniuseVersion = resolveNestedVersion('@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite');
-
 /**
  * @param {string} env
  * @returns {{[string]:string}}
@@ -35,7 +33,13 @@ function resolveBabelTargets(env) {
 }
 
 const browsers = {
-  version: caniuseVersion,
+  version: {
+    global: resolveNestedVersion('browserslist', 'caniuse-lite'),
+    webpack: resolveNestedVersion('webpack', 'browserslist', 'caniuse-lite'),
+    babel: resolveNestedVersion('@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite'),
+    'babel-preset-env': resolveNestedVersion('@babel/preset-env', 'browserslist', 'caniuse-lite'),
+    postcss: resolveNestedVersion('postcss-preset-env', 'browserslist', 'caniuse-lite')
+  },
   all: resolveBabelTargets('all'),
   modern: resolveBabelTargets('modern'),
   legacy: resolveBabelTargets('legacy')
@@ -218,6 +222,17 @@ function resolveNestedVersion(...modules) {
   return packageJson.version;
 }
 
+/**
+ * @param {string} environment
+ * @returns {{ browsers: string[], config: string | undefined }}
+ */
+function browserslistEnvironment(environment) {
+  const browsers = browserslist(null, { env: environment });
+  let config = browserslist.loadConfig({ path: dir.src, env: environment });
+  config = Array.isArray(config) ? config.join(' or ') : config;
+  return { browsers, config };
+}
+
 /** @param {RuleSetRule[]} rules */
 function mergeBabelRules(rules) {
   for (let i = 0; i < rules.length; ++i) {
@@ -244,6 +259,27 @@ function mergeBabelRules(rules) {
         return;
       }
     }
+  }
+}
+
+/**
+ * @param {WebpackPluginInstance[]} originalPlugins
+ * @param {WebpackPluginInstance[]} newPlugins
+ */
+function mergeCspPlugin(originalPlugins, newPlugins) {
+  const findCspPlugin = (plugin) => plugin.constructor.name === 'CspHtmlWebpackPlugin';
+  const originalPlugin = originalPlugins.find(findCspPlugin);
+  const newPlugin = newPlugins.find(findCspPlugin);
+  if (originalPlugin && newPlugin) {
+    const originalProcessFn = originalPlugin.opts.processFn;
+    const newProcessFn = newPlugin.opts.processFn;
+    const options = Object.assign({}, originalPlugin.opts);
+    options.processFn = (...parameters) => {
+      originalProcessFn(...parameters);
+      newProcessFn(...parameters);
+    };
+    originalPlugin.opts = Object.freeze(options);
+    newPlugins.splice(newPlugins.findIndex(findCspPlugin), 1);
   }
 }
 
@@ -286,6 +322,8 @@ module.exports = {
   ThrowOnAssetsEmitedWebpackPlugin,
   CreateFilePlugin,
   resolveNestedVersion,
+  browserslistEnvironment,
   mergeBabelRules,
+  mergeCspPlugin,
   postcssRemoveCarriageReturn
 };

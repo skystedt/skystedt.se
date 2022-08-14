@@ -1,7 +1,6 @@
 /* eslint-env node */
 const path = require('path');
 const update = require('immutability-helper');
-const browserslist = require('browserslist');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity').SubresourceIntegrityPlugin;
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
@@ -18,7 +17,7 @@ const ScriptsHtmlWebpackPlugin = require('./webpack.helpers.cjs').ScriptsHtmlWeb
 const ThrowOnAssetsEmitedWebpackPlugin = require('./webpack.helpers.cjs').ThrowOnAssetsEmitedWebpackPlugin;
 const CreateFilePlugin = require('./webpack.helpers.cjs').CreateFilePlugin;
 const postcssRemoveCarriageReturn = require('./webpack.helpers.cjs').postcssRemoveCarriageReturn;
-const { resolveNestedVersion, mergeBabelRules } = require('./webpack.helpers.cjs');
+const { resolveNestedVersion, browserslistEnvironment, mergeBabelRules } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("@babel/preset-env").Options } BabelOptions */
 /** @typedef { import("csp-html-webpack-plugin").Policy } CspPolicy */
@@ -127,11 +126,8 @@ const modern = {
         'script-src': false,
         'style-src': false
       },
-      processFn: (builtPolicy, htmlPluginData, $, compilation) => {
+      processFn: (builtPolicy) => {
         cspPolicy = builtPolicy;
-        if (compilation.options.mode === 'development') {
-          new CspHtmlWebpackPlugin().opts.processFn(builtPolicy, htmlPluginData, $);
-        }
       }
     }),
     new ThrowOnAssetsEmitedWebpackPlugin('polyfills.*.mjs'),
@@ -175,7 +171,7 @@ const modern = {
                   postcssRemoveCarriageReturn(),
                   postcssMergeRules(),
                   postcssPresetEnv({
-                    browsers: browserslist(null, { env: 'all' }),
+                    browsers: browserslistEnvironment('all').browsers,
                     features: {
                       'nesting-rules': true
                     }

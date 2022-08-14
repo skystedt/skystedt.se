@@ -78,7 +78,6 @@ const chunks = {
             switch (moduleName) {
               case 'earcut':
               case 'eventemitter3':
-              case 'ismobilejs':
               case 'punycode':
               case 'querystring':
               case 'url':
@@ -91,6 +90,8 @@ const chunks = {
               case 'regenerator-runtime':
                 return 'polyfills';
               case 'unfetch-polyfill':
+                return 'polyfills';
+              case 'navigator.sendbeacon':
                 return 'polyfills';
               case '@microsoft/dynamicproto-js':
                 return 'insights';
