@@ -6,7 +6,6 @@ import './index.css';
 
   const game = new Game();
   document.body.appendChild(game.canvas);
-
-  const { default: Backend } = await import('./test_backend.mjs');
-  Backend.test();
+  await game.load();
+  await game.connect();
 })();

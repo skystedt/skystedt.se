@@ -3,6 +3,7 @@ import { Uninitialized } from './primitives.mjs';
 /** @typedef { import("./primitives.mjs").Size } Size */
 
 const BLINK_PROBABILITY = 0.0001;
+const BLINK_DURATION = 30;
 // prettier-ignore
 const SPEED_PROBABILITIES = [
   { speed: 2.00, p: 0.01 },
@@ -12,21 +13,23 @@ const SPEED_PROBABILITIES = [
 ];
 
 export default class Stars extends PIXI.Container {
-  /**
-   * @param {PIXI.Container} stage
-   * @param {Size} gameSize
-   * @param {number} updatesPerSecond
-   * @param {number} numberOfStars
-   */
-  constructor(stage, gameSize, updatesPerSecond, numberOfStars) {
+  /** @param {PIXI.Container} stage */
+  constructor(stage) {
     super();
-    for (let i = 0; i < numberOfStars; i++) {
-      this.addChild(new Star(gameSize, updatesPerSecond));
-    }
     stage.addChild(this);
   }
 
-  move() {
+  /**
+   * @param {Size} gameSize
+   * @param {number} numberOfStars
+   */
+  load(gameSize, numberOfStars) {
+    for (let i = 0; i < numberOfStars; i++) {
+      this.addChild(new Star(gameSize));
+    }
+  }
+
+  tick() {
     for (let star of this.children) {
       /** @type {Star} */ (star).move();
     }
@@ -35,19 +38,16 @@ export default class Stars extends PIXI.Container {
 
 export class Star extends PIXI.Graphics {
   #gameSize;
-  #updatesPerSecond;
   #speed = /** @type {number} */ (Uninitialized);
   #blinking = /** @type {number} */ (Uninitialized);
   #originalColor = /** @type {number} */ (Uninitialized);
 
   /**
    * @param {Size} gameSize
-   * @param {number} updatesPerSecond
    */
-  constructor(gameSize, updatesPerSecond) {
+  constructor(gameSize) {
     super();
     this.#gameSize = gameSize;
-    this.#updatesPerSecond = updatesPerSecond;
 
     this.#newStar(false);
   }
@@ -99,7 +99,7 @@ export class Star extends PIXI.Graphics {
     } else if (this.#blinking > 1) {
       this.#blinking--;
     } else if (Math.random() < BLINK_PROBABILITY) {
-      this.#blinking = this.#updatesPerSecond;
+      this.#blinking = BLINK_DURATION;
       this.#setColor(0x000000);
     }
   }

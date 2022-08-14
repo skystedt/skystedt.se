@@ -1,9 +1,11 @@
 /* eslint-env node */
 const webpack = require('webpack');
 const update = require('immutability-helper');
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const StylelintPlugin = require('stylelint-webpack-plugin');
 const { dir } = require('./webpack.helpers.cjs');
+const { browserslistEnvironment, mergeCspPlugin } = require('./webpack.helpers.cjs');
 const { sharedLegacy, sharedModern } = require('./webpack.config.shared.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 
@@ -37,10 +39,24 @@ const developmentModern = {
     }
   },
   plugins: [
+    new CspHtmlWebpackPlugin(
+      {},
+      {
+        processFn: (builtPolicy, htmlPluginData, $) => {
+          builtPolicy = builtPolicy.replace('webpack', 'webpack webpack-dev-server#overlay');
+          new CspHtmlWebpackPlugin().opts.processFn(builtPolicy, htmlPluginData, $);
+        }
+      }
+    ),
     new ESLintPlugin({
       extensions: '.mjs',
       failOnError: false,
-      failOnWarning: false
+      failOnWarning: false,
+      overrideConfig: {
+        rules: {
+          'compat/compat': ['warn', browserslistEnvironment('all').config]
+        }
+      }
     }),
     new StylelintPlugin({
       extensions: '.css',
@@ -63,7 +79,13 @@ const rulesModern = (configuration) => {
   return {
     output: { $merge: configuration.output },
     devServer: { $set: configuration.devServer },
-    plugins: { $push: configuration.plugins }
+    plugins: {
+      $apply: (plugins) => {
+        mergeCspPlugin(plugins, configuration.plugins);
+        plugins = [...(plugins || []), ...(configuration.plugins || [])];
+        return plugins;
+      }
+    }
   };
 };
 

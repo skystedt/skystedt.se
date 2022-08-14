@@ -4,6 +4,7 @@ const minimatch = require('minimatch');
 const update = require('immutability-helper');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const StylelintPlugin = require('stylelint-webpack-plugin');
+const { browserslistEnvironment } = require('./webpack.helpers.cjs');
 const { sharedLegacy, sharedModern } = require('./webpack.config.shared.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 
@@ -38,6 +39,11 @@ const productionModern = {
       extensions: '.mjs',
       failOnError: true,
       failOnWarning: true,
+      overrideConfig: {
+        rules: {
+          'compat/compat': ['warn', browserslistEnvironment('all').config]
+        }
+      },
       baseConfig: {
         // customize eslint by enforcing prettier (make sure prettier has been used)
         // only for production so to not disrupt development, https://prettier.io/docs/en/integrating-with-linters.html

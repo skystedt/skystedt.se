@@ -16,7 +16,7 @@
     "prettier" // disables unnecessary/conflicting rules when using prettier, should be last, https://github.com/prettier/eslint-config-prettier#installation
   ],
   "settings": {
-    "polyfills": ["fetch"]
+    "polyfills": ["Promise", "fetch", "navigator.sendBeacon"]
   },
   "rules": {
     "curly": ["error", "all"],

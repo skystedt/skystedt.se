@@ -1,12 +1,10 @@
 import * as PIXI from './pixi.mjs';
-import { GamePosition, Size } from './primitives.mjs';
-import ShipStraightImage from './ship.png';
-import ShipLeftImage from './ship_left.png';
-import ShipRightImage from './ship_right.png';
+import { GamePosition, Size, Uninitialized } from './primitives.mjs';
+import Assets from './assets.mjs';
+import ShipStraightImage from './assets/ship.png';
+import ShipLeftImage from './assets/ship_left.png';
+import ShipRightImage from './assets/ship_right.png';
 
-const NAME_SHIP_STRAIGHT = 'ship_straight';
-const NAME_SHIP_LEFT = 'ship_left';
-const NAME_SHIP_RIGHT = 'ship_right';
 const TURN_STRAIGHT_DELAY = 10;
 
 /** @enum {number} */
@@ -17,31 +15,30 @@ export const ShipDirection = {
 };
 
 export default class Ship {
-  #container;
-  #spriteStraight;
-  #spriteLeft;
-  #spriteRight;
-  #startPosition;
+  #container = /** @type {PIXI.Container} */ (Uninitialized);
+  #spriteStraight = /** @type {PIXI.Sprite} */ (Uninitialized);
+  #spriteLeft = /** @type {PIXI.Sprite} */ (Uninitialized);
+  #spriteRight = /** @type {PIXI.Sprite} */ (Uninitialized);
+  #startPosition = /** @type {GamePosition} */ (Uninitialized);
   #straightDelay = 0;
 
-  /** @param {PIXI.Loader} loader */
-  static addResources(loader) {
-    loader
-      .add(NAME_SHIP_STRAIGHT, ShipStraightImage)
-      .add(NAME_SHIP_LEFT, ShipLeftImage)
-      .add(NAME_SHIP_RIGHT, ShipRightImage);
+  /**
+   * @param {PIXI.Container} stage
+   */
+  constructor(stage) {
+    this.#container = new PIXI.Container();
+    stage.addChild(this.#container);
   }
 
-  /**
-   * @param {PIXI.utils.Dict<PIXI.LoaderResource>} loaderResources
-   * @param {PIXI.Container} stage
-   * @param {Size} gameSize
-   */
-  constructor(loaderResources, stage, gameSize) {
-    this.#container = new PIXI.Container();
-    this.#spriteStraight = new PIXI.Sprite(loaderResources[NAME_SHIP_STRAIGHT].texture);
-    this.#spriteLeft = new PIXI.Sprite(loaderResources[NAME_SHIP_LEFT].texture);
-    this.#spriteRight = new PIXI.Sprite(loaderResources[NAME_SHIP_RIGHT].texture);
+  /** @param {Size} gameSize */
+  async load(gameSize) {
+    const shipStraightTexture = /** @type {PIXI.Texture} */ (await Assets.loadImage(ShipStraightImage));
+    const shipLeftTexture = /** @type {PIXI.Texture} */ (await Assets.loadImage(ShipLeftImage));
+    const shipRightTexture = /** @type {PIXI.Texture} */ (await Assets.loadImage(ShipRightImage));
+
+    this.#spriteStraight = PIXI.Sprite.from(shipStraightTexture);
+    this.#spriteLeft = PIXI.Sprite.from(shipLeftTexture);
+    this.#spriteRight = PIXI.Sprite.from(shipRightTexture);
 
     this.#container.addChild(this.#spriteStraight);
     this.#container.addChild(this.#spriteLeft);
@@ -52,8 +49,6 @@ export default class Ship {
       (gameSize.height - this.size.height) / 2
     );
     this.reset();
-
-    stage.addChild(this.#container);
   }
 
   get size() {

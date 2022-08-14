@@ -1,15 +1,18 @@
 import './game.css';
+import * as PIXI from './pixi.mjs';
 import Display from './display.mjs';
 import Input from './input.mjs';
-import * as PIXI from './pixi.mjs';
+import Communication from './communication.mjs';
 import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
+import Minis from './minis.mjs';
 import Stars from './stars.mjs';
 /** @typedef { number } DOMHighResTimeStamp */
 /** @typedef { import("@microsoft/applicationinsights-web").ApplicationInsights } ApplicationInsights */
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;
+const COMMUNICATE_POSITION_INTERVAL = 10000;
 const WAIT_BEFORE_FPS_CHECK = 1000;
 const MAX_LOG_METRIC_RETRIES = 10;
 
@@ -17,54 +20,63 @@ const STARS = 100;
 
 export default class Game {
   #app;
-  #display;
-  #input;
+  #display = /** @type {Display} */ (Uninitialized);
+  #input = /** @type {Input} */ (Uninitialized);
+  #communication = /** @type {Communication} */ (Uninitialized);
 
-  #loopState = {
+  #frameState = {
     fpsCheck: 0,
-    logicWait: 0,
     logicRemaining: 0,
-    backgroundWait: 0,
     backgroundRemaining: 0,
     lastTimestamp: 0
   };
 
-  #stars = /** @type {Stars} */ (Uninitialized);
   #ship = /** @type {Ship} */ (Uninitialized);
+  #minis = /** @type {Minis} */ (Uninitialized);
+  #stars = /** @type {Stars} */ (Uninitialized);
 
   get canvas() {
     return this.#app.view;
   }
 
   constructor() {
-    PIXI.utils.skipHello();
+    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
     this.#app = new PIXI.Application();
+
     this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas, true);
     this.#input = new Input(this.#display);
+    this.#communication = new Communication();
 
-    Ship.addResources(this.#app.loader);
-    this.#app.loader.load(this.#initialize.bind(this));
+    // order determines z order, last will be on top
+    this.#stars = new Stars(this.#app.stage);
+    this.#minis = new Minis(this.#app.stage);
+    this.#ship = new Ship(this.#app.stage);
   }
 
-  #initialize() {
+  async load() {
     try {
-      this.#stars = new Stars(this.#app.stage, this.#display.gameSize, BACKGROUND_FPS, STARS);
-      this.#ship = new Ship(this.#app.loader.resources, this.#app.stage, this.#display.gameSize);
+      await this.#ship.load(this.#display.gameSize);
+      await this.#minis.load();
+      this.#stars.load(this.#display.gameSize, STARS);
+
       this.#startFrameLoop();
       this.#gameReset();
+      setInterval(this.#communicatePosition.bind(this), COMMUNICATE_POSITION_INTERVAL);
     } catch (e) {
       console.error(e);
       throw e;
     }
   }
 
+  async connect() {
+    await this.#communication.connect(this.#minis);
+  }
+
   #startFrameLoop() {
-    this.#loopState.logicWait = 1000 / LOGIC_FPS;
-    this.#loopState.logicRemaining = 0;
-    this.#loopState.backgroundWait = 1000 / BACKGROUND_FPS;
-    this.#loopState.backgroundRemaining = 0;
-    this.#loopState.fpsCheck = this.#loopState.lastTimestamp + WAIT_BEFORE_FPS_CHECK;
+    this.#frameState.logicRemaining = 0;
+    this.#frameState.backgroundRemaining = 0;
+    this.#frameState.fpsCheck = this.#frameState.lastTimestamp + WAIT_BEFORE_FPS_CHECK;
     requestAnimationFrame(this.#frameLoop.bind(this));
   }
 
@@ -76,11 +88,11 @@ export default class Game {
   #frameLoop(timestamp) {
     requestAnimationFrame(this.#frameLoop.bind(this));
 
-    if (!this.#loopState.lastTimestamp) {
-      this.#loopState.lastTimestamp = timestamp;
+    if (!this.#frameState.lastTimestamp) {
+      this.#frameState.lastTimestamp = timestamp;
     }
-    const elapsed = timestamp - this.#loopState.lastTimestamp;
-    this.#loopState.lastTimestamp = timestamp;
+    const elapsed = timestamp - this.#frameState.lastTimestamp;
+    this.#frameState.lastTimestamp = timestamp;
 
     let logicTicks;
     let backgroundTick;
@@ -88,16 +100,18 @@ export default class Game {
     // if inactive or lag, don't process all missing time at once
     if (elapsed >= 200) {
       logicTicks = 1;
-      this.#loopState.logicRemaining = 0;
+      this.#frameState.logicRemaining = 0;
 
       backgroundTick = true;
-      this.#loopState.backgroundRemaining = 0;
+      this.#frameState.backgroundRemaining = 0;
     } else {
-      logicTicks = Math.floor((this.#loopState.logicRemaining + elapsed) / this.#loopState.logicWait);
-      this.#loopState.logicRemaining += elapsed - logicTicks * this.#loopState.logicWait;
+      const logicWait = 1000 / LOGIC_FPS;
+      logicTicks = Math.floor((this.#frameState.logicRemaining + elapsed) / logicWait);
+      this.#frameState.logicRemaining += elapsed - logicTicks * logicWait;
 
-      backgroundTick = this.#loopState.backgroundRemaining > this.#loopState.backgroundWait;
-      this.#loopState.backgroundRemaining += elapsed - (backgroundTick ? this.#loopState.backgroundWait : 0);
+      const backgroundWait = 1000 / BACKGROUND_FPS;
+      backgroundTick = this.#frameState.backgroundRemaining > backgroundWait;
+      this.#frameState.backgroundRemaining += elapsed - (backgroundTick ? backgroundWait : 0);
     }
 
     while (logicTicks--) {
@@ -108,8 +122,8 @@ export default class Game {
       this.#updateBackground();
     }
 
-    if (this.#loopState.fpsCheck && timestamp > this.#loopState.fpsCheck) {
-      this.#loopState.fpsCheck = 0;
+    if (this.#frameState.fpsCheck && timestamp > this.#frameState.fpsCheck) {
+      this.#frameState.fpsCheck = 0;
       this.#checkFps();
     }
   }
@@ -142,6 +156,19 @@ export default class Game {
   }
 
   #updateLogic() {
+    this.#updateShip();
+  }
+
+  #updateBackground() {
+    this.#minis.tick();
+    this.#stars.tick();
+  }
+
+  #communicatePosition() {
+    this.#communication.update(this.#ship.centerPosition);
+  }
+
+  #updateShip() {
     const movement = this.#input.movement(this.#ship.centerPosition);
     this.#ship.position = this.#display.restrictGamePositionToDisplay(this.#ship.position, movement, this.#ship.size);
     if (movement.dx < 0) {
@@ -151,9 +178,5 @@ export default class Game {
     } else {
       this.#ship.direction = ShipDirection.Straight;
     }
-  }
-
-  #updateBackground() {
-    this.#stars.move();
   }
 }
