@@ -3,7 +3,6 @@ const path = require('path');
 const update = require('immutability-helper');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity').SubresourceIntegrityPlugin;
-const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlInlineCssWebpackPlugin = require('html-inline-css-webpack-plugin').default;
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
@@ -13,6 +12,8 @@ const postcssPresetEnv = require('postcss-preset-env');
 const postcssMergeRules = require('postcss-merge-rules');
 const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
 const { dir, browsers } = require('./webpack.helpers.cjs');
+const MoveHtmlWebpackPlugin = require('./webpack.helpers.cjs').MoveHtmlWebpackPlugin;
+const ExtendedCspHtmlWebpackPlugin = require('./webpack.helpers.cjs').ExtendedCspHtmlWebpackPlugin;
 const ScriptsHtmlWebpackPlugin = require('./webpack.helpers.cjs').ScriptsHtmlWebpackPlugin;
 const ThrowOnAssetsEmitedWebpackPlugin = require('./webpack.helpers.cjs').ThrowOnAssetsEmitedWebpackPlugin;
 const CreateFilePlugin = require('./webpack.helpers.cjs').CreateFilePlugin;
@@ -67,7 +68,14 @@ const shared = {
       minSizeReduction: 0,
       cacheGroups: splitChunks.cacheGroups
     },
-    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          module: true
+        }
+      }),
+      new CssMinimizerPlugin()
+    ],
     realContentHash: true,
     removeAvailableModules: true,
     sideEffects: true
@@ -83,6 +91,7 @@ const modern = {
     filename: '[name].[contenthash].mjs',
     path: dir.dist,
     publicPath: '',
+    scriptType: 'module',
     trustedTypes: 'webpack',
     crossOriginLoading: 'anonymous',
     clean: {
@@ -90,13 +99,14 @@ const modern = {
     }
   },
   experiments: {
-    outputModule: true
+    outputModule: false // using modules will force use of import() for loading child scripts, which does not support SRI/integrity
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
       scriptLoading: 'module'
     }),
+    new MoveHtmlWebpackPlugin(),
     new ScriptsHtmlWebpackPlugin({
       add: [
         { path: 'legacy/insights.*.js', directory: dir.dist },
@@ -105,7 +115,7 @@ const modern = {
       ],
       attributes: [
         { path: '**/insights.*.*js', async: true },
-        { path: 'legacy/*.js', type: 'nomodule', defer: true }
+        { path: 'legacy/*.js', type: 'nomodule', defer: true, integrity: false }
       ]
     }),
     new MiniCssExtractPlugin({
@@ -116,7 +126,7 @@ const modern = {
       enabled: 'auto',
       hashFuncNames: ['sha384']
     }),
-    new CspHtmlWebpackPlugin(require('./content-security-policy.json'), {
+    new ExtendedCspHtmlWebpackPlugin(require('./content-security-policy.json'), {
       hashingMethod: 'sha384',
       hashEnabled: {
         'script-src': false,

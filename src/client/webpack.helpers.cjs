@@ -1,4 +1,5 @@
 /* eslint-env node */
+const webpack = require('webpack');
 const path = require('path');
 const fs = require('fs');
 const structuredClone = require('core-js/stable/structured-clone.js');
@@ -7,6 +8,7 @@ const minimatch = require('minimatch');
 const glob = require('glob');
 const browserslist = require('browserslist');
 const { default: babelTargets, prettifyTargets: babelPrettifyTargets } = require('@babel/helper-compilation-targets');
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 /** @typedef { import("webpack").Compiler } Compiler */
 /** @typedef { import("webpack").RuleSetRule } RuleSetRule */
@@ -37,7 +39,7 @@ const browsers = {
     global: resolveNestedVersion('browserslist', 'caniuse-lite'),
     webpack: resolveNestedVersion('webpack', 'browserslist', 'caniuse-lite'),
     babel: resolveNestedVersion('@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite'),
-    'babel-preset-env': resolveNestedVersion('@babel/preset-env', 'browserslist', 'caniuse-lite'),
+    babel_preset_env: resolveNestedVersion('@babel/preset-env', 'browserslist', 'caniuse-lite'),
     postcss: resolveNestedVersion('postcss-preset-env', 'browserslist', 'caniuse-lite')
   },
   all: resolveBabelTargets('all'),
@@ -60,9 +62,40 @@ function urlJoin(path1, path2) {
   return path1.replace(/\/+$/, '') + '/' + path2.replace(/^\/+/, '');
 }
 
+class MoveHtmlWebpackPlugin {
+  /** @param {Compiler} compiler */
+  apply(compiler) {
+    compiler.hooks.compilation.tap('MoveHtmlWebpackPlugin', (compilation) => {
+      compilation.hooks.processAssets.intercept({
+        register: (tap) => {
+          if (
+            tap.name === HtmlWebpackPlugin.name &&
+            tap.stage == webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
+          ) {
+            // move HtmlWebpackPlugin to after optimize.RealContentHashPlugin is run
+            tap.stage = webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_HASH + 1;
+          }
+          return tap;
+        }
+      });
+    });
+  }
+}
+
+class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {
+  getShas($, policyName, selector) {
+    const shas = super.getShas($, policyName, selector);
+    const integritySelector = selector.replace(/:not\((\[.+\])\)/, '$1[integrity]');
+    const integrityShas = $(integritySelector)
+      .map((_i, element) => `'${$(element).attr('integrity')}'`)
+      .get();
+    return shas.concat(integrityShas);
+  }
+}
+
 class ScriptsHtmlWebpackPlugin {
   /** @typedef {{ path: string, directory: string }} AddScript */
-  /** @typedef {{ path: string, defer?: boolean, async?: boolean, type?: "module" | "nomodule" | false }} ScriptAttributes */
+  /** @typedef {{ path: string, defer?: boolean, async?: boolean, type?: "module" | "nomodule" | false, integrity?: bool }} ScriptAttributes */
 
   /** @type {AddScript[]} */
   #add;
@@ -78,15 +111,12 @@ class ScriptsHtmlWebpackPlugin {
 
   /** @param {Compiler} compiler */
   apply(compiler) {
-    compiler.hooks.compilation.tap('ScriptsAttributesHtmlWebpackPlugin', (compilation) => {
-      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync(
-        'ScriptsAttributesHtmlWebpackPlugin',
-        async (data, cb) => {
-          await this.#addScripts(data.publicPath, data.assetTags.scripts);
-          this.#updateAttributes(data.assetTags.scripts);
-          cb(null, data);
-        }
-      );
+    compiler.hooks.compilation.tap('ScriptsHtmlWebpackPlugin', (compilation) => {
+      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('ScriptsHtmlWebpackPlugin', async (data, cb) => {
+        await this.#addScripts(data.publicPath, data.assetTags.scripts);
+        this.#updateAttributes(data.assetTags.scripts);
+        cb(null, data);
+      });
     });
   }
 
@@ -105,16 +135,28 @@ class ScriptsHtmlWebpackPlugin {
     }
   }
 
+  /**
+   * @param {HtmlTagObject} script
+   * @param {ScriptAttributes} attributes
+   * @param {string} attributeName
+   */
+  #booleanAttribute(script, attributes, attributeName) {
+    if (attributes[attributeName] === true) {
+      script.attributes[attributeName] = true;
+    } else if (attributes[attributeName] === false) {
+      script.attributes[attributeName] = undefined;
+    }
+  }
+
   /** @param {HtmlTagObject[]} scripts */
   #updateAttributes(scripts) {
     for (const script of scripts) {
-      for (const attribute of this.#attributes) {
-        if (minimatch(script.attributes.src, attribute.path)) {
-          script.attributes.defer =
-            attribute.defer === true || attribute.defer == false ? attribute.defer : script.attributes.defer;
-          script.attributes.async =
-            attribute.async === true || attribute.async == false ? attribute.async : script.attributes.async;
-          switch (attribute.type) {
+      for (const attributes of this.#attributes) {
+        if (minimatch(script.attributes.src, attributes.path)) {
+          this.#booleanAttribute(script, attributes, 'defer');
+          this.#booleanAttribute(script, attributes, 'async');
+          this.#booleanAttribute(script, attributes, 'integrity');
+          switch (attributes.type) {
             case 'module':
               script.attributes.type = 'module';
               script.attributes.nomodule = false;
@@ -267,7 +309,7 @@ function mergeBabelRules(rules) {
  * @param {WebpackPluginInstance[]} newPlugins
  */
 function mergeCspPlugin(originalPlugins, newPlugins) {
-  const findCspPlugin = (plugin) => plugin.constructor.name === 'CspHtmlWebpackPlugin';
+  const findCspPlugin = (plugin) => plugin.constructor.name === 'ExtendedCspHtmlWebpackPlugin';
   const originalPlugin = originalPlugins.find(findCspPlugin);
   const newPlugin = newPlugins.find(findCspPlugin);
   if (originalPlugin && newPlugin) {
@@ -318,6 +360,8 @@ postcssRemoveCarriageReturn.postcss = true;
 module.exports = {
   dir,
   browsers,
+  MoveHtmlWebpackPlugin,
+  ExtendedCspHtmlWebpackPlugin,
   ScriptsHtmlWebpackPlugin,
   ThrowOnAssetsEmitedWebpackPlugin,
   CreateFilePlugin,

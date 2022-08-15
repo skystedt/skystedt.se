@@ -6,6 +6,8 @@
     {
       "route": "/",
       "headers": {
+        "Reporting-Endpoints": "csp-endpoint=\"/api/report/csp\",default=\"/api/report\"",
+        "Report-To": "{\"group\":\"csp-endpoint\",\"max_age\":86400,\"endpoints\":[{\"url\":\"/api/report/csp\"}]}",
         "Content-Security-Policy": "{{placeholder}}",
         "X-Frame-Options": "DENY"
       }

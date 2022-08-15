@@ -21,19 +21,13 @@ const production = {
   },
   performance: {
     assetFilter: (assetFilename) => {
-      if (minimatch(assetFilename, 'pixi.*.*js')) {
-        return false;
-      }
-      return true;
+      return !minimatch(assetFilename, 'pixi.*.*js');
     }
   }
 };
 
 /** @type {Configuration} */
 const productionModern = {
-  output: {
-    module: true
-  },
   plugins: [
     new ESLintPlugin({
       extensions: '.mjs',
@@ -70,7 +64,6 @@ const rules = (configuration) => {
 
 const rulesModern = (configuration) => {
   return {
-    output: { $merge: configuration.output },
     plugins: { $push: configuration.plugins }
   };
 };

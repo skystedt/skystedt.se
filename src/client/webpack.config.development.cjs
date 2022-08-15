@@ -1,10 +1,10 @@
 /* eslint-env node */
 const webpack = require('webpack');
 const update = require('immutability-helper');
-const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const StylelintPlugin = require('stylelint-webpack-plugin');
 const { dir } = require('./webpack.helpers.cjs');
+const ExtendedCspHtmlWebpackPlugin = require('./webpack.helpers.cjs').ExtendedCspHtmlWebpackPlugin;
 const { browserslistEnvironment, mergeCspPlugin } = require('./webpack.helpers.cjs');
 const { sharedLegacy, sharedModern } = require('./webpack.config.shared.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
@@ -25,9 +25,6 @@ const development = {
 
 /** @type {Configuration} */
 const developmentModern = {
-  output: {
-    module: false // HMR is not implemented for module chunk format yet
-  },
   devServer: {
     static: {
       directory: dir.dist
@@ -39,12 +36,18 @@ const developmentModern = {
     }
   },
   plugins: [
-    new CspHtmlWebpackPlugin(
+    new ExtendedCspHtmlWebpackPlugin(
       {},
       {
         processFn: (builtPolicy, htmlPluginData, $) => {
-          builtPolicy = builtPolicy.replace('webpack', 'webpack webpack-dev-server#overlay');
-          new CspHtmlWebpackPlugin().opts.processFn(builtPolicy, htmlPluginData, $);
+          // modify CSP for local development
+          builtPolicy = builtPolicy
+            .replace('webpack', "webpack 'allow-duplicates' webpack-dev-server#overlay")
+            .replace("'strict-dynamic'", '')
+            .replace('; report-uri /api/csp/report', '')
+            .replace('; report-to csp-report', '');
+          // call default processFn to add <meta> tag
+          new ExtendedCspHtmlWebpackPlugin().opts.processFn(builtPolicy, htmlPluginData, $);
         }
       }
     ),
@@ -77,7 +80,6 @@ const rules = (configuration) => {
 
 const rulesModern = (configuration) => {
   return {
-    output: { $merge: configuration.output },
     devServer: { $set: configuration.devServer },
     plugins: {
       $apply: (plugins) => {
