@@ -63,7 +63,7 @@
     "@pixi/extensions": "6.5.1",
     "@pixi/graphics": "6.5.1",
     "@pixi/math": "6.5.1",
-    "@pixi/polyfill": "6.5.1",
+    "@pixi/polyfill": "6.5.2",
     "@pixi/runner": "6.5.1",
     "@pixi/settings": "6.5.1",
     "@pixi/sprite": "6.5.1",
