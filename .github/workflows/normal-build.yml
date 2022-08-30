@@ -1,8 +1,8 @@
 name: Normal
 
 concurrency: 
-  group: aswa-${{ github.ref }}
-  cancel-in-progress: false
+  group: aswa-normal-build-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
   push:
