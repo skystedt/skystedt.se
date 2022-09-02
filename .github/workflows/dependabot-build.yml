@@ -1,7 +1,7 @@
 name: Dependabot
 
 concurrency: 
-  group: aswa-${{ github.ref }}
+  group: aswa-dependabot-${{ github.ref }}
   cancel-in-progress: false
 
 on:
