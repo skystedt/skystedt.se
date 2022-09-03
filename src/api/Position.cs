@@ -37,7 +37,7 @@ namespace Skystedt.Api
 
         // Update a clients data and inform other clients of the update
         [FunctionName($"{nameof(Position)}-{nameof(Update)}")]
-        public async Task<ActionResult> Update(
+        public async Task<IActionResult> Update(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{nameof(Position)}/update")] HttpRequest request,
             [ExtendedWebPubSub(Connection = WebPubSubConnection, Hub = HubName)] IAsyncCollector<WebPubSubAction> webpubsub,
             [Table(TableName, Connection = TableConnection)] TableClient table)
