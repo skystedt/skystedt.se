@@ -43,7 +43,12 @@ const developmentModern = {
       {},
       {
         processFn: (builtPolicy, htmlPluginData, $) => {
-          builtPolicy = builtPolicy.replace('webpack', 'webpack webpack-dev-server#overlay');
+          // modify CSP for local development
+          builtPolicy = builtPolicy
+            .replace('webpack', "webpack 'allow-duplicates' webpack-dev-server#overlay")
+            .replace('; report-uri /api/csp/report', '')
+            .replace('; report-to csp-report', '');
+          // call default processFn to add <meta> tag
           new CspHtmlWebpackPlugin().opts.processFn(builtPolicy, htmlPluginData, $);
         }
       }

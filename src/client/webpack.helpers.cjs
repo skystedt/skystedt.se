@@ -43,15 +43,12 @@ class ScriptsHtmlWebpackPlugin {
 
   /** @param {Compiler} compiler */
   apply(compiler) {
-    compiler.hooks.compilation.tap('ScriptsAttributesHtmlWebpackPlugin', (compilation) => {
-      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync(
-        'ScriptsAttributesHtmlWebpackPlugin',
-        async (data, cb) => {
-          await this.#addScripts(data.publicPath, data.assetTags.scripts);
-          this.#updateAttributes(data.assetTags.scripts);
-          cb(null, data);
-        }
-      );
+    compiler.hooks.compilation.tap('ScriptsHtmlWebpackPlugin', (compilation) => {
+      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('ScriptsHtmlWebpackPlugin', async (data, cb) => {
+        await this.#addScripts(data.publicPath, data.assetTags.scripts);
+        this.#updateAttributes(data.assetTags.scripts);
+        cb(null, data);
+      });
     });
   }
 
@@ -85,16 +82,27 @@ class ScriptsHtmlWebpackPlugin {
     }
   }
 
+  /**
+   * @param {HtmlTagObject} script
+   * @param {ScriptAttributes} attributes
+   * @param {string} attributeName
+   */
+  #booleanAttribute(script, attributes, attributeName) {
+    if (attributes[attributeName] === true) {
+      script.attributes[attributeName] = true;
+    } else if (attributes[attributeName] === false) {
+      script.attributes[attributeName] = undefined;
+    }
+  }
+
   /** @param {HtmlTagObject[]} scripts */
   #updateAttributes(scripts) {
     for (const script of scripts) {
-      for (const attribute of this.#attributes) {
-        if (minimatch(script.attributes.src, attribute.path)) {
-          script.attributes.defer =
-            attribute.defer === true || attribute.defer == false ? attribute.defer : script.attributes.defer;
-          script.attributes.async =
-            attribute.async === true || attribute.async == false ? attribute.async : script.attributes.async;
-          switch (attribute.type) {
+      for (const attributes of this.#attributes) {
+        if (minimatch(script.attributes.src, attributes.path)) {
+          this.#booleanAttribute(script, attributes, 'defer');
+          this.#booleanAttribute(script, attributes, 'async');
+          switch (attributes.type) {
             case 'module':
               script.attributes.type = 'module';
               script.attributes.nomodule = false;

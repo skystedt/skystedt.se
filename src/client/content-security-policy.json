@@ -8,6 +8,9 @@
   "img-src": "data:",
   "style-src": "",
   "style-src-attr": "'none'",
+  "form-action": "'none'",
   "trusted-types": "webpack",
-  "require-trusted-types-for": "'script'"
+  "require-trusted-types-for": "'script'",
+  "report-uri": "/api/report/csp",
+  "report-to": "csp-endpoint"
 }
