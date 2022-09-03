@@ -12,12 +12,18 @@ const CopyPlugin = require('copy-webpack-plugin');
 const postcssPresetEnv = require('postcss-preset-env');
 const postcssMergeRules = require('postcss-merge-rules');
 const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
-const { dir, browsers } = require('./webpack.helpers.cjs');
+const { dir } = require('./webpack.helpers.cjs');
 const ScriptsHtmlWebpackPlugin = require('./webpack.helpers.cjs').ScriptsHtmlWebpackPlugin;
 const ThrowOnAssetsEmitedWebpackPlugin = require('./webpack.helpers.cjs').ThrowOnAssetsEmitedWebpackPlugin;
 const CreateFilePlugin = require('./webpack.helpers.cjs').CreateFilePlugin;
 const postcssRemoveCarriageReturn = require('./webpack.helpers.cjs').postcssRemoveCarriageReturn;
-const { resolveNestedVersion, browserslistEnvironment, mergeBabelRules } = require('./webpack.helpers.cjs');
+const {
+  resolveNestedVersion,
+  resolveBabelTargets,
+  fileSizes,
+  browserslistEnvironment,
+  mergeBabelRules
+} = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("@babel/preset-env").Options } BabelOptions */
 /** @typedef { import("csp-html-webpack-plugin").Policy } CspPolicy */
@@ -26,9 +32,43 @@ const { resolveNestedVersion, browserslistEnvironment, mergeBabelRules } = requi
 // "Recommended to specify used minor core-js version"
 const corejsVersion = resolveNestedVersion('core-js');
 
-// print the browsers so it's possible to compare browsers between builds without having the dist
-// eslint-disable-next-line no-console
-console.log('browsers', browsers);
+const versionInfo = () => {
+  const version = { built: new Date().toISOString().replace('T', ' ').replace('Z', '') };
+
+  // eslint-disable-next-line no-console
+  console.log('version', version);
+
+  return JSON.stringify(version, null, 2);
+};
+
+const browsersInfo = () => {
+  const browsers = {
+    version: {
+      global: resolveNestedVersion('browserslist', 'caniuse-lite'),
+      webpack: resolveNestedVersion('webpack', 'browserslist', 'caniuse-lite'),
+      babel: resolveNestedVersion('@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite'),
+      babel_preset_env: resolveNestedVersion('@babel/preset-env', 'browserslist', 'caniuse-lite'),
+      postcss: resolveNestedVersion('postcss-preset-env', 'browserslist', 'caniuse-lite')
+    },
+    all: resolveBabelTargets('all'),
+    modern: resolveBabelTargets('modern'),
+    legacy: resolveBabelTargets('legacy')
+  };
+
+  // eslint-disable-next-line no-console
+  console.log('browsers', browsers);
+
+  return JSON.stringify(browsers, null, 2);
+};
+
+const filesInfo = () => {
+  const files = fileSizes('*.html', '*.mjs', '*.js');
+
+  // eslint-disable-next-line no-console
+  console.log('files', files);
+
+  return JSON.stringify(files, null, 2);
+};
 
 /** @type {CspPolicy} */
 let cspPolicy;
@@ -139,7 +179,9 @@ const modern = {
       staticwebapp.routes.find((route) => route.route === '/').headers['Content-Security-Policy'] = cspPolicy;
       return JSON.stringify(staticwebapp, null, 2);
     }),
-    new CreateFilePlugin(dir.dist, 'browsers.json', JSON.stringify(browsers, null, 2))
+    new CreateFilePlugin(dir.dist, 'build/version.json', versionInfo),
+    new CreateFilePlugin(dir.dist, 'build/browsers.json', browsersInfo),
+    new CreateFilePlugin(dir.dist, 'build/sizes.json', filesInfo)
   ],
   module: {
     rules: [
