@@ -2,6 +2,7 @@
 const path = require('path');
 const minimatch = require('minimatch');
 const { dir } = require('./webpack.helpers.cjs');
+const { mathchesPatterns } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
 /** @typedef { import("webpack").EntryObject } EntryObject */
 
@@ -18,11 +19,11 @@ const entryLegacy = {
 };
 
 /**
- * @param {string[]} patterns
+ * @param {...string} patterns
  * @returns {(string) => boolean}
  */
 function wildcardMatch(...patterns) {
-  return (value) => patterns.some((pattern) => minimatch(value, pattern));
+  return (value) => mathchesPatterns(value, ...patterns);
 }
 
 /** @type {Configuration} */

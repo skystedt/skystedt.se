@@ -6,6 +6,7 @@ const enchancedResolve = require('enhanced-resolve');
 const minimatch = require('minimatch');
 const glob = require('glob');
 const browserslist = require('browserslist');
+const bytes = require('bytes');
 const { default: babelTargets, prettifyTargets: babelPrettifyTargets } = require('@babel/helper-compilation-targets');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 /** @typedef { import("webpack").Compiler } Compiler */
@@ -23,42 +24,6 @@ const dir = {
   dist: path.resolve(__dirname, 'dist'),
   node_modules: path.resolve(__dirname, 'node_modules')
 };
-
-/**
- * @param {string} env
- * @returns {{[string]:string}}
- */
-function resolveBabelTargets(env) {
-  return babelPrettifyTargets(babelTargets({}, { browserslistEnv: env }));
-}
-
-const browsers = {
-  version: {
-    global: resolveNestedVersion('browserslist', 'caniuse-lite'),
-    webpack: resolveNestedVersion('webpack', 'browserslist', 'caniuse-lite'),
-    babel: resolveNestedVersion('@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite'),
-    'babel-preset-env': resolveNestedVersion('@babel/preset-env', 'browserslist', 'caniuse-lite'),
-    postcss: resolveNestedVersion('postcss-preset-env', 'browserslist', 'caniuse-lite')
-  },
-  all: resolveBabelTargets('all'),
-  modern: resolveBabelTargets('modern'),
-  legacy: resolveBabelTargets('legacy')
-};
-
-/**
- * @param {string} path1
- * @param {string} path2
- * @returns {string}
- */
-function urlJoin(path1, path2) {
-  if (!path2) {
-    return path1;
-  }
-  if (!path1) {
-    return path2;
-  }
-  return path1.replace(/\/+$/, '') + '/' + path2.replace(/^\/+/, '');
-}
 
 class ScriptsHtmlWebpackPlugin {
   /** @typedef {{ path: string, directory: string }} AddScript */
@@ -91,6 +56,21 @@ class ScriptsHtmlWebpackPlugin {
   }
 
   /**
+   * @param {string} path1
+   * @param {string} path2
+   * @returns {string}
+   */
+  #urlJoin(path1, path2) {
+    if (!path2) {
+      return path1;
+    }
+    if (!path1) {
+      return path2;
+    }
+    return path1.replace(/\/+$/, '') + '/' + path2.replace(/^\/+/, '');
+  }
+
+  /**
    * @param {string} publicPath
    * @param {HtmlTagObject[]} scripts
    */
@@ -98,7 +78,7 @@ class ScriptsHtmlWebpackPlugin {
     for (const script of this.#add) {
       const files = glob.sync(script.path, { cwd: script.directory });
       for (const file of files) {
-        const url = urlJoin(publicPath, file);
+        const url = this.#urlJoin(publicPath, file);
         const tag = HtmlWebpackPlugin.createHtmlTagObject('script', { src: url });
         scripts.push(tag);
       }
@@ -190,7 +170,11 @@ class CreateFilePlugin {
 
   #createFile() {
     const fullPath = path.join(this.#filePath, this.#fileName);
+    const directory = path.dirname(fullPath);
     const content = typeof this.#content === 'function' ? this.#content() : this.#content;
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
+    }
     fs.writeFileSync(fullPath, content);
   }
 }
@@ -263,6 +247,40 @@ function mergeBabelRules(rules) {
 }
 
 /**
+ * @param {string} env
+ * @returns {{[string]:string}}
+ */
+function resolveBabelTargets(env) {
+  return babelPrettifyTargets(babelTargets({}, { browserslistEnv: env }));
+}
+
+/**
+ * @param {...string} fileTypes
+ * @returns {{[string]:string}}
+ */
+function fileSizes(...fileTypes) {
+  const sizes = {};
+  const files = glob.sync('**/*', { cwd: dir.dist });
+  for (const file of files) {
+    if (mathchesPatterns(path.basename(file), ...fileTypes)) {
+      const stat = fs.statSync(path.resolve(dir.dist, file));
+      const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' });
+      sizes[file] = size;
+    }
+  }
+  return sizes;
+}
+
+/**
+ * @param {string} filepath
+ * @param {...string} patterns
+ * @returns {boolean}
+ */
+function mathchesPatterns(filepath, ...patterns) {
+  return [].concat(patterns || []).some((pattern) => minimatch(filepath, pattern));
+}
+
+/**
  * @param {WebpackPluginInstance[]} originalPlugins
  * @param {WebpackPluginInstance[]} newPlugins
  */
@@ -317,11 +335,13 @@ postcssRemoveCarriageReturn.postcss = true;
 
 module.exports = {
   dir,
-  browsers,
   ScriptsHtmlWebpackPlugin,
   ThrowOnAssetsEmitedWebpackPlugin,
   CreateFilePlugin,
   resolveNestedVersion,
+  resolveBabelTargets,
+  fileSizes,
+  mathchesPatterns,
   browserslistEnvironment,
   mergeBabelRules,
   mergeCspPlugin,
