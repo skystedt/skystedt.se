@@ -64,7 +64,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "dependencies": {
-    "@microsoft/applicationinsights-web": "2.8.6",
+    "@microsoft/applicationinsights-web": "2.8.9",
     "@pixi/unsafe-eval": "6.5.2",
     "core-js": "3.25.0",
     "pixi.js": "6.5.2",
