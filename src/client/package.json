@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "@microsoft/applicationinsights-web": "2.8.6",
-    "@pixi/unsafe-eval": "6.5.2",
+    "@pixi/unsafe-eval": "7.0.2",
     "core-js": "3.25.0",
     "pixi.js": "6.5.2",
     "unfetch": "4.2.0"
