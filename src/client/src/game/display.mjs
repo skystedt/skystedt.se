@@ -15,7 +15,7 @@ export default class Display {
   #gameOutsideDisplay;
 
   /**
-   * @param {PIXI.Renderer | PIXI.AbstractRenderer} renderer
+   * @param {PIXI.IRenderer} renderer
    * @param {PIXI.Container} stage
    * @param {HTMLCanvasElement} canvas
    * @param {boolean} ignoreBorders

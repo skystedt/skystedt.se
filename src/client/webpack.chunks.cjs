@@ -9,7 +9,7 @@ const { mathchesPatterns } = require('./webpack.helpers.cjs');
 /** @type {EntryObject} */
 const entry = {
   insights: path.resolve(dir.src, 'insights', 'insights.mjs'),
-  app: { import: path.resolve(dir.src, 'index.mjs') } // declare as object with import, so it can be extended and merged
+  app: path.resolve(dir.src, 'index.mjs')
 };
 
 /** @type {EntryObject} */
@@ -62,33 +62,26 @@ const chunks = {
         vendor: {
           test: (module) =>
             module.resource &&
-            minimatch(module.resource, path.resolve(dir.node_modules, '**'), { windowsPathsNoEscape: true }) &&
-            // when using output = module then node modules only used with local dev server will break local development if included in cacheGroups
-            ![
-              'webpack',
-              'webpack-dev-server',
-              'ansi-html-community',
-              'html-entities',
-              'events',
-              'mini-css-extract-plugin'
-            ].includes(module.resourceResolveData.descriptionFileData.name),
+            minimatch(module.resource, path.resolve(dir.node_modules, '**'), { windowsPathsNoEscape: true }),
           type: wildcardMatch('javascript/*'),
           priority: 10,
           name: (module) => {
             const moduleName = module.resourceResolveData.descriptionFileData.name;
             switch (moduleName) {
+              case 'webpack':
+              case 'webpack-dev-server':
+              case 'ansi-html-community':
+              case 'html-entities':
+              case 'events':
+              case 'mini-css-extract-plugin':
+                return 'development';
               case 'earcut':
               case 'eventemitter3':
               case 'punycode':
               case 'querystring':
               case 'url':
                 return 'pixi';
-              case '@pixi/polyfill':
-              case 'promise-polyfill':
-              case 'object-assign':
-                return 'polyfills';
               case 'core-js':
-              case 'regenerator-runtime':
                 return 'polyfills';
               case 'unfetch-polyfill':
                 return 'polyfills';
