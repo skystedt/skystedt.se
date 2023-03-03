@@ -36,12 +36,10 @@ export default class Game {
   #stars = /** @type {Stars} */ (Uninitialized);
 
   get canvas() {
-    return this.#app.view;
+    return /** @type {HTMLCanvasElement} */ (this.#app.view);
   }
 
   constructor() {
-    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-
     this.#app = new PIXI.Application();
 
     this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas, true);

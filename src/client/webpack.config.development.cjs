@@ -46,8 +46,15 @@ const developmentModern = {
           // modify CSP for local development
           builtPolicy = builtPolicy
             .replace('webpack', "webpack 'allow-duplicates' webpack-dev-server#overlay")
-            .replace('; report-uri /api/csp/report', '')
-            .replace('; report-to csp-report', '');
+            .replace('; report-uri /api/report/csp', '') // Not allowed in <meta> tag
+            .replace(
+              "; style-src-attr 'none'",
+              "; style-src-attr 'unsafe-hashes'" +
+                " 'sha256-dKPMtStvhWirlTIky2ozsboS0Q6fEpiYn8PJwiK2ywo='" + // Error overlay
+                " 'sha256-9i4CO/Nl+gX45HxIVK0YGg311ZbVCsEZzl4uJ47ZNOo='" + // Error overlay
+                " 'sha256-V4C0IT9aeNBiUnxIeGJONTAiAhnmC5iiZqBiYPLqrb0='" + // Error overlay
+                " 'sha256-2j+NsrE/qRlmhkADxLdqK0AALIC4Gcc77SVRgwXmYCc='" // Error overlay
+            );
           // call default processFn to add <meta> tag
           new CspHtmlWebpackPlugin().opts.processFn(builtPolicy, htmlPluginData, $);
         }

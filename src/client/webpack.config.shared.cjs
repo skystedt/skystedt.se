@@ -1,5 +1,6 @@
 /* eslint-env node */
 const path = require('path');
+const util = require('util');
 const update = require('immutability-helper');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const SubresourceIntegrityPlugin = require('webpack-subresource-integrity').SubresourceIntegrityPlugin;
@@ -14,7 +15,7 @@ const postcssMergeRules = require('postcss-merge-rules');
 const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
 const { dir } = require('./webpack.helpers.cjs');
 const ScriptsHtmlWebpackPlugin = require('./webpack.helpers.cjs').ScriptsHtmlWebpackPlugin;
-const ThrowOnAssetsEmitedWebpackPlugin = require('./webpack.helpers.cjs').ThrowOnAssetsEmitedWebpackPlugin;
+const ThrowOnAssetEmitedWebpackPlugin = require('./webpack.helpers.cjs').ThrowOnAssetEmitedWebpackPlugin;
 const CreateFilePlugin = require('./webpack.helpers.cjs').CreateFilePlugin;
 const postcssRemoveCarriageReturn = require('./webpack.helpers.cjs').postcssRemoveCarriageReturn;
 const {
@@ -22,6 +23,7 @@ const {
   resolveBabelTargets,
   fileSizes,
   browserslistEnvironment,
+  mergeEntries,
   mergeBabelRules
 } = require('./webpack.helpers.cjs');
 /** @typedef { import("webpack").Configuration } Configuration */
@@ -38,27 +40,34 @@ const versionInfo = () => {
   // eslint-disable-next-line no-console
   console.log('version', version);
 
-  return JSON.stringify(version, null, 2);
+  return version;
 };
 
 const browsersInfo = () => {
   const browsers = {
-    version: {
+    definitions: {
       global: resolveNestedVersion('browserslist', 'caniuse-lite'),
       webpack: resolveNestedVersion('webpack', 'browserslist', 'caniuse-lite'),
       babel: resolveNestedVersion('@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite'),
       babel_preset_env: resolveNestedVersion('@babel/preset-env', 'browserslist', 'caniuse-lite'),
       postcss: resolveNestedVersion('postcss-preset-env', 'browserslist', 'caniuse-lite')
     },
-    all: resolveBabelTargets('all'),
-    modern: resolveBabelTargets('modern'),
-    legacy: resolveBabelTargets('legacy')
+    browserslist: {
+      all: browserslistEnvironment('all').versions,
+      modern: browserslistEnvironment('modern').versions,
+      legacy: browserslistEnvironment('legacy').versions
+    },
+    babel: {
+      all: resolveBabelTargets('all'),
+      modern: resolveBabelTargets('modern'),
+      legacy: resolveBabelTargets('legacy')
+    }
   };
 
   // eslint-disable-next-line no-console
-  console.log('browsers', browsers);
+  console.log('browsers', util.inspect(browsers, { depth: Infinity, colors: true, compact: 1, breakLength: Infinity }));
 
-  return JSON.stringify(browsers, null, 2);
+  return browsers;
 };
 
 const filesInfo = () => {
@@ -67,7 +76,7 @@ const filesInfo = () => {
   // eslint-disable-next-line no-console
   console.log('files', files);
 
-  return JSON.stringify(files, null, 2);
+  return files;
 };
 
 /** @type {CspPolicy} */
@@ -80,14 +89,21 @@ const shared = {
   module: {
     rules: [
       {
+        // used to set sideEffects: false
         test: /\.m?js$/i,
         include: dir.src,
-        exclude: [path.resolve(dir.src, 'polyfills.mjs'), path.resolve(dir.src, 'game', 'pixi.mjs')],
+        exclude: [
+          path.resolve(dir.src, 'polyfills.mjs'),
+          path.resolve(dir.src, 'game', 'pixi.mjs') // needed for @pixi/unsafe-eval
+        ],
         sideEffects: false
       },
       {
         test: /\.m?js$/i,
-        include: dir.src,
+        include: [
+          dir.src,
+          path.resolve(dir.node_modules, '@pixi') // pixi.js v7+ doesn't ship polyfills
+        ],
         use: {
           loader: 'babel-loader',
           options: require('./babel.config.json')
@@ -170,14 +186,14 @@ const modern = {
         cspPolicy = builtPolicy;
       }
     }),
-    new ThrowOnAssetsEmitedWebpackPlugin('polyfills.*.mjs'),
+    new ThrowOnAssetEmitedWebpackPlugin('polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
     new CopyPlugin({
       patterns: [path.resolve(dir.src, 'favicon.ico')]
     }),
     new CreateFilePlugin(dir.root, 'staticwebapp.config.json', () => {
       const staticwebapp = require('./staticwebapp.config.template.json');
       staticwebapp.routes.find((route) => route.route === '/').headers['Content-Security-Policy'] = cspPolicy;
-      return JSON.stringify(staticwebapp, null, 2);
+      return staticwebapp;
     }),
     new CreateFilePlugin(dir.dist, 'build/version.json', versionInfo),
     new CreateFilePlugin(dir.dist, 'build/browsers.json', browsersInfo),
@@ -193,10 +209,32 @@ const modern = {
             browserslistEnv: 'modern',
             corejs: corejsVersion,
             bugfixes: true,
+            // http://zloirock.github.io/core-js/compat/
             exclude: [
-              'web.dom-collections.iterator', // added when using any for-of, but is not needed if not using for-of on DOM collections, https://github.com/zloirock/core-js/issues/1003
-              'es.error.cause' // newer option that can be used with Error, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
-            ]
+              'web.dom-collections.iterator', // needed for older ios, added when using any for-of, but is not needed if not using for-of on DOM collections, https://github.com/zloirock/core-js/issues/1003
+              'es.error.cause', // needed for older ios/safari, newer option that can be used with Error, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+              'es.array.push', // needed for modern browsers, length not properly set for arrays larger than 0x100000000, https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/es.array.push.js
+              // needed for older ios/safari, different error is thrown, https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/es.array.push.js
+
+              // Below is from pixi.js
+              'es.array.unshift',
+              'es.string.replace',
+              'es.typed-array.*-array',
+              'es.typed-array.at',
+              'es.typed-array.fill',
+              'es.typed-array.find-last',
+              'es.typed-array.find-last-index',
+              'es.typed-array.set',
+              'es.typed-array.sort',
+              'esnext.typed-array.to-reversed',
+              'esnext.typed-array.to-sorted',
+              'esnext.typed-array.with',
+              'esnext.typed-array.at',
+              'esnext.typed-array.find-last',
+              'esnext.typed-array.find-last-index',
+              'web.dom-exception.stack'
+            ],
+            debug: false
           })
         }
       },
@@ -264,19 +302,11 @@ const rules = (configuration) => {
     name: { $set: configuration.name },
     dependencies: { $set: configuration.dependencies },
     target: { $set: configuration.target },
-    entry: { $merge: configuration.entry || {}, app: { $merge: configuration.entry?.app || {} } },
+    entry: { $apply: (entry) => mergeEntries(entry, configuration.entry) },
     output: { $set: configuration.output },
     experiments: { $set: configuration.experiments },
     plugins: { $push: configuration.plugins || [] },
-    module: {
-      rules: {
-        $apply: (rules) => {
-          rules = [...(rules || []), ...(configuration.module.rules || [])];
-          mergeBabelRules(rules);
-          return rules;
-        }
-      }
-    }
+    module: { rules: { $apply: (rules) => mergeBabelRules(rules, configuration.module.rules) } }
   };
 };
 

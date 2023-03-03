@@ -4,12 +4,13 @@ const fs = require('fs');
 const structuredClone = require('core-js/stable/structured-clone.js');
 const enchancedResolve = require('enhanced-resolve');
 const minimatch = require('minimatch');
-const glob = require('glob');
+const { glob, globSync } = require('glob');
 const browserslist = require('browserslist');
 const bytes = require('bytes');
 const { default: babelTargets, prettifyTargets: babelPrettifyTargets } = require('@babel/helper-compilation-targets');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 /** @typedef { import("webpack").Compiler } Compiler */
+/** @typedef { import("webpack").EntryObject } EntryObject */
 /** @typedef { import("webpack").RuleSetRule } RuleSetRule */
 /** @typedef { import("webpack").WebpackPluginInstance } WebpackPluginInstance */
 /** @typedef { import("@babel/core").TransformOptions } BabelTransformOptions */
@@ -44,10 +45,9 @@ class ScriptsHtmlWebpackPlugin {
   /** @param {Compiler} compiler */
   apply(compiler) {
     compiler.hooks.compilation.tap('ScriptsHtmlWebpackPlugin', (compilation) => {
-      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapAsync('ScriptsHtmlWebpackPlugin', async (data, cb) => {
+      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapPromise('ScriptsHtmlWebpackPlugin', async (data) => {
         await this.#addScripts(data.publicPath, data.assetTags.scripts);
         this.#updateAttributes(data.assetTags.scripts);
-        cb(null, data);
       });
     });
   }
@@ -73,7 +73,7 @@ class ScriptsHtmlWebpackPlugin {
    */
   async #addScripts(publicPath, scripts) {
     for (const script of this.#add) {
-      const files = glob.sync(script.path, { cwd: script.directory });
+      const files = await glob(script.path, { cwd: script.directory });
       for (const file of files) {
         const url = this.#urlJoin(publicPath, file);
         const tag = HtmlWebpackPlugin.createHtmlTagObject('script', { src: url });
@@ -122,7 +122,7 @@ class ScriptsHtmlWebpackPlugin {
   }
 }
 
-class ThrowOnAssetsEmitedWebpackPlugin {
+class ThrowOnAssetEmitedWebpackPlugin {
   #patterns;
 
   /** @param {...string} patterns */
@@ -132,17 +132,17 @@ class ThrowOnAssetsEmitedWebpackPlugin {
 
   /** @param {Compiler} compiler */
   apply(compiler) {
-    compiler.hooks.afterEmit.tap('ThrowOnAssetsEmitedWebpackPlugin', () => {
+    compiler.hooks.afterEmit.tapPromise('ThrowOnAssetEmitedWebpackPlugin', async () => {
       const found = [];
       for (const pattern of this.#patterns) {
-        const files = glob.sync(pattern, { cwd: dir.dist });
+        const files = await glob(pattern, { cwd: dir.dist });
         if (files.length) {
           found.push(files);
         }
       }
       if (found.length) {
         throw new Error(
-          `ThrowOnAssetsEmitedWebpackPlugin - Following assets are not permitted to be emited \n${found.join('\n')}`
+          `ThrowOnAssetEmitedWebpackPlugin - Following assets are not permitted to be emited \n${found.join('\n')}`
         );
       }
     });
@@ -154,13 +154,13 @@ class CreateFilePlugin {
   #filePath;
   /** @type {string} */
   #fileName;
-  /** @type {string | Function<string>} */
+  /** @type {string | object | Function<string | object>} */
   #content;
 
   /**
    * @param {string} filePath
    * @param {string} fileName
-   * @param {string | Function<string>} content
+   * @param {string | object | Function<string | object>} content
    */
   constructor(filePath, fileName, content) {
     this.#filePath = filePath;
@@ -179,7 +179,13 @@ class CreateFilePlugin {
   #createFile() {
     const fullPath = path.join(this.#filePath, this.#fileName);
     const directory = path.dirname(fullPath);
-    const content = typeof this.#content === 'function' ? this.#content() : this.#content;
+    let content = this.#content;
+    if (typeof content === 'function') {
+      content = this.#content();
+    }
+    if (typeof content !== 'string') {
+      content = JSON.stringify(content, null, 2);
+    }
     if (!fs.existsSync(directory)) {
       fs.mkdirSync(directory, { recursive: true });
     }
@@ -216,17 +222,43 @@ function resolveNestedVersion(...modules) {
 
 /**
  * @param {string} environment
- * @returns {{ browsers: string[], config: string | undefined }}
+ * @returns {{ browsers: string[], versions: {[string]:string[]}, config: string | undefined }}
  */
 function browserslistEnvironment(environment) {
   const browsers = browserslist(null, { env: environment });
+  const versions = browsers.reduce((map, value) => {
+    const split = value.split(' ');
+    map[split[0]] = [...(map[split[0]] || []), split[1]].sort();
+    return map;
+  }, {});
   let config = browserslist.loadConfig({ path: dir.src, env: environment });
   config = Array.isArray(config) ? config.join(' or ') : config;
-  return { browsers, config };
+  return { browsers, versions, config };
 }
 
-/** @param {RuleSetRule[]} rules */
-function mergeBabelRules(rules) {
+/**
+ * @param {EntryObject} entry1
+ * @param {EntryObject} entry2
+ * @returns {EntryObject}
+ */
+function mergeEntries(entry1, entry2) {
+  return Object.keys(Object.assign({}, entry1, entry2)).reduce((map, key) => {
+    const value1 = entry1 ? entry1[key] : {};
+    const object1 = typeof value1 === 'string' || Array.isArray(value1) ? { import: value1 } : value1 || {};
+    const value2 = entry2 ? entry2[key] : {};
+    const object2 = typeof value2 === 'string' || Array.isArray(value2) ? { import: value2 } : value2 || {};
+    map[key] = Object.assign(object1, object2);
+    return map;
+  }, {});
+}
+
+/**
+ * @param {RuleSetRule[]} rules1
+ * @param {RuleSetRule[]} rules2
+ * @returns {RuleSetRule[]}
+ */
+function mergeBabelRules(rules1, rules2) {
+  const rules = [...(rules1 || []), ...(rules2 || [])];
   for (let i = 0; i < rules.length; ++i) {
     for (let j = 0; j < rules.length; ++j) {
       // check for equal <test> and <use.loader> is for babel
@@ -248,10 +280,11 @@ function mergeBabelRules(rules) {
         }
 
         rules.splice(j, 1);
-        return;
+        return rules;
       }
     }
   }
+  return rules;
 }
 
 /**
@@ -268,7 +301,7 @@ function resolveBabelTargets(env) {
  */
 function fileSizes(...fileTypes) {
   const sizes = {};
-  const files = glob.sync('**/*', { cwd: dir.dist });
+  const files = globSync('**/*', { cwd: dir.dist });
   for (const file of files) {
     if (mathchesPatterns(path.basename(file), ...fileTypes)) {
       const stat = fs.statSync(path.resolve(dir.dist, file));
@@ -344,13 +377,14 @@ postcssRemoveCarriageReturn.postcss = true;
 module.exports = {
   dir,
   ScriptsHtmlWebpackPlugin,
-  ThrowOnAssetsEmitedWebpackPlugin,
+  ThrowOnAssetEmitedWebpackPlugin,
   CreateFilePlugin,
   resolveNestedVersion,
   resolveBabelTargets,
   fileSizes,
   mathchesPatterns,
   browserslistEnvironment,
+  mergeEntries,
   mergeBabelRules,
   mergeCspPlugin,
   postcssRemoveCarriageReturn
