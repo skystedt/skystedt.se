@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "@microsoft/applicationinsights-web": "2.8.10",
-    "@pixi/unsafe-eval": "7.0.5",
+    "@pixi/unsafe-eval": "7.1.4",
     "core-js": "3.29.0",
     "navigator.sendbeacon": "0.0.20",
     "pixi.js": "7.1.4",
