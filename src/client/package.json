@@ -54,7 +54,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "dependencies": {
-    "@microsoft/applicationinsights-web": "2.8.10",
+    "@microsoft/applicationinsights-web": "2.8.11",
     "@pixi/unsafe-eval": "7.0.5",
     "core-js": "3.29.0",
     "navigator.sendbeacon": "0.0.20",
