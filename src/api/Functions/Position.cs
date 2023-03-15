@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Extensions.WebPubSub;
 using Skystedt.Api.Extensions;
+using Skystedt.Api.Infrastructure;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 #pragma warning disable IDE0060 // Remove unused parameter
 
-namespace Skystedt.Api
+namespace Skystedt.Api.Functions
 {
     public class Position
     {

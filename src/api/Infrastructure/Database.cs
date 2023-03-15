@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Skystedt.Api
+namespace Skystedt.Api.Infrastructure
 {
     internal static class Database
     {
