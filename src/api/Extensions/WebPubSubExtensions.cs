@@ -21,7 +21,7 @@ namespace Skystedt.Api.Extensions
     [Binding]
     public class ExtendedWebPubSubAttribute : Attribute
     {
-        // Replacement for: https://github.com/Azure/azure-sdk-for-net/blob/Microsoft.Azure.WebJobs.Extensions.WebPubSub_1.1.0/sdk/webpubsub/Microsoft.Azure.WebJobs.Extensions.WebPubSub/src/WebPubSubAttribute.cs
+        // Replacement for: https://github.com/Azure/azure-sdk-for-net/blob/Microsoft.Azure.WebJobs.Extensions.WebPubSub_1.4.0/sdk/webpubsub/Microsoft.Azure.WebJobs.Extensions.WebPubSub/src/WebPubSubAttribute.cs
 
         /// <summary>
         /// The connection of target Web PubSub service.
@@ -78,6 +78,9 @@ namespace Skystedt.Api.Extensions
     {
         private readonly WebPubSubServiceClient _client;
 
+        // https://github.com/Azure/azure-sdk-for-net/blob/Azure.Messaging.WebPubSub_1.2.0/sdk/webpubsub/Azure.Messaging.WebPubSub/src/Generated/WebPubSubServiceClient.cs#L1081
+        private static HttpPipelinePolicy Policy { get; } = new ResponseClassifierOverridePolicy(new ResponseClassifier202Ignore429());
+
         internal WebPubSubAsyncCollector(string connectionString, string? hub)
         {
             _client = new WebPubSubServiceClient(connectionString, hub);
@@ -85,23 +88,26 @@ namespace Skystedt.Api.Extensions
 
         public async Task AddAsync(WebPubSubAction item, CancellationToken cancellationToken = default)
         {
-            // Based on: https://github.com/Azure/azure-sdk-for-net/blob/Microsoft.Azure.WebJobs.Extensions.WebPubSub_1.1.0/sdk/webpubsub/Microsoft.Azure.WebJobs.Extensions.WebPubSub/src/Bindings/WebPubSubAsyncCollector.cs#L20
+            // Based on: https://github.com/Azure/azure-sdk-for-net/blob/Microsoft.Azure.WebJobs.Extensions.WebPubSub_1.4.0/sdk/webpubsub/Microsoft.Azure.WebJobs.Extensions.WebPubSub/src/Bindings/WebPubSubAsyncCollector.cs#L21
 
             var context = new RequestContext { CancellationToken = cancellationToken };
 
             // Used to override the ResponseClassifier with one that will not retry status code 429
-            context.AddPolicy(ResponseClassifier202Ignore429Policy.Instance, HttpPipelinePosition.PerCall);
+            context.AddPolicy(Policy, HttpPipelinePosition.PerCall);
 
             switch (item)
             {
                 case null:
                     throw new ArgumentNullException(nameof(item));
+
                 case SendToAllAction action:
                     await _client.SendToAllAsync(RequestContent.Create(action.Data), GetContentType(action.DataType), action.Excluded, context).ConfigureAwait(false);
                     break;
+
                 case SendToConnectionAction action:
                     await _client.SendToConnectionAsync(action.ConnectionId, RequestContent.Create(action.Data), GetContentType(action.DataType), context).ConfigureAwait(false);
                     break;
+
                 default:
                     // Add more methods as needed, see link above
                     throw new ArgumentException($"Not supported WebPubSubOperation: {nameof(item)}.");
@@ -115,45 +121,48 @@ namespace Skystedt.Api.Extensions
 
         private static ContentType GetContentType(WebPubSubDataType dataType) => dataType switch
         {
-            // Based on: https://github.com/Azure/azure-sdk-for-net/blob/Microsoft.Azure.WebJobs.Extensions.WebPubSub_1.1.0/sdk/webpubsub/Microsoft.Azure.WebJobs.Extensions.WebPubSub/src/Utilities.cs#L21
+            // Based on: https://github.com/Azure/azure-sdk-for-net/blob/Microsoft.Azure.WebJobs.Extensions.WebPubSub_1.4.0/sdk/webpubsub/Microsoft.Azure.WebJobs.Extensions.WebPubSub/src/Utilities.cs#L21
             WebPubSubDataType.Text => ContentType.TextPlain,
             WebPubSubDataType.Json => ContentType.ApplicationJson,
             WebPubSubDataType.Binary => ContentType.ApplicationOctetStream,
             _ => throw new InvalidEnumArgumentException("DataType", (int)dataType, typeof(WebPubSubDataType))
         };
 
-        private class ResponseClassifier202Ignore429Policy : HttpPipelinePolicy
+        private class ResponseClassifierOverridePolicy : HttpPipelinePolicy
         {
-            public static HttpPipelinePolicy Instance { get; } = new ResponseClassifier202Ignore429Policy();
+            private readonly ResponseClassifier _responseClassifier;
+
+            public ResponseClassifierOverridePolicy(ResponseClassifier responseClassifier)
+            {
+                _responseClassifier = responseClassifier;
+            }
 
             public override void Process(HttpMessage message, ReadOnlyMemory<HttpPipelinePolicy> pipeline)
             {
-                message.ResponseClassifier = ResponseClassifier202Ignore429.Instance;
+                message.ResponseClassifier = _responseClassifier;
                 ProcessNext(message, pipeline);
             }
+
             public override async ValueTask ProcessAsync(HttpMessage message, ReadOnlyMemory<HttpPipelinePolicy> pipeline)
             {
-                message.ResponseClassifier = ResponseClassifier202Ignore429.Instance;
+                message.ResponseClassifier = _responseClassifier;
                 await ProcessNextAsync(message, pipeline).ConfigureAwait(false);
             }
         }
 
-        private class ResponseClassifier202Ignore429 : ResponseClassifier
+        private class ResponseClassifier202Ignore429 : StatusCodeClassifier
         {
-            public static ResponseClassifier Instance { get; } = new ResponseClassifier202Ignore429();
-            public override bool IsErrorResponse(HttpMessage message)
-            {
-                // https://github.com/Azure/azure-sdk-for-net/blob/Azure.Messaging.WebPubSub_1.0.0/sdk/webpubsub/Azure.Messaging.WebPubSub/src/Generated/WebPubSubServiceClient.cs#L1656
-                // https://github.com/Azure/azure-sdk-for-net/blob/Azure.Messaging.WebPubSub_1.0.0/sdk/webpubsub/Azure.Messaging.WebPubSub/src/Generated/WebPubSubServiceClient.cs#L2163
-                return message.Response.Status != 202;
-            }
+            // https://github.com/Azure/azure-sdk-for-net/blob/Azure.Messaging.WebPubSub_1.2.0/sdk/webpubsub/Azure.Messaging.WebPubSub/src/Generated/WebPubSubServiceClient.cs#L1469
+            public ResponseClassifier202Ignore429() : base(stackalloc ushort[] { 202 }) { }
+
             public override bool IsRetriableResponse(HttpMessage message)
             {
-                return message.Response.Status switch
+                if (message.Response.Status == 429)
                 {
-                    429 => false,
-                    _ => base.IsRetriableResponse(message)
-                };
+                    return false;
+                }
+
+                return base.IsRetriableResponse(message);
             }
         }
     }

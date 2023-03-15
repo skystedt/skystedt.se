@@ -5,7 +5,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
-namespace Skystedt.Api
+namespace Skystedt.Api.Functions
 {
     public class BrowserReporting
     {
@@ -34,7 +34,7 @@ namespace Skystedt.Api
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"report/csp")] HttpRequest request,
             ILogger logger)
         {
-            if (request.ContentType != ContentTypeReports && request.ContentType != ContentTypeCsp)
+            if (request.ContentType is not ContentTypeReports and not ContentTypeCsp)
             {
                 logger.LogWarning("Unsupported Csp header: {Header}", request.ContentType);
                 return new UnsupportedMediaTypeResult();

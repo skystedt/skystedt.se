@@ -75,8 +75,10 @@ const chunks = {
               case 'events':
               case 'mini-css-extract-plugin':
                 return 'development';
+              case 'colord':
               case 'earcut':
               case 'eventemitter3':
+              case 'ismobilejs':
               case 'punycode':
               case 'querystring':
               case 'url':

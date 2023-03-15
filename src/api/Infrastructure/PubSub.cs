@@ -10,7 +10,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Skystedt.Api
+namespace Skystedt.Api.Infrastructure
 {
     internal static class PubSub
     {
