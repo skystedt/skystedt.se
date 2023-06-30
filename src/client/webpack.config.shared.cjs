@@ -12,7 +12,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const postcssPresetEnv = require('postcss-preset-env');
 const postcssMergeRules = require('postcss-merge-rules');
-const { entry, entryLegacy, splitChunks } = require('./webpack.chunks.cjs');
+const { entry, entryLegacy, cacheGroups } = require('./webpack.chunks.cjs');
 const { dir } = require('./webpack.helpers.cjs');
 const ScriptsHtmlWebpackPlugin = require('./webpack.helpers.cjs').ScriptsHtmlWebpackPlugin;
 const ThrowOnAssetEmitedWebpackPlugin = require('./webpack.helpers.cjs').ThrowOnAssetEmitedWebpackPlugin;
@@ -82,7 +82,7 @@ const filesInfo = () => {
 /** @type {CspPolicy} */
 let cspPolicy;
 
-/** @returns {Configuration} */
+/** @type {Configuration} */
 const shared = {
   entry: entry,
   plugins: [], // needs an array for merging
@@ -119,9 +119,10 @@ const shared = {
     moduleIds: 'deterministic',
     runtimeChunk: false,
     splitChunks: {
+      chunks: 'all',
       minSize: 0,
       minSizeReduction: 0,
-      cacheGroups: splitChunks.cacheGroups
+      cacheGroups: cacheGroups
     },
     minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
     realContentHash: true,
@@ -217,6 +218,7 @@ const modern = {
               // needed for older ios/safari, different error is thrown, https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/es.array.push.js
 
               // Below is from pixi.js
+              'es.array.reduce',
               'es.array.unshift',
               'es.string.replace',
               'es.typed-array.*-array',
@@ -226,6 +228,9 @@ const modern = {
               'es.typed-array.find-last-index',
               'es.typed-array.set',
               'es.typed-array.sort',
+              'es.typed-array.to-reversed',
+              'es.typed-array.to-sorted',
+              'es.typed-array.with',
               'esnext.typed-array.to-reversed',
               'esnext.typed-array.to-sorted',
               'esnext.typed-array.with',
@@ -234,7 +239,7 @@ const modern = {
               'esnext.typed-array.find-last-index',
               'web.dom-exception.stack'
             ],
-            debug: false
+            debug: false // when ThrowOnAssetEmitedWebpackPlugin is thrown for polyfills.*.mjs, set this to true to debug why
           })
         }
       },

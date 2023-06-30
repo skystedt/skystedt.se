@@ -1,6 +1,6 @@
 /* eslint-env node */
 const webpack = require('webpack');
-const minimatch = require('minimatch');
+const { minimatch } = require('minimatch');
 const update = require('immutability-helper');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const StylelintPlugin = require('stylelint-webpack-plugin');
