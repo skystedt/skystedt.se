@@ -1,5 +1,5 @@
-/** @typedef { import("./minis.mjs").default } Minis */
-/** @typedef { import("./primitives.mjs").GamePosition } GamePosition */
+import Minis from './minis.mjs';
+import { GamePosition } from './primitives.mjs';
 
 export default class Communication {
   /** @type {string?} */
