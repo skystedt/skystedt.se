@@ -7,8 +7,9 @@ import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Minis from './minis.mjs';
 import Stars from './stars.mjs';
+import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+
 /** @typedef { number } DOMHighResTimeStamp */
-/** @typedef { import("@microsoft/applicationinsights-web").ApplicationInsights } ApplicationInsights */
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;

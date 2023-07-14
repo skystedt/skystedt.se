@@ -1,6 +1,5 @@
 import * as PIXI from './pixi.mjs';
-import { Uninitialized } from './primitives.mjs';
-/** @typedef { import("./primitives.mjs").Size } Size */
+import { Size, Uninitialized } from './primitives.mjs';
 
 const BLINK_PROBABILITY = 0.0001;
 const BLINK_DURATION = 30;
