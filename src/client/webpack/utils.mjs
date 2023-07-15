@@ -30,23 +30,6 @@ export const browserslistEnvironment = (environment) => {
 };
 
 /**
- * @param {webpack.Configuration} configuration
- * @param {Function} processFn
- */
-export const extendCspPluginProcessFn = (configuration, processFn) => {
-  const cspPlugin = configuration.plugins.find((plugin) => plugin.constructor.name === 'CspHtmlWebpackPlugin');
-  if (cspPlugin) {
-    const originalProcessFn = cspPlugin.opts.processFn;
-    const options = Object.assign({}, cspPlugin.opts);
-    options.processFn = (...parameters) => {
-      originalProcessFn(...parameters);
-      processFn(...parameters);
-    };
-    cspPlugin.opts = Object.freeze(options);
-  }
-};
-
-/**
  * @typedef {import("immutability-helper").Spec<webpack.Configuration>} ImmutabilityHelperSpec
  * @param {webpack.Configuration} configuration
  * @returns {ImmutabilityHelperSpec}

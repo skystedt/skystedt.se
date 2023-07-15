@@ -2,7 +2,7 @@
   "default-src": "'none'",
   "base-uri": "'self'",
   "object-src": "'none'",
-  "script-src": "'self'",
+  "script-src": ["'self'", "'strict-dynamic'"],
   "script-src-attr": "'none'",
   "connect-src": ["'self'", "wss://skystedt.webpubsub.azure.com", "https://dc.services.visualstudio.com"],
   "img-src": "data:",

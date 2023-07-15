@@ -54,6 +54,7 @@ export const cspProcessFn = (builtPolicy, ...parameters) => {
   // modify CSP for local development
   builtPolicy = builtPolicy
     .replace('webpack', "webpack 'allow-duplicates' webpack-dev-server#overlay")
+    .replace("'strict-dynamic'", '')
     .replace('; report-uri /api/report/csp', '') // Not allowed in <meta> tag
     .replace("; style-src-attr 'none'", "; style-src-attr 'unsafe-hashes'" + errorOverlay);
 

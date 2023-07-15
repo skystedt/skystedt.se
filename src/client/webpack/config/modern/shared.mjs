@@ -17,7 +17,9 @@ import cacheGroups from '../chunks.mjs';
 import BuildInfo from '../../build-info.mjs';
 import { dir, browserslistEnvironment, mergeBabelOptions } from '../../utils.mjs';
 import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
+import MoveHtmlWebpackPlugin from '../../plugins/move-html-webpack-plugin.mjs';
 import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.mjs';
+import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
 import ThrowOnAssetEmitedPlugin from '../../plugins/throw-on-asset-emited-plugin.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 
@@ -219,6 +221,7 @@ export default {
       template: path.resolve(dir.src, 'index.html'),
       scriptLoading: 'module'
     }),
+    new MoveHtmlWebpackPlugin(),
     new ScriptsHtmlWebpackPlugin({
       add: [
         { path: 'legacy/insights.*.js', directory: dir.dist },
@@ -238,7 +241,7 @@ export default {
       enabled: 'auto',
       hashFuncNames: ['sha384']
     }),
-    new CspHtmlWebpackPlugin(csp, {
+    new ExtendedCspHtmlWebpackPlugin(csp, {
       hashingMethod: 'sha384',
       hashEnabled: {
         'script-src': false,
