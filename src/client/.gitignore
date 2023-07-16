@@ -2,11 +2,8 @@
 node_modules
 
 # Build results
-[Dd]ist/
+[Pp]ublic/
 
 # Lock files
 *.lock
 package-lock.json
-
-# Generated during build
-staticwebapp.config.json
