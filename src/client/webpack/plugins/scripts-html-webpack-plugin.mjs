@@ -5,7 +5,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 export default class ScriptsHtmlWebpackPlugin {
   /** @typedef {{ path: string, directory: string }} AddScript */
-  /** @typedef {{ path: string, defer?: boolean, async?: boolean, type?: "module" | "nomodule" | false }} ScriptAttributes */
+  /** @typedef {{ path: string, defer?: boolean, async?: boolean, type?: "module" | "nomodule" | false, integrity?: boolean }} ScriptAttributes */
 
   /** @type {AddScript[]} */
   #add;
@@ -79,6 +79,7 @@ export default class ScriptsHtmlWebpackPlugin {
         if (minimatch(script.attributes.src, attributes.path)) {
           this.#booleanAttribute(script, attributes, 'defer');
           this.#booleanAttribute(script, attributes, 'async');
+          this.#booleanAttribute(script, attributes, 'integrity');
           switch (attributes.type) {
             case 'module':
               script.attributes.type = 'module';

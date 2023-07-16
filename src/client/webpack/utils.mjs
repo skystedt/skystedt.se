@@ -33,16 +33,16 @@ export const browserslistEnvironment = (environment) => {
  * @param {webpack.Configuration} configuration
  * @param {Function} processFn
  */
-export const extendCspPlugin = (configuration, processFn) => {
-  const originalPlugin = configuration.plugins.find((plugin) => plugin.constructor.name === 'CspHtmlWebpackPlugin');
-  if (originalPlugin) {
-    const originalProcessFn = originalPlugin.opts.processFn;
-    const options = Object.assign({}, originalPlugin.opts);
+export const extendCspPluginProcessFn = (configuration, processFn) => {
+  const cspPlugin = configuration.plugins.find((plugin) => plugin.constructor.name === 'CspHtmlWebpackPlugin');
+  if (cspPlugin) {
+    const originalProcessFn = cspPlugin.opts.processFn;
+    const options = Object.assign({}, cspPlugin.opts);
     options.processFn = (...parameters) => {
       originalProcessFn(...parameters);
       processFn(...parameters);
     };
-    originalPlugin.opts = Object.freeze(options);
+    cspPlugin.opts = Object.freeze(options);
   }
 };
 
@@ -55,7 +55,6 @@ export const mergeRules = (configuration) => {
   return {
     mode: { $set: configuration.mode },
     devtool: { $set: configuration.devtool },
-    output: { $merge: configuration.output || {} },
     optimization: { $merge: configuration.optimization || {} },
     devServer: { $set: configuration.devServer },
     plugins: { $push: configuration.plugins || [] }
