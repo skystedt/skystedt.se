@@ -127,6 +127,7 @@ export default {
     filename: '[name].[contenthash].mjs',
     path: dir.dist,
     publicPath: '',
+    scriptType: 'module',
     trustedTypes: 'webpack',
     crossOriginLoading: 'anonymous',
     clean: {
@@ -143,13 +144,20 @@ export default {
       minSizeReduction: 0,
       cacheGroups: cacheGroups
     },
-    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          module: true
+        }
+      }),
+      new CssMinimizerPlugin()
+    ],
     realContentHash: true,
     removeAvailableModules: true,
     sideEffects: true
   },
   experiments: {
-    outputModule: true
+    outputModule: false // using modules will force use of import() for loading child scripts, which does not support SRI/integrity
   },
   performance: {
     assetFilter: (assetFilename) => {
@@ -219,7 +227,7 @@ export default {
       ],
       attributes: [
         { path: '**/insights.*.*js', async: true },
-        { path: 'legacy/*.js', type: 'nomodule', defer: true }
+        { path: 'legacy/*.js', type: 'nomodule', defer: true, integrity: false }
       ]
     }),
     new MiniCssExtractPlugin({

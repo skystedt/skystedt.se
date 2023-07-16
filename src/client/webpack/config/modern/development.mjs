@@ -9,9 +9,6 @@ import { dir, browserslistEnvironment } from '../../utils.mjs';
 export default {
   mode: 'development',
   devtool: 'inline-source-map',
-  output: {
-    module: false // HMR is not implemented for module chunk format yet
-  },
   optimization: {
     minimize: false
   },
@@ -48,18 +45,18 @@ export default {
 };
 
 export const cspProcessFn = (builtPolicy, ...parameters) => {
+  const errorOverlay =
+    " 'sha256-dKPMtStvhWirlTIky2ozsboS0Q6fEpiYn8PJwiK2ywo='" +
+    " 'sha256-9i4CO/Nl+gX45HxIVK0YGg311ZbVCsEZzl4uJ47ZNOo='" +
+    " 'sha256-V4C0IT9aeNBiUnxIeGJONTAiAhnmC5iiZqBiYPLqrb0='" +
+    " 'sha256-2j+NsrE/qRlmhkADxLdqK0AALIC4Gcc77SVRgwXmYCc='";
+
   // modify CSP for local development
   builtPolicy = builtPolicy
     .replace('webpack', "webpack 'allow-duplicates' webpack-dev-server#overlay")
     .replace('; report-uri /api/report/csp', '') // Not allowed in <meta> tag
-    .replace(
-      "; style-src-attr 'none'",
-      "; style-src-attr 'unsafe-hashes'" +
-        " 'sha256-dKPMtStvhWirlTIky2ozsboS0Q6fEpiYn8PJwiK2ywo='" + // Error overlay
-        " 'sha256-9i4CO/Nl+gX45HxIVK0YGg311ZbVCsEZzl4uJ47ZNOo='" + // Error overlay
-        " 'sha256-V4C0IT9aeNBiUnxIeGJONTAiAhnmC5iiZqBiYPLqrb0='" + // Error overlay
-        " 'sha256-2j+NsrE/qRlmhkADxLdqK0AALIC4Gcc77SVRgwXmYCc='" // Error overlay
-    );
+    .replace("; style-src-attr 'none'", "; style-src-attr 'unsafe-hashes'" + errorOverlay);
+
   // call default processFn to add <meta> tag
   new CspHtmlWebpackPlugin().opts.processFn(builtPolicy, ...parameters);
 };

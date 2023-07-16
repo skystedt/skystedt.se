@@ -10,9 +10,6 @@ export default {
   optimization: {
     minimize: true
   },
-  output: {
-    module: true
-  },
   plugins: [
     new webpack.DefinePlugin({
       INSTRUMENTATION_KEY: `"${settings.production.INSTRUMENTATION_KEY}"`
