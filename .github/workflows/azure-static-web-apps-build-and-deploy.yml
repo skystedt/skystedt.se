@@ -17,5 +17,5 @@ jobs:
           action: "upload"
           app_location: "/src/client"
           api_location: "/src/api"
-          output_location: "dist"
-          app_build_command: "npm run production"
+          output_location: "public/dist"
+          app_build_command: "yarn run production"

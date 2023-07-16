@@ -7,9 +7,9 @@ import babelPresetEnv from '@babel/preset-env';
 
 const cwd = process.cwd();
 export const dir = {
-  root: path.resolve(cwd),
   src: path.resolve(cwd, 'src'),
-  dist: path.resolve(cwd, 'dist'),
+  public: path.resolve(cwd, 'public'),
+  dist: path.resolve(cwd, 'public', 'dist'),
   node_modules: path.resolve(cwd, 'node_modules')
 };
 

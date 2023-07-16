@@ -254,7 +254,7 @@ export default {
     new CopyPlugin({
       patterns: [path.resolve(dir.src, 'favicon.ico')]
     }),
-    new CreateFilePlugin(dir.root, 'staticwebapp.config.json', staticwebappConfig),
+    new CreateFilePlugin(dir.public, 'staticwebapp.config.json', staticwebappConfig),
     new CreateFilePlugin(dir.dist, 'build/version.json', () => buildInfo.version()),
     new CreateFilePlugin(dir.dist, 'build/browsers.json', () => buildInfo.browsers()),
     new CreateFilePlugin(dir.dist, 'build/sizes.json', () => buildInfo.sizes())
