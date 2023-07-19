@@ -6,13 +6,6 @@ import TerserPlugin from 'terser-webpack-plugin';
 import cacheGroups from '../chunks.mjs';
 import { dir, mergeBabelOptions } from '../../utils.mjs';
 
-/** @type {webpack.EntryObject} */
-const entry = {
-  polyfills: path.resolve(dir.src, 'polyfills.mjs'),
-  insights: path.resolve(dir.src, 'insights', 'insights.mjs'),
-  app: { import: path.resolve(dir.src, 'index.mjs'), dependOn: 'polyfills' }
-};
-
 /** @type {webpack.Configuration} */
 export default {
   name: 'legacy',
@@ -23,7 +16,6 @@ export default {
     publicPath: 'legacy/',
     clean: true
   },
-  entry: entry,
   optimization: {
     moduleIds: 'deterministic',
     runtimeChunk: false,

@@ -28,12 +28,6 @@ import staticwebapp from '../../../staticwebapp.config.template.json' assert { t
 
 const buildInfo = new BuildInfo(true);
 
-/** @type {webpack.EntryObject} */
-const entry = {
-  insights: path.resolve(dir.src, 'insights', 'insights.mjs'),
-  app: path.resolve(dir.src, 'index.mjs')
-};
-
 /** @type {babelPresetEnv.Options | { browserslistEnv: string }} */
 const babelPresetEnvOptions = {
   browserslistEnv: 'modern',
@@ -134,10 +128,9 @@ export default {
       keep: 'legacy'
     }
   },
-  entry: entry,
   optimization: {
     moduleIds: 'deterministic',
-    runtimeChunk: false,
+    runtimeChunk: false, // false adds runtime code to entry chunks, instead of having additional runtime chunks
     splitChunks: {
       chunks: 'all',
       minSize: 0,

@@ -11,6 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution
 	ProjectSection(SolutionItems) = preProject
 		..\.editorconfig = ..\.editorconfig
 		..\.gitignore = ..\.gitignore
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+		client\staticwebapp.config.template.json = client\staticwebapp.config.template.json
 	EndProjectSection
 EndProject
 Global
@@ -24,7 +27,6 @@ Global
 		{DEAAF84A-70A4-490B-BBB9-3970807F0F0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEAAF84A-70A4-490B-BBB9-3970807F0F0E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{877DCF29-C85A-4571-A659-118DF32AF090}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{877DCF29-C85A-4571-A659-118DF32AF090}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{877DCF29-C85A-4571-A659-118DF32AF090}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution

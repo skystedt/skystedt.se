@@ -55,6 +55,7 @@ export const mergeRules = (configuration) => {
   return {
     mode: { $set: configuration.mode },
     devtool: { $set: configuration.devtool },
+    entry: { $set: configuration.entry },
     optimization: { $merge: configuration.optimization || {} },
     devServer: { $set: configuration.devServer },
     plugins: { $push: configuration.plugins || [] }
