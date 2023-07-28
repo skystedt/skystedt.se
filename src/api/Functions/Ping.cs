@@ -1,21 +1,15 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using System;
-
-#pragma warning disable IDE0060 // Remove unused parameter
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 
 namespace Skystedt.Api.Functions
 {
     public class Ping
     {
-        [FunctionName($"{nameof(Ping)}")]
+        [Function($"{nameof(Ping)}")]
         public string Get(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = $"{nameof(Ping)}")] HttpRequest request)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = $"{nameof(Ping)}")] HttpRequestData request)
         {
             return DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff");
         }
     }
 }
-
-#pragma warning restore IDE0060 // Remove unused parameter

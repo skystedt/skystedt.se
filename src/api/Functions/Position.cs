@@ -1,118 +1,186 @@
-using Azure.Data.Tables;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.WebPubSub;
-using Skystedt.Api.Extensions;
-using Skystedt.Api.Infrastructure;
-using System;
-using System.IO;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
-
-#pragma warning disable IDE0060 // Remove unused parameter
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+using Skystedt.Api.Services;
+using System.Net;
 
 namespace Skystedt.Api.Functions
 {
     public class Position
     {
-        private const string TableConnection = "CosmosTableConnectionString";
-        private const string TableName = "Connections";
-
-        private const string WebPubSubConnection = "WebPubSubConnectionString";
-        private const string HubName = "position";
-
-        private readonly record struct PositionModel(string Id, decimal X, decimal Y);
-
-        // Websockets connection information for new clients
-        [FunctionName($"{nameof(Position)}-{nameof(Negotiate)}")]
-        public async Task<WebPubSubConnection> Negotiate(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = $"{nameof(Position)}/negotiate/{{userId}}")] HttpRequest request,
-            [ExtendedWebPubSub(Connection = WebPubSubConnection, Hub = HubName)] WebPubSubConnectionFactory connectionFactory,
-            string userId)
+        private enum MessageType
         {
-            return await connectionFactory.CreateConnection(userId);
+            Connect,
+            Disconnect,
+            Init,
+            Update
         }
 
-        // Update a clients data and inform other clients of the update
-        [FunctionName($"{nameof(Position)}-{nameof(Update)}")]
-        public async Task<IActionResult> Update(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{nameof(Position)}/update")] HttpRequest request,
-            [ExtendedWebPubSub(Connection = WebPubSubConnection, Hub = HubName)] IAsyncCollector<WebPubSubAction> webpubsub,
-            [Table(TableName, Connection = TableConnection)] TableClient table)
+        private static readonly TimeSpan TokenValidTime = TimeSpan.FromHours(1);
+        private static readonly TimeSpan UpdateInterval = TimeSpan.FromSeconds(10);
+        private static readonly TimeSpan UpdateSkew = TimeSpan.FromSeconds(2);
+
+        private readonly IDatabase _database;
+        private readonly IPubSub _pubSub;
+
+        public Position(IDatabase database, IPubSub pubSub)
         {
-            var body = await JsonDeserializeStruct<PositionModel>(request.Body);
-            var connectionId = body?.Id;
-            if (string.IsNullOrEmpty(connectionId))
+            _database = database;
+            _pubSub = pubSub;
+        }
+
+        // Websockets connection url for new clients
+        [Function($"{nameof(Position)}-{nameof(Negotiate)}")]
+        public async Task<object> Negotiate(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = $"{nameof(Position)}/negotiate")] HttpRequestData request)
+        {
+            var userId = User.GenerateId();
+            var expiresAt = DateTimeOffset.UtcNow.Add(TokenValidTime);
+            var (token, websocket) = await _pubSub.Connect(userId, expiresAt);
+
+            return new
             {
-                return new BadRequestResult();
+                userId,
+                token,
+                expiresAt,
+                websocket,
+                updateInterval = UpdateInterval.TotalMilliseconds
+            };
+        }
+
+        private readonly record struct PositionModel(string Token, decimal X, decimal Y);
+
+        // Update a clients data and inform other clients of the update
+        [Function($"{nameof(Position)}-{nameof(Update)}")]
+        public async Task<HttpResponseData> Update(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{nameof(Position)}/update")] HttpRequestData request)
+        {
+            static decimal Round(decimal value) => Math.Round(value, 2, MidpointRounding.AwayFromZero);
+
+            var (token, x, y) = await DeserializeRequest<PositionModel>(request);
+
+            var userId = await ValidateToken(token);
+
+            var timestamps = await _database.Update(userId);
+
+            if (!timestamps.HasValue)
+            {
+                // Not active, probably because TTL has expired
+                await _pubSub.DisconnetUser(userId);
+
+                throw new ResponseException(HttpStatusCode.Gone);
             }
 
-            await Database.Update(table, connectionId);
+            var timeSinceLastUpdate = timestamps.Value.Current - timestamps.Value.Previous;
 
-            var x = Math.Round(body!.Value.X, 2, MidpointRounding.AwayFromZero);
-            var y = Math.Round(body!.Value.Y, 2, MidpointRounding.AwayFromZero);
-            await PubSub.BroadcastMessage(webpubsub, PubSub.MessageType.Update, connectionId, x, y);
+            if (timeSinceLastUpdate > UpdateInterval - UpdateSkew)
+            {
+                // Only broadcast if enough time has passed
 
-            return new OkResult();
+                await _pubSub.Broadcast(new
+                {
+                    Type = MessageType.Update,
+                    Id = userId,
+                    x = Round(x),
+                    y = Round(y)
+                });
+            }
+
+            return request.CreateResponse();
         }
 
         // Callback from websockets service when a client connects
-        [FunctionName($"{nameof(Position)}-Callback-{nameof(Connected)}")]
-        public async Task Connected(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{nameof(Position)}/callback/connected")] HttpRequest request,
-            [WebPubSubContext] WebPubSubContext webpubsubContext,
-            [ExtendedWebPubSub(Connection = WebPubSubConnection, Hub = HubName)] IAsyncCollector<WebPubSubAction> webpubsub,
-            [Table(TableName, Connection = TableConnection)] TableClient table)
+        [Function($"{nameof(Position)}-Callback-{nameof(Connected)}")]
+        public async Task<HttpResponseData> Connected(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{nameof(Position)}/callback/connected")] HttpRequestData request)
         {
-            var connectionId = webpubsubContext.Request.ConnectionContext.ConnectionId;
+            _pubSub.ValidateCallback(request);
 
-            var ids = await Database.GetAll(table);
-            await Database.Add(table, connectionId); // Add after querying to exclude own connection
+            var userId = _pubSub.GetUserId(request);
+            var connectionId = _pubSub.GetConnectionId(request);
 
-            await PubSub.InitMessage(webpubsub, connectionId, ids);
-            await PubSub.BroadcastMessage(webpubsub, PubSub.MessageType.Connect, connectionId);
+            var userIds = await _database.GetAll();
+            userIds = userIds.Where(id => id != userId).ToList();
+
+            await _database.Add(userId);
+
+            await _pubSub.CloseUsersOtherConnections(userId, connectionId);
+
+            await _pubSub.SendToUser(new
+            {
+                Type = MessageType.Init,
+                Ids = userIds
+            }, userId);
+
+            await _pubSub.Broadcast(new
+            {
+                Type = MessageType.Connect,
+                Id = userId,
+            }, connectionId);
+
+            return request.CreateResponse();
         }
 
         // Callback from websockets service when a client disconnects
-        [FunctionName($"{nameof(Position)}-Callback-{nameof(Disconnected)}")]
-        public async Task Disconnected(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{nameof(Position)}/callback/disconnected")] HttpRequest request,
-            [WebPubSubContext] WebPubSubContext webpubsubContext,
-            [ExtendedWebPubSub(Connection = WebPubSubConnection, Hub = HubName)] IAsyncCollector<WebPubSubAction> webpubsub,
-            [Table(TableName, Connection = TableConnection)] TableClient table)
+        [Function($"{nameof(Position)}-Callback-{nameof(Disconnected)}")]
+        public async Task<HttpResponseData> Disconnected(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"{nameof(Position)}/callback/disconnected")] HttpRequestData request)
         {
-            var connectionId = webpubsubContext.Request.ConnectionContext.ConnectionId;
+            _pubSub.ValidateCallback(request);
 
-            await Database.Remove(table, connectionId);
+            var userId = _pubSub.GetUserId(request);
 
-            await PubSub.BroadcastMessage(webpubsub, PubSub.MessageType.Disconnect, connectionId);
+            await _database.Remove(userId);
+
+            await _pubSub.Broadcast(new
+            {
+                Type = MessageType.Disconnect,
+                Id = userId,
+            });
+
+            return request.CreateResponse();
         }
 
         // Abuse protecton
-        [FunctionName($"{nameof(Position)}-Callback-{nameof(Validate)}")]
-        public HttpResponseMessage Validate(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "options", Route = $"{nameof(Position)}/callback/validate")] HttpRequest request,
-            [WebPubSubContext] WebPubSubContext webpubsubContext)
+        [Function($"{nameof(Position)}-Callback-{nameof(Validate)}")]
+        public HttpResponseData Validate(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "options", Route = $"{nameof(Position)}/callback/validate")] HttpRequestData request)
         {
-            return webpubsubContext.Response;
+            var (headerName, headerValue) = _pubSub.AbuseProtection(request);
+
+            var response = request.CreateResponse();
+            response.Headers.Add(headerName, headerValue);
+            return response;
         }
 
-        private static async Task<T?> JsonDeserializeStruct<T>(Stream stream)
+        private async Task<string> ValidateToken(string token)
+        {
+            var (status, userId) = await _pubSub.ValidateUser(token);
+            // userId is only null when status is Invalid
+
+            if (status != PubSub.ValidationStatus.Valid)
+            {
+                if (status == PubSub.ValidationStatus.Expired)
+                {
+                    await _pubSub.DisconnetUser(userId!);
+                }
+
+                throw new ResponseException(HttpStatusCode.Unauthorized);
+            }
+
+            return userId!;
+        }
+
+        private static async Task<T> DeserializeRequest<T>(HttpRequestData request)
             where T : struct
         {
             try
             {
-                return await JsonSerializer.DeserializeAsync<T>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return await request.ReadFromJsonAsync<T>();
             }
             catch
             {
-                return null;
+                throw new ResponseException(HttpStatusCode.BadGateway);
             }
         }
     }
 }
-
-#pragma warning restore IDE0060 // Remove unused parameter

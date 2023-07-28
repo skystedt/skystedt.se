@@ -1,49 +1,61 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
+using Skystedt.Api.Services;
+using System.Net;
+using System.Net.Http.Headers;
 
 namespace Skystedt.Api.Functions
 {
     public class BrowserReporting
     {
+        private readonly ILogger _logger;
+
+        public BrowserReporting(ILogger<BrowserReporting> logger)
+        {
+            _logger = logger;
+        }
+
         private const string ContentTypeReports = "application/reports+json";
         private const string ContentTypeCsp = "application/csp-report";
 
-        [FunctionName($"{nameof(BrowserReporting)}-{nameof(Default)}")]
-        public async Task<IActionResult> Default(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"report")] HttpRequest request,
-            ILogger logger)
+        [Function($"{nameof(BrowserReporting)}-{nameof(Default)}")]
+        public async Task<HttpResponseData> Default(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"report")] HttpRequestData request)
         {
-            if (request.ContentType != ContentTypeReports)
+            var contentType = ContentType(request.Headers);
+            if (contentType is not ContentTypeReports)
             {
-                logger.LogWarning("Unsupported report header: {Header}", request.ContentType);
-                return new UnsupportedMediaTypeResult();
+                _logger.LogWarning("Unsupported Browser Report content type header: {Header}", contentType);
+                throw new ResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
             var report = await request.ReadAsStringAsync();
-            logger.LogWarning("Browser report: {Report}", report); // Warning
+            _logger.LogWarning("Browser Report: {Report}", report); // Warning
 
-            return new OkResult();
+            return request.CreateResponse();
         }
 
-        [FunctionName($"{nameof(BrowserReporting)}-{nameof(ContentSecurityPolicy)}")]
-        public async Task<IActionResult> ContentSecurityPolicy(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"report/csp")] HttpRequest request,
-            ILogger logger)
+        [Function($"{nameof(BrowserReporting)}-{nameof(ContentSecurityPolicy)}")]
+        public async Task<HttpResponseData> ContentSecurityPolicy(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = $"report/csp")] HttpRequestData request)
         {
-            if (request.ContentType is not ContentTypeReports and not ContentTypeCsp)
+            var contentType = ContentType(request.Headers);
+            if (contentType is not ContentTypeReports and not ContentTypeCsp)
             {
-                logger.LogWarning("Unsupported Csp header: {Header}", request.ContentType);
-                return new UnsupportedMediaTypeResult();
+                _logger.LogWarning("Unsupported CSP content type header: {Header}", contentType);
+                throw new ResponseException(HttpStatusCode.UnsupportedMediaType);
             }
 
             var report = await request.ReadAsStringAsync();
-            logger.LogError("Csp violation: {Report}", report); // Error
+            _logger.LogError("CSP violation: {Report}", report); // Error
 
-            return new OkResult();
+            return request.CreateResponse();
+        }
+
+        private static string? ContentType(HttpHeaders headers)
+        {
+            return headers.TryGetValues("Content-Type", out var header) ? header.FirstOrDefault() : null;
         }
     }
 }

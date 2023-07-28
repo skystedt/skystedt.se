@@ -2,7 +2,7 @@ import './game.css';
 import * as PIXI from './pixi.mjs';
 import Display from './display.mjs';
 import Input from './input.mjs';
-import Communication from './communication.mjs';
+import Communication, { MessageType } from './communication.mjs';
 import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Minis from './minis.mjs';
@@ -13,7 +13,6 @@ import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;
-const COMMUNICATE_POSITION_INTERVAL = 10000;
 const WAIT_BEFORE_FPS_CHECK = 1000;
 const MAX_LOG_METRIC_RETRIES = 10;
 
@@ -45,7 +44,10 @@ export default class Game {
 
     this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas, true);
     this.#input = new Input(this.#display);
-    this.#communication = new Communication();
+    this.#communication = new Communication(
+      this.#communicationReceived.bind(this),
+      this.#communicationSendUpdate.bind(this)
+    );
 
     // order determines z order, last will be on top
     this.#stars = new Stars(this.#app.stage);
@@ -60,16 +62,14 @@ export default class Game {
       this.#stars.load(this.#display.gameSize, STARS);
 
       this.#startFrameLoop();
-      this.#gameReset();
-      setInterval(this.#communicatePosition.bind(this), COMMUNICATE_POSITION_INTERVAL);
     } catch (e) {
       console.error(e);
       throw e;
     }
   }
 
-  async connect() {
-    await this.#communication.connect(this.#minis);
+  async start() {
+    await this.#communication.connect();
   }
 
   #startFrameLoop() {
@@ -77,10 +77,6 @@ export default class Game {
     this.#frameState.backgroundRemaining = 0;
     this.#frameState.fpsCheck = this.#frameState.lastTimestamp + WAIT_BEFORE_FPS_CHECK;
     requestAnimationFrame(this.#frameLoop.bind(this));
-  }
-
-  #gameReset() {
-    //
   }
 
   /** @param {DOMHighResTimeStamp} timestamp */
@@ -163,10 +159,6 @@ export default class Game {
     this.#stars.tick();
   }
 
-  #communicatePosition() {
-    this.#communication.update(this.#ship.centerPosition);
-  }
-
   #updateShip() {
     const movement = this.#input.movement(this.#ship.centerPosition);
     this.#ship.position = this.#display.restrictGamePositionToDisplay(this.#ship.position, movement, this.#ship.size);
@@ -177,5 +169,40 @@ export default class Game {
     } else {
       this.#ship.direction = ShipDirection.Straight;
     }
+  }
+
+  /** @param {any} data  */
+  #communicationReceived(data) {
+    switch (data.type) {
+      case MessageType.Init: {
+        this.#minis.clear();
+        for (const id of data.ids) {
+          this.#minis.add(id);
+        }
+        break;
+      }
+
+      case MessageType.Connect: {
+        this.#minis.add(data.id);
+        break;
+      }
+
+      case MessageType.Disconnect: {
+        this.#minis.remove(data.id);
+        break;
+      }
+
+      case MessageType.Update: {
+        this.#minis.update(data.id, data.x, data.y);
+        break;
+      }
+    }
+  }
+
+  #communicationSendUpdate() {
+    this.#communication.sendBeacon({
+      x: this.#ship.centerPosition.x,
+      y: this.#ship.centerPosition.y
+    });
   }
 }

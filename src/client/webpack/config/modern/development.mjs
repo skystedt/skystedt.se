@@ -1,3 +1,4 @@
+import path from 'path';
 import webpack from 'webpack';
 import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
@@ -9,6 +10,12 @@ import { dir, browserslistEnvironment } from '../../utils.mjs';
 export default {
   mode: 'development',
   devtool: 'inline-source-map',
+  entry: {
+    // dependOn is needed for HMR with multiple entrypoints
+    // https://github.com/webpack/webpack-dev-server/issues/2792#issuecomment-1631579320
+    insights: { import: path.resolve(dir.src, 'insights', 'insights.mjs'), dependOn: 'app' },
+    app: path.resolve(dir.src, 'index.mjs')
+  },
   optimization: {
     minimize: false
   },

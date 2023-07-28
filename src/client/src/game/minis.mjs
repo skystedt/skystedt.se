@@ -6,6 +6,7 @@ import MiniImage from './assets/mini.png';
 const ALPHA_DELTA = 0.025;
 const SHOWN_DURATION = 20;
 
+/** @enum {number} */
 const MiniState = {
   Hidden: 0,
   FadeIn: 1,
@@ -61,6 +62,10 @@ export default class Minis extends PIXI.Container {
       sprite.destroy();
       this.#map.delete(id);
     }
+  }
+
+  clear() {
+    this.#map.clear();
   }
 
   tick() {

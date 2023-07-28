@@ -1,4 +1,4 @@
-import { resolve, relative } from 'path';
+import path from 'path';
 import { minimatch } from 'minimatch';
 import webpack from 'webpack';
 import { dir } from '../utils.mjs';
@@ -18,7 +18,7 @@ export default {
   default: false, // disable default/defaultVendors cache groups, to prevent entrypoints to end up in their own chunks
   defaultVendors: false,
   app: {
-    test: resolve(dir.src, 'index.mjs'),
+    test: path.resolve(dir.src, 'index.mjs'),
     type: wildcardMatch('javascript/*'),
     name: 'app'
   },
@@ -28,23 +28,24 @@ export default {
     name: 'styles'
   },
   game: {
-    test: resolve(dir.src, 'game'),
+    test: path.resolve(dir.src, 'game'),
     type: wildcardMatch('javascript/*', 'asset/inline'),
     name: 'game'
   },
   insights: {
-    test: resolve(dir.src, 'insights'),
+    test: path.resolve(dir.src, 'insights'),
     type: wildcardMatch('javascript/*'),
     name: 'insights'
   },
   polyfills: {
-    test: resolve(dir.src, 'polyfills.mjs'),
+    test: path.resolve(dir.src, 'polyfills.mjs'),
     type: wildcardMatch('javascript/*'),
     name: 'polyfills'
   },
   vendors: {
     test: (module) =>
-      module.resource && minimatch(module.resource, resolve(dir.node_modules, '**'), { windowsPathsNoEscape: true }),
+      module.resource &&
+      minimatch(module.resource, path.resolve(dir.node_modules, '**'), { windowsPathsNoEscape: true }),
     type: wildcardMatch('javascript/*'),
     name: (module) => mapVendorModuleToChunk(module.resourceResolveData.descriptionFileData.name)
   },
@@ -54,7 +55,7 @@ export default {
     name: (module) => {
       console.warn(`Using ignored module: ${module.identifier()}`);
       const [, modulePath] = module.identifier().split('|');
-      const moduleName = relative(dir.node_modules, modulePath);
+      const moduleName = path.relative(dir.node_modules, modulePath);
       return mapVendorModuleToChunk(moduleName);
     }
   }

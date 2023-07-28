@@ -1,12 +1,17 @@
+import path from 'path';
 import webpack from 'webpack';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import StylelintPlugin from 'stylelint-webpack-plugin';
-import { browserslistEnvironment } from '../../utils.mjs';
 import settings from '../../../settings.mjs';
+import { dir, browserslistEnvironment } from '../../utils.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
   mode: 'production',
+  entry: {
+    insights: path.resolve(dir.src, 'insights', 'insights.mjs'),
+    app: path.resolve(dir.src, 'index.mjs')
+  },
   optimization: {
     minimize: true
   },

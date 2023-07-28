@@ -7,5 +7,5 @@ import './index.css';
   const game = new Game();
   document.body.appendChild(game.canvas);
   await game.load();
-  await game.connect();
+  await game.start();
 })();

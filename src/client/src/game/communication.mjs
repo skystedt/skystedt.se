@@ -1,87 +1,134 @@
-import Minis from './minis.mjs';
-import { GamePosition } from './primitives.mjs';
+const WebsocketNormalClose = 1000;
+
+/** @enum {string} */
+export const MessageType = {
+  Init: 'Init',
+  Connect: 'Connect',
+  Disconnect: 'Disconnect',
+  Update: 'Update'
+};
 
 export default class Communication {
-  /** @type {string?} */
-  #id = null;
+  /** @type {(data: any) => void} */
+  #receivedCallback;
+  /** @type {() => void} */
+  #updateCallback;
 
-  #attempt = 0;
+  #connectionAttempt = 1;
+  /**
+   * @type {{
+   *   ws: WebSocket,
+   *   token: string,
+   *   expiresAt: Date,
+   *   intervalId: ReturnType<typeof setInterval>,
+   *   reconnect: boolean
+   * }?}
+   */
+  #connection = null;
 
-  /** @param {Minis} minis */
-  async connect(minis) {
-    const userId = Communication.#userId();
+  /**
+   * @param {(data: any) => void} receivedCallback
+   * @param {() => void} updateCallback
+   */
+  constructor(receivedCallback, updateCallback) {
+    this.#receivedCallback = receivedCallback;
+    this.#updateCallback = updateCallback;
+  }
 
-    const response = await fetch(`/api/position/negotiate/${userId}`);
+  async connect() {
+    const negotiation = await this.#negotiate();
+    if (negotiation) {
+      this.#createWebsocket(
+        negotiation.token,
+        negotiation.expiresAt,
+        negotiation.websocketUrl,
+        negotiation.updateInterval
+      );
+    }
+  }
+
+  /** @param {any} data */
+  sendBeacon(data) {
+    if (this.#connection) {
+      const body = Object.assign({ token: this.#connection.token }, data);
+      navigator.sendBeacon('/api/position/update', JSON.stringify(body));
+    }
+  }
+
+  /**
+   * @returns {Promise<{
+   *   token: string,
+   *   expiresAt: Date,
+   *   websocketUrl: string,
+   *   updateInterval: number
+   * }?>}
+   */
+  async #negotiate() {
+    const response = await fetch(`/api/position/negotiate`);
     if (!response.ok) {
       console.error(`Failed to negotiate websocket connection, status code: ${response.status}`);
-      return;
+      return null;
     }
-    const service = await response.json();
-
-    this.#attempt++;
-    const ws = new WebSocket(service.url);
-
-    ws.onopen = () => {
-      this.#attempt = 0;
-    };
-
-    ws.onclose = () => {
-      const delay = Communication.#retryDelay(this.#attempt);
-      setTimeout(() => {
-        this.connect(minis);
-      }, delay);
-    };
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      switch (data.type.toLowerCase()) {
-        case 'init': {
-          this.#id = data.ownId;
-          for (const id of data.ids) {
-            minis.add(id);
-          }
-          break;
-        }
-
-        case 'connect': {
-          minis.add(data.id);
-          break;
-        }
-
-        case 'disconnect': {
-          minis.remove(data.id);
-          break;
-        }
-
-        case 'update': {
-          minis.update(data.id, data.x, data.y);
-          break;
-        }
-      }
+    const { token, expiresAt, websocket, updateInterval } = await response.json();
+    return {
+      token,
+      expiresAt: new Date(expiresAt),
+      websocketUrl: websocket,
+      updateInterval
     };
   }
 
   /**
-   * @param {GamePosition} position
+   * @param {string} token
+   * @param {Date} expiresAt
+   * @param {string} websocketUrl
+   * @param {number} updateInterval
    */
-  update(position) {
-    if (this.#id) {
-      const data = { id: this.#id, x: position.x, y: position.y };
-      const sent = navigator.sendBeacon('/api/position/update', JSON.stringify(data));
-      if (!sent) {
-        console.warn('Failed to send beacon');
-      }
-    }
-  }
+  #createWebsocket(token, expiresAt, websocketUrl, updateInterval) {
+    const ws = new WebSocket(websocketUrl);
 
-  /** @returns {string} */
-  static #userId() {
-    let userId = localStorage.getItem('userId');
-    if (!userId) {
-      userId = Math.random().toString(36).slice(2).padEnd(11, '0');
-      localStorage.setItem('userId', userId);
-    }
-    return userId;
+    // Events will not run before the websocket has connected, https://stackoverflow.com/a/53519282
+
+    ws.onopen = () => {
+      this.#connectionAttempt = 1;
+
+      const intervalId = setInterval(() => {
+        if (this.#connection) {
+          if (new Date() > this.#connection.expiresAt) {
+            this.#connection.reconnect = true;
+            this.#connection.ws.close();
+            return;
+          }
+          this.#updateCallback();
+        }
+      }, updateInterval);
+
+      this.#connection = { ws, token, expiresAt, intervalId, reconnect: false };
+    };
+
+    ws.onclose = (event) => {
+      if (this.#connection) {
+        clearInterval(this.#connection.intervalId);
+        const reconnect = this.#connection.reconnect;
+        this.#connection = null;
+        if (reconnect) {
+          this.connect();
+        }
+      }
+
+      if (event.code !== WebsocketNormalClose) {
+        this.#connectionAttempt++;
+        const delay = Communication.#retryDelay(this.#connectionAttempt);
+        setTimeout(() => {
+          this.#createWebsocket(token, expiresAt, websocketUrl, updateInterval);
+        }, delay);
+      }
+    };
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      this.#receivedCallback(data);
+    };
   }
 
   /**
@@ -92,14 +139,14 @@ export default class Communication {
     const random = (/** @type {number} */ min, /** @type {number} */ max) =>
       Math.floor(Math.random() * (max - min + 1) + min);
     switch (attempt) {
-      case 0:
-      case 1:
-        return 0;
+      // first time there is a retry it will be attempt
       case 2:
-        return random(1_000, 2_000);
+        return 0;
       case 3:
-        return random(5_000, 10_000);
+        return random(1_000, 2_000);
       case 4:
+        return random(5_000, 10_000);
+      case 5:
         return random(30_000, 40_000);
       default:
         return random(600_000, 900_000);
