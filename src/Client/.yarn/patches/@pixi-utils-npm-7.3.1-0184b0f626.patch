@@ -1,0 +1,19 @@
+diff --git a/lib/index.mjs b/lib/index.mjs
+index 74cc6a749cbd4495d4d72f51b1e060825942e3bb..82dfcad3b71ba32e3d183cbcc9adcc126f4cb1b5 100644
+--- a/lib/index.mjs
++++ b/lib/index.mjs
+@@ -2,7 +2,6 @@ import "./settings.mjs";
+ import { isMobile } from "@pixi/settings";
+ import { default as default2 } from "eventemitter3";
+ import { default as default3 } from "earcut";
+-import { url } from "./url.mjs";
+ import { path } from "./path.mjs";
+ import { detectVideoAlphaMode } from "./browser/detectVideoAlphaMode.mjs";
+ import { sayHello, skipHello } from "./browser/hello.mjs";
+@@ -68,6 +67,5 @@ export {
+   string2hex,
+   trimCanvas,
+   uid,
+-  url
+ };
+ //# sourceMappingURL=index.mjs.map
