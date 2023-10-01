@@ -1,0 +1,23 @@
+{
+  "platform": {
+    "apiRuntime": "dotnet-isolated:7.0"
+  },
+  "routes": [
+    {
+      "route": "/",
+      "headers": {
+        "Reporting-Endpoints": "csp-endpoint=\"/api/report/csp\",default=\"/api/report\"",
+        "Report-To": "{\"group\":\"csp-endpoint\",\"max_age\":86400,\"endpoints\":[{\"url\":\"/api/report/csp\"}]}",
+        "Content-Security-Policy": "{{placeholder}}",
+        "X-Frame-Options": "DENY"
+      }
+    },
+    {
+      "route": "/*.{mjs,js,css,png,svg,jpg,jpeg,gif,ico}",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable",
+        "ETag": ""
+      }
+    }
+  ]
+}
