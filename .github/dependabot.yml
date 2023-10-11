@@ -1,4 +1,4 @@
-﻿version: 2
+version: 2
 
 updates:
   - package-ecosystem: "github-actions"
@@ -9,7 +9,7 @@ updates:
       timezone: "Europe/Stockholm"
 
   - package-ecosystem: "nuget"
-    directory: "/src/api"
+    directory: "/src/Api"
     schedule:
       interval: "daily"
       time: "17:00"
@@ -17,7 +17,7 @@ updates:
     open-pull-requests-limit: 100
 
   - package-ecosystem: "npm"
-    directory: "/src/client"
+    directory: "/src/Client"
     schedule:
       interval: "daily"
       time: "17:00"
