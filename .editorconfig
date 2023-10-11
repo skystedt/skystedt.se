@@ -1,4 +1,4 @@
-# https://editorconfig.org
+﻿# https://editorconfig.org
 
 [*]
 charset = utf-8-bom
@@ -22,3 +22,6 @@ indent_size = 2
 
 [*.*proj]
 indent_size = 2
+
+[dependabot.yml]
+charset = utf-8
