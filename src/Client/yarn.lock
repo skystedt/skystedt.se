@@ -2304,13 +2304,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pixi/app@npm:7.3.1":
-  version: 7.3.1
-  resolution: "@pixi/app@npm:7.3.1"
+"@pixi/app@npm:7.3.2":
+  version: 7.3.2
+  resolution: "@pixi/app@npm:7.3.2"
   peerDependencies:
-    "@pixi/core": 7.3.1
-    "@pixi/display": 7.3.1
-  checksum: eda3d63d68f87a56d00d64a9ffae58e516c79a9d98781dd833e11adf8a0fca3fc81afe00ef1fe3d3a28cebe8c09f0934c9ac53e1daeca46ccae3cf9de9d2a08b
+    "@pixi/core": 7.3.2
+    "@pixi/display": 7.3.2
+  checksum: ab98864f874f52af7d9955f3141b0377e636092e00d6095d4c38bf4d9ec7a8006c63fbc48965dc13bde0c07db74b04b6031c96762a9a7e99b64299d11ba5abc5
   languageName: node
   linkType: hard
 
@@ -9158,7 +9158,7 @@ __metadata:
     "@babel/plugin-syntax-import-assertions": 7.22.5
     "@babel/preset-env": 7.22.20
     "@microsoft/applicationinsights-web": 3.0.3
-    "@pixi/app": 7.3.1
+    "@pixi/app": 7.3.2
     "@pixi/core": 7.3.1
     "@pixi/display": 7.3.1
     "@pixi/graphics": 7.3.1
