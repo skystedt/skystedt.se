@@ -2354,12 +2354,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pixi/display@npm:7.3.1":
-  version: 7.3.1
-  resolution: "@pixi/display@npm:7.3.1"
+"@pixi/display@npm:7.3.2":
+  version: 7.3.2
+  resolution: "@pixi/display@npm:7.3.2"
   peerDependencies:
-    "@pixi/core": 7.3.1
-  checksum: 3d2c48248728860ba779ad23fd8a1223ab48373da2a5bf6899209beb98d609524960a3a9be9b5121de13b246b2b2c6a6d46a6861a9b5f9f9c2a2469d0d48f939
+    "@pixi/core": 7.3.2
+  checksum: 2304a379b4144214dbc09f54e29159d8272d6a347c11a169d5c0fe9589779171accdcc7ae64f2fc64e8bde039007c6d5c6e767cf976c80f0edfa1c6d1b5436a4
   languageName: node
   linkType: hard
 
@@ -9160,7 +9160,7 @@ __metadata:
     "@microsoft/applicationinsights-web": 3.0.3
     "@pixi/app": 7.3.1
     "@pixi/core": 7.3.1
-    "@pixi/display": 7.3.1
+    "@pixi/display": 7.3.2
     "@pixi/graphics": 7.3.1
     "@pixi/sprite": 7.3.1
     "@pixi/unsafe-eval": 7.3.1
