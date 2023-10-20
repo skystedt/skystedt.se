@@ -2370,14 +2370,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pixi/graphics@npm:7.3.1":
-  version: 7.3.1
-  resolution: "@pixi/graphics@npm:7.3.1"
+"@pixi/graphics@npm:7.3.2":
+  version: 7.3.2
+  resolution: "@pixi/graphics@npm:7.3.2"
   peerDependencies:
-    "@pixi/core": 7.3.1
-    "@pixi/display": 7.3.1
-    "@pixi/sprite": 7.3.1
-  checksum: c75e9c193eeb5ec46fb708b93252936e553d9f78f344d57f0524561357c836d23795d026ad6e0740923fa251d0e3a0f267e65e89a880642ba52a1772249be4f6
+    "@pixi/core": 7.3.2
+    "@pixi/display": 7.3.2
+    "@pixi/sprite": 7.3.2
+  checksum: c5e5679460ec860713fb56afe5edf2b4e00618af9281971fc8c2be2199388945680502b61776e41fa280c9ed11e59660016526c8aae58123a5ba3053c1017442
   languageName: node
   linkType: hard
 
@@ -9161,7 +9161,7 @@ __metadata:
     "@pixi/app": 7.3.1
     "@pixi/core": 7.3.1
     "@pixi/display": 7.3.1
-    "@pixi/graphics": 7.3.1
+    "@pixi/graphics": 7.3.2
     "@pixi/sprite": 7.3.1
     "@pixi/unsafe-eval": 7.3.1
     babel-loader: 9.1.3
