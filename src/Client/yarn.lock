@@ -2427,12 +2427,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pixi/unsafe-eval@npm:7.3.1":
-  version: 7.3.1
-  resolution: "@pixi/unsafe-eval@npm:7.3.1"
+"@pixi/unsafe-eval@npm:7.3.2":
+  version: 7.3.2
+  resolution: "@pixi/unsafe-eval@npm:7.3.2"
   peerDependencies:
-    "@pixi/core": 7.3.1
-  checksum: 10259890c94f812119d4cae278f6306936c98850edec9615550e4c68a247e1708130fa6f5a359aec7a67c8de8670a4fb22c4ae328644e0adf2cba5e3da0b6128
+    "@pixi/core": 7.3.2
+  checksum: 9f6c2e89e99a244cc74ce976b972bf928e99148ea2572a55c7a68d3d2a661c6b674de8b763ba86d010340bcccdc17386d14eb3cef279402d1c1eafd5c28ba34b
   languageName: node
   linkType: hard
 
@@ -9163,7 +9163,7 @@ __metadata:
     "@pixi/display": 7.3.1
     "@pixi/graphics": 7.3.1
     "@pixi/sprite": 7.3.1
-    "@pixi/unsafe-eval": 7.3.1
+    "@pixi/unsafe-eval": 7.3.2
     babel-loader: 9.1.3
     bytes: 3.1.2
     copy-webpack-plugin: 11.0.0
