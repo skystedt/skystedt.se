@@ -39,9 +39,12 @@ jobs:
         run: dotnet publish ${{ env.API_DIR }} --output ${{ env.OUTPUT_DIR }}/${{ env.API_DIR }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
 
       - name: Node Setup
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 'latest'
+          
+      - name: Corepack Enable
+        run: corepack enable
 
       - name: Yarn Install
         run: yarn install --immutable
