@@ -58,7 +58,7 @@
     "typescript": ">=1"
   },
   "dependencies": {
-    "@microsoft/applicationinsights-web": "3.0.3",
+    "@microsoft/applicationinsights-web": "3.0.4",
     "@pixi/app": "7.3.2",
     "@pixi/core": "7.3.2",
     "@pixi/display": "7.3.2",
