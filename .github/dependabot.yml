@@ -26,3 +26,7 @@ updates:
     allow:
       - dependency-name: "*"
         dependency-type: "production"
+    groups:
+       pixi:
+          patterns:
+            - "@pixi/*"
