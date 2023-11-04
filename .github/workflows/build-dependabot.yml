@@ -1,7 +1,7 @@
 ﻿name: Build - Dependabot
 
 concurrency: 
-  group: aswa-dependabot-${{ github.ref }}
+  group: build-${{ github.ref }}
   cancel-in-progress: false
 
 on:

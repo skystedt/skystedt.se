@@ -1,7 +1,7 @@
 ﻿name: Build - Maintainer
 
 concurrency: 
-  group: aswa-maintaner-${{ github.ref }}
+  group: build-${{ github.ref }}
   cancel-in-progress: false
 
 on:
