@@ -1,4 +1,4 @@
-name: Dependabot
+﻿name: Close PR - Dependabot
 
 concurrency: 
   group: aswa-dependabot-${{ github.ref }}
@@ -14,5 +14,5 @@ jobs:
   close_pull_request:
     name: Close
     if: github.actor == 'dependabot[bot]'
-    uses: ./.github/workflows/azure-static-web-apps-close-pull-request.yml
+    uses: ./.github/workflows/close-pr-reusable.yml
     secrets: inherit

@@ -1,7 +1,7 @@
-name: Normal
+﻿name: Close PR - Maintaner
 
 concurrency: 
-  group: aswa-normal-${{ github.ref }}
+  group: aswa-maintaner-${{ github.ref }}
   cancel-in-progress: false
 
 on:
@@ -14,5 +14,5 @@ jobs:
   close_pull_request:
     name: Close
     if: github.actor != 'dependabot[bot]'
-    uses: ./.github/workflows/azure-static-web-apps-close-pull-request.yml
+    uses: ./.github/workflows/close-pr-reusable.yml
     secrets: inherit
