@@ -1,4 +1,4 @@
-name: Reusable - Azure Static Web Apps - Close
+﻿name: Close PR - Reusable
 
 on:
   workflow_call:

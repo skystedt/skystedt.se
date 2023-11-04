@@ -1,4 +1,4 @@
-﻿name: Reusable - Azure Static Web Apps - Build
+﻿name: Build - Reusable
 
 on:
   workflow_call:
