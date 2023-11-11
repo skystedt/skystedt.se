@@ -1,0 +1,15 @@
+﻿name: Close Pull Request
+
+concurrency: 
+  group: close-pull-request-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    name: Cleanup
+    uses: ./.github/workflows/cleanup.yml
+    secrets: inherit
