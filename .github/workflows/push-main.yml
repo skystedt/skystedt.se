@@ -1,0 +1,16 @@
+﻿name: Push main
+
+concurrency: 
+  group: push-main-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_test_and_deploy:
+    name: Build, Test and Deploy
+    uses: ./.github/workflows/build-test-deploy.yml
+    secrets: inherit
