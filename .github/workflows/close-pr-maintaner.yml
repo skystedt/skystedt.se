@@ -1,7 +1,7 @@
 ﻿name: Close PR - Maintaner
 
 concurrency: 
-  group: close-pr-${{ github.ref }}
+  group: close-pr-maintaner-${{ github.ref }}
   cancel-in-progress: false
 
 on:

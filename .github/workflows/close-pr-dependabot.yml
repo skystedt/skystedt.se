@@ -1,7 +1,7 @@
 ﻿name: Close PR - Dependabot
 
 concurrency: 
-  group: close-pr-${{ github.ref }}
+  group: close-pr-dependabot-${{ github.ref }}
   cancel-in-progress: false
   
 on:
