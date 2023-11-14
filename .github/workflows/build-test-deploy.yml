@@ -4,40 +4,56 @@ on:
   workflow_call:
 
 env:
-  WORKING_DIR: "src"
-  OUTPUT_DIR: "publish"
+  SRC_DIR: "src"
+  PUBLISH_DIR: "publish"
   API_DIR: "Api"
   CLIENT_DIR: "Client"
   DOTNET_CONFIGURATION: "Release"
   
 jobs:
-  build_test_and_deploy:
-    name: Build, Test and Deploy
+  build_api:
+    name: Build API
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ${{ env.WORKING_DIR }}
+        working-directory: ${{ env.SRC_DIR }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
   
-      - name: .NET Setup
+      - name: Dotnet Setup
         uses: actions/setup-dotnet@v3
         with:
-          global-json-file: ${{ env.WORKING_DIR }}/global.json
+          global-json-file: ${{ env.SRC_DIR }}/global.json
           
-      - name: .NET Restore
+      - name: Dotnet Restore
         run: dotnet restore
       
-      - name: .NET Build
+      - name: Dotnet Build
         run: dotnet build --configuration ${{ env.DOTNET_CONFIGURATION }} --no-restore
     
-      - name: .NET Test
+      - name: Dotnet Test
         run: dotnet test --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
 
-      - name: .NET Publish
-        run: dotnet publish ${{ env.API_DIR }} --output ${{ env.OUTPUT_DIR }}/${{ env.API_DIR }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
+      - name: Dotnet Publish
+        run: dotnet publish ${{ env.API_DIR }} --output ${{ env.PUBLISH_DIR }}/${{ env.API_DIR }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
+        
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: api
+          path: ${{ env.SRC_DIR }}/${{ env.PUBLISH_DIR }}/${{ env.API_DIR }}
 
+  build_client:
+    name: Build Client
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.SRC_DIR }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+  
       - name: Node Setup
         uses: actions/setup-node@v4
         with:
@@ -48,11 +64,46 @@ jobs:
 
       - name: Yarn Install
         run: yarn install --immutable
-        working-directory: ${{ env.WORKING_DIR }}/${{ env.CLIENT_DIR }}
+        working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
         
       - name: Yarn Build
         run: yarn run production
-        working-directory: ${{ env.WORKING_DIR }}/${{ env.CLIENT_DIR }}
+        working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
+        
+      - name: Upload Config
+        uses: actions/upload-artifact@v3
+        with:
+          name: config
+          path: ${{ env.SRC_DIR }}/${{ env.PUBLISH_DIR }}/staticwebapp.config.json
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: client
+          path: ${{ env.SRC_DIR }}/${{ env.PUBLISH_DIR }}/${{ env.CLIENT_DIR }}
+
+  deploy:
+    name: Deploy
+    needs: [build_api, build_client]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Config
+        uses: actions/download-artifact@v3
+        with:
+          name: config
+          path: ${{ github.workspace }}/artifacts/config
+
+      - name: Download Api
+        uses: actions/download-artifact@v3
+        with:
+          name: api
+          path: ${{ github.workspace }}/artifacts/api
+
+      - name: Download Client
+        uses: actions/download-artifact@v3
+        with:
+          name: client
+          path: ${{ github.workspace }}/artifacts/client
 
       - name: Azure Static Web Apps - Deploy
         uses: Azure/static-web-apps-deploy@v1
@@ -60,8 +111,8 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          config_file_location: ${{ env.WORKING_DIR }}/${{ env.OUTPUT_DIR }}
-          app_location: ${{ env.WORKING_DIR }}/${{ env.OUTPUT_DIR }}/${{ env.CLIENT_DIR }}
-          api_location: ${{ env.WORKING_DIR }}/${{ env.OUTPUT_DIR }}/${{ env.API_DIR }}
+          config_file_location: ${{ github.workspace }}/artifacts/config
+          app_location: ${{ github.workspace }}/artifacts/client
+          api_location: ${{ github.workspace }}/artifacts/api
           skip_app_build: true
           skip_api_build: true
