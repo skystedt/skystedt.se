@@ -20,7 +20,10 @@ indent_size = 2
 [*.{json,yml}]
 indent_size = 2
 
-[*.*proj]
+[*.{*proj,props,targets}]
+indent_size = 2
+
+[NuGet.Config]
 indent_size = 2
 
 [dependabot.yml]
