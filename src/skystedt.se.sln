@@ -5,11 +5,15 @@ VisualStudioVersion = 17.0.31612.314
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Folder", "Solution Folder", "{A222E678-9956-4174-87CF-88D3DB440ABF}"
 	ProjectSection(SolutionItems) = preProject
-		..\.editorconfig = ..\.editorconfig
+		.editorconfig = .editorconfig
 		..\.gitignore = ..\.gitignore
 		..\.github\dependabot.yml = ..\.github\dependabot.yml
+		Directory.Build.props = Directory.Build.props
+		Directory.NoWarn.props = Directory.NoWarn.props
+		Directory.Packages.props = Directory.Packages.props
 		global.json = global.json
 		..\LICENSE = ..\LICENSE
+		NuGet.Config = NuGet.Config
 		..\README.md = ..\README.md
 		Client\staticwebapp.config.template.json = Client\staticwebapp.config.template.json
 	EndProjectSection
