@@ -4,7 +4,10 @@ using Skystedt.Api.Test.Helpers;
 
 namespace Skystedt.Api.Test.Implementations;
 
-public class CallbackPubSub : IPubSub
+public class CallbackPubSub(
+    CallbackPubSub.ConnectedCallback connectedCallback,
+    CallbackPubSub.DisconnectedCallback disconnectedCallback)
+    : IPubSub
 {
     public class Connections : List<string> { }
 
@@ -16,29 +19,18 @@ public class CallbackPubSub : IPubSub
     private const string HeaderName_UserId = "UserId";
     private const string HeaderName_ConnectionId = "ConnectionId";
 
-    private readonly Dictionary<string, Connections> _users = new();
+    private readonly Dictionary<string, Connections> _users = [];
 
-    private readonly ConnectedCallback _connectedCallback;
-    private readonly DisconnectedCallback _disconnectedCallback;
-
-    public List<MessageList> Messages { get; } = new();
-
-    public CallbackPubSub(
-        ConnectedCallback connectedCallback,
-        DisconnectedCallback disconnectedCallback)
-    {
-        _connectedCallback = connectedCallback;
-        _disconnectedCallback = disconnectedCallback;
-    }
+    public List<MessageList> Messages { get; } = [];
 
     public async Task<string> ConnectClient(string userId)
     {
         var connectionId = Guid.NewGuid().ToString();
 
-        _users.TryAdd(userId, new Connections());
+        _users.TryAdd(userId, []);
         _users[userId].Add(connectionId);
 
-        await _connectedCallback(CreateRequest(userId, connectionId));
+        await connectedCallback(CreateRequest(userId, connectionId));
 
         return connectionId;
     }
@@ -48,7 +40,7 @@ public class CallbackPubSub : IPubSub
         if (_users.TryGetValue(userId, out var connections) && connections.Contains(connectionId))
         {
             connections.Remove(connectionId);
-            await _disconnectedCallback(CreateRequest(userId, connectionId));
+            await disconnectedCallback(CreateRequest(userId, connectionId));
             if (!connections.Any())
             {
                 _users.Remove(userId);
@@ -110,7 +102,7 @@ public class CallbackPubSub : IPubSub
             foreach (var connectionId in connectionsToClose)
             {
                 connections.Remove(connectionId);
-                await _disconnectedCallback(CreateRequest(userId, connectionId));
+                await disconnectedCallback(CreateRequest(userId, connectionId));
             }
             if (!connections.Any())
             {

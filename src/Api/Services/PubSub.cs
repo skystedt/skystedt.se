@@ -174,11 +174,11 @@ public class PubSub : IPubSub
         return (WebHookAllowedOrigin, AllowedAllOrigins);
     }
 
-    public async Task Broadcast<T>(T data, string? excludeConnectionId = null, CancellationToken cancellationToken = default)
+    public async Task Broadcast<T>(T data, string? currentConnectionId = null, CancellationToken cancellationToken = default)
         where T : class
     {
         var (content, contentType, context) = CreateRequest(data, cancellationToken);
-        var excluded = excludeConnectionId != null ? new List<string> { excludeConnectionId } : null;
+        var excluded = currentConnectionId != null ? new List<string> { currentConnectionId } : null;
         await _client.SendToAllAsync(content, contentType, excluded, context);
     }
 
@@ -195,10 +195,10 @@ public class PubSub : IPubSub
         await _client.CloseUserConnectionsAsync(userId, context: context);
     }
 
-    public async Task CloseUsersOtherConnections(string userId, string excludeConnectionId, CancellationToken cancellationToken = default)
+    public async Task CloseUsersOtherConnections(string userId, string currentConnectionId, CancellationToken cancellationToken = default)
     {
         var context = CreateRequest(cancellationToken);
-        var excluded = new List<string> { excludeConnectionId };
+        var excluded = new List<string> { currentConnectionId };
         await _client.CloseUserConnectionsAsync(userId, excluded, context: context);
     }
 

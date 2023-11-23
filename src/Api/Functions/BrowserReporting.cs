@@ -7,15 +7,8 @@ using System.Net.Http.Headers;
 
 namespace Skystedt.Api.Functions;
 
-public class BrowserReporting
+public class BrowserReporting(ILogger<BrowserReporting> logger)
 {
-    private readonly ILogger _logger;
-
-    public BrowserReporting(ILogger<BrowserReporting> logger)
-    {
-        _logger = logger;
-    }
-
     private const string ContentTypeReports = "application/reports+json";
     private const string ContentTypeCsp = "application/csp-report";
 
@@ -26,12 +19,12 @@ public class BrowserReporting
         var contentType = ContentType(request.Headers);
         if (contentType is not ContentTypeReports)
         {
-            _logger.LogWarning("Unsupported Browser Report content type header: {Header}", contentType);
+            logger.LogWarning("Unsupported Browser Report content type header: {Header}", contentType);
             throw new ResponseException(HttpStatusCode.UnsupportedMediaType);
         }
 
         var report = await request.ReadAsStringAsync();
-        _logger.LogWarning("Browser Report: {Report}", report); // Warning
+        logger.LogWarning("Browser Report: {Report}", report); // Warning
 
         return request.CreateResponse();
     }
@@ -43,12 +36,12 @@ public class BrowserReporting
         var contentType = ContentType(request.Headers);
         if (contentType is not ContentTypeReports and not ContentTypeCsp)
         {
-            _logger.LogWarning("Unsupported CSP content type header: {Header}", contentType);
+            logger.LogWarning("Unsupported CSP content type header: {Header}", contentType);
             throw new ResponseException(HttpStatusCode.UnsupportedMediaType);
         }
 
         var report = await request.ReadAsStringAsync();
-        _logger.LogError("CSP violation: {Report}", report); // Error
+        logger.LogError("CSP violation: {Report}", report); // Error
 
         return request.CreateResponse();
     }

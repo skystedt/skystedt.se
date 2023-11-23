@@ -14,20 +14,13 @@ public class MessageList : List<Message>
 
 public record Message(string UserId, string ConnectionId, object Data);
 
-public class PubSubMessages
+public class PubSubMessages(ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public PubSubMessages(ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
     public bool CompareMessages(List<MessageList> expected, List<MessageList> actual)
     {
         if (expected.Count != actual.Count)
         {
-            _output.WriteLine($"'List<MessageList>' count mismatch, Expected: {expected.Count}, Actual: {actual.Count}");
+            output.WriteLine($"'List<MessageList>' count mismatch, Expected: {expected.Count}, Actual: {actual.Count}");
             return false;
         }
 
@@ -35,7 +28,7 @@ public class PubSubMessages
         {
             if (expected[i].Count != actual[i].Count)
             {
-                _output.WriteLine($"'MessageList[{i}]' count mismatch, Expected: {expected[i].Count}, Actual: {actual[i].Count}");
+                output.WriteLine($"'MessageList[{i}]' count mismatch, Expected: {expected[i].Count}, Actual: {actual[i].Count}");
                 return false;
             }
 
@@ -52,7 +45,7 @@ public class PubSubMessages
                 }
                 if (!equal)
                 {
-                    _output.WriteLine($"'MessageList[{i}]' not equal");
+                    output.WriteLine($"'MessageList[{i}]' not equal");
                     return false;
                 }
             }
@@ -61,7 +54,7 @@ public class PubSubMessages
         return true;
     }
 
-    public bool CompareMessage(Message expected, Message actual)
+    public static bool CompareMessage(Message expected, Message actual)
     {
         const string AnonymousFieldName = "<([^>]+)>i__Field";
         [SuppressMessage("GeneratedRegex", "SYSLIB1045:Convert to 'GeneratedRegexAttribute'")]
@@ -114,7 +107,7 @@ public class PubSubMessages
         return true;
     }
 
-    public bool CompareField(object? expected, object? actual, Type expectedType, Type actualType)
+    public static bool CompareField(object? expected, object? actual, Type expectedType, Type actualType)
     {
         if (ReferenceEquals(expected, actual))
         {
