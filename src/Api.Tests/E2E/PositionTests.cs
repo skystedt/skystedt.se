@@ -6,16 +6,11 @@ using Xunit.Abstractions;
 
 namespace Skystedt.Api.Test.E2E;
 
-public class PositionTests
+public class PositionTests(ITestOutputHelper output)
 {
     private static readonly TimeSpan TestUpdateInterval = TimeSpan.FromMilliseconds(500); // Use a low value to avoid having to wait too long while testing
 
-    private readonly Func<List<MessageList>, List<MessageList>, bool> _compareMessages;
-
-    public PositionTests(ITestOutputHelper output)
-    {
-        _compareMessages = new PubSubMessages(output).CompareMessages;
-    }
+    private readonly Func<List<MessageList>, List<MessageList>, bool> _compareMessages = new PubSubMessages(output).CompareMessages;
 
     private async Task<(
         Position Function,
@@ -54,18 +49,22 @@ public class PositionTests
 
         await clientDisconnect(user, connection);
 
-        var expected = new List<MessageList>
-        {
+        List<MessageList> expected =
+        [
             // ClientConnect
-            new MessageList { new (user, connection, new { Type = "Init", Ids = new List<string> { } }) },
-            new MessageList { },
+            [
+                new(user, connection, new { Type = "Init", Ids = (List<string>)[] })
+            ],
+            [],
 
             // Update
-            new MessageList { new (user, connection, new { Type = "Update", Id = user, X = 1, Y = 2 }) },
+            [
+                new(user, connection, new { Type = "Update", Id = user, X = 1, Y = 2 })
+            ],
 
             // ClientDisconnect
-            new MessageList { }
-        };
+            []
+        ];
         Assert.Equal(expected, messages, _compareMessages);
     }
 
@@ -92,34 +91,42 @@ public class PositionTests
         await clientDisconnect(user1, connection1);
         await clientDisconnect(user2, connection2);
 
-        var expected = new List<MessageList>
-        {
+        List<MessageList> expected =
+        [
             // ClientConnect 1
-            new MessageList { new (user1, connection1, new { Type = "Init", Ids = new List<string> { } }) },
-            new MessageList { },
+            [
+                new(user1, connection1, new { Type = "Init", Ids = (List<string>)[] })
+            ],
+            [],
 
             // ClientConnect 2
-            new MessageList { new (user2, connection2, new { Type = "Init", Ids = new List<string> { user1 } }) },
-            new MessageList { new (user1, connection1, new { Type = "Connect", Id = user2 }) },
+            [
+                new(user2, connection2, new { Type = "Init", Ids = (List<string>)[user1] })
+            ],
+            [
+                new(user1, connection1, new { Type = "Connect", Id = user2 })
+            ],
 
             // Update 1
-            new MessageList {
-                new (user1, connection1, new { Type = "Update", Id = user1, X = 1, Y = 2 }),
-                new (user2, connection2, new { Type = "Update", Id = user1, X = 1, Y = 2 })
-            },
+            [
+                new(user1, connection1, new { Type = "Update", Id = user1, X = 1, Y = 2 }),
+                new(user2, connection2, new { Type = "Update", Id = user1, X = 1, Y = 2 })
+            ],
 
             // Update 2
-            new MessageList {
-                new (user1, connection1, new { Type = "Update", Id = user2, X = 3, Y = 4 }),
-                new (user2, connection2, new { Type = "Update", Id = user2, X = 3, Y = 4 })
-            },
+            [
+                new(user1, connection1, new { Type = "Update", Id = user2, X = 3, Y = 4 }),
+                new(user2, connection2, new { Type = "Update", Id = user2, X = 3, Y = 4 })
+            ],
 
             // ClientDisconnect 1
-            new MessageList { new (user2, connection2, new { Type = "Disconnect", Id = user1 }) },
+            [
+                new(user2, connection2, new { Type = "Disconnect", Id = user1 })
+            ],
 
             // ClientDisconnect 2
-            new MessageList { }
-        };
+            []
+        ];
         Assert.Equal(expected, messages, _compareMessages);
     }
 
@@ -144,33 +151,44 @@ public class PositionTests
         await clientDisconnect(user2, user2_connection1);
         await clientDisconnect(user2, user2_connection2);
 
-        var expected = new List<MessageList>
-        {
+        List<MessageList> expected = [
             // ClientConnect 1_1
-            new MessageList { new (user1, user1_connection1, new { Type = "Init", Ids = new List<string> { } }) },
-            new MessageList { },
+            [
+                new(user1, user1_connection1, new { Type = "Init", Ids = (List<string>)[] })
+            ],
+            [],
 
             // ClientConnect 2_1
-            new MessageList { new (user2, user2_connection1, new { Type = "Init", Ids = new List<string> { user1 } }) },
-            new MessageList { new (user1, user1_connection1, new { Type = "Connect", Id = user2 }) },
+            [
+                new(user2, user2_connection1, new { Type = "Init", Ids = (List<string>)[user1] })
+            ],
+            [
+                new(user1, user1_connection1, new { Type = "Connect", Id = user2 })
+            ],
 
             // ClientConnect 2_2
-            new MessageList {
-                new (user1, user1_connection1, new { Type = "Disconnect", Id = user2 }),
-                new (user2, user2_connection2, new { Type = "Disconnect", Id = user2 }),
-            },
-            new MessageList { new (user2, user2_connection2, new { Type = "Init", Ids = new List<string> { user1 } }) },
-            new MessageList { new (user1, user1_connection1, new { Type = "Connect", Id = user2 }) },
+            [
+                new(user1, user1_connection1, new { Type = "Disconnect", Id = user2 }),
+                new(user2, user2_connection2, new { Type = "Disconnect", Id = user2 }),
+            ],
+            [
+                new(user2, user2_connection2, new { Type = "Init", Ids = (List<string>)[user1] })
+            ],
+            [
+                new(user1, user1_connection1, new { Type = "Connect", Id = user2 })
+            ],
 
             // ClientDisconnect 1_1
-            new MessageList { new (user2, user2_connection2, new { Type = "Disconnect", Id = user1 }) },
+            [
+                new(user2, user2_connection2, new { Type = "Disconnect", Id = user1 })
+            ],
 
             // ClientDisconnect 2_1
             // None
 
             // ClientDisconnect 2_2
-            new MessageList { }
-        };
+            []
+        ];
         Assert.Equal(expected, messages, _compareMessages);
     }
 }
