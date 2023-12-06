@@ -1,0 +1,3 @@
+<!-- Workaround for Github Dependency Graph and Dependabot to update packages in Directory.Build.props -->
+<Project Sdk="Microsoft.NET.Sdk">
+</Project>
