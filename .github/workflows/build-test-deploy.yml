@@ -39,7 +39,7 @@ jobs:
         run: dotnet publish ${{ env.API_DIR }} --output ${{ env.PUBLISH_DIR }}/${{ env.API_DIR }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
         
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: api
           path: ${{ env.SRC_DIR }}/${{ env.PUBLISH_DIR }}/${{ env.API_DIR }}
@@ -71,13 +71,13 @@ jobs:
         working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
         
       - name: Upload Config
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: config
           path: ${{ env.SRC_DIR }}/${{ env.PUBLISH_DIR }}/staticwebapp.config.json
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: client
           path: ${{ env.SRC_DIR }}/${{ env.PUBLISH_DIR }}/${{ env.CLIENT_DIR }}
