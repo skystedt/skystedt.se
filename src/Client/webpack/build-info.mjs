@@ -2,12 +2,13 @@ import util from 'util';
 import path from 'path';
 import fs from 'fs';
 import bytes from 'bytes';
-import enchancedResolve from 'enhanced-resolve';
 import _babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
 const babelTargets = /** @type {_babelTargets} */ (_babelTargets.default);
 import { globSync } from 'glob';
 import { minimatch } from 'minimatch';
 import { dir, browserslistBrowsers } from './utils.mjs';
+
+import caniuseLite from 'caniuse-lite/package.json' assert { type: 'json' };
 
 export default class BuildInfo {
   /** @type {boolean} */
@@ -28,14 +29,7 @@ export default class BuildInfo {
 
   browsers() {
     const result = {
-      definitions: {
-        caniuse_lite: this.#resolveNestedVersion('caniuse-lite'),
-        browserslist: this.#resolveNestedVersion('browserslist', 'caniuse-lite'),
-        webpack: this.#resolveNestedVersion('webpack', 'browserslist', 'caniuse-lite'),
-        babel: this.#resolveNestedVersion('@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite'),
-        babel_preset_env: this.#resolveNestedVersion('@babel/preset-env', 'browserslist', 'caniuse-lite'),
-        postcss: this.#resolveNestedVersion('postcss-preset-env', 'browserslist', 'caniuse-lite')
-      },
+      definitions: caniuseLite.version,
       browserslist: {
         all: this.#browserslistVersions('all'),
         modern: this.#browserslistVersions('modern'),
@@ -83,42 +77,6 @@ export default class BuildInfo {
       // eslint-disable-next-line no-console
       console.log(name, data);
     }
-  }
-
-  /**
-   * @param {...string} modules
-   * @returns {string | false}
-   */
-  #resolveNestedVersion(...modules) {
-    const baseJson = path.resolve(dir.node_modules, modules[modules.length - 1], 'package.json');
-
-    let nestedJson = baseJson;
-    if (modules.length > 1) {
-      const resolver = enchancedResolve.create.sync({
-        mainFiles: ['package'],
-        extensions: ['.json'],
-        enforceExtension: true
-      });
-
-      const [firstModule, ...otherModules] = modules;
-      nestedJson = path.resolve(dir.node_modules, modules[0], 'package.json');
-      nestedJson = path.resolve(nestedJson, firstModule);
-      for (const module of otherModules) {
-        nestedJson = resolver(nestedJson, module);
-      }
-
-      if (baseJson === nestedJson) {
-        return false;
-      }
-    }
-
-    const packageJsonString = fs.readFileSync(nestedJson, 'utf-8');
-    if (!packageJsonString) {
-      throw new Error(`Module not found: ${modules.join(', ')}`);
-    }
-    const packageJson = JSON.parse(packageJsonString);
-
-    return packageJson.version;
   }
 
   /**
