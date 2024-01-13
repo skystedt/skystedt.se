@@ -7,14 +7,32 @@ updates:
       interval: "daily"
       time: "17:00"
       timezone: "Europe/Stockholm"
-
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+      
   - package-ecosystem: "nuget"
     directory: "/src"
     schedule:
       interval: "daily"
       time: "17:00"
       timezone: "Europe/Stockholm"
-    open-pull-requests-limit: 100
+    groups:
+      api:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "nuget"
+    directory: "/src/Api.Tests"
+    schedule:
+      interval: "daily"
+      time: "17:00"
+      timezone: "Europe/Stockholm"
+    groups:
+      api-tests:
+        patterns:
+          - "*"
 
   - package-ecosystem: "npm"
     directory: "/src/Client"
@@ -22,11 +40,25 @@ updates:
       interval: "daily"
       time: "17:00"
       timezone: "Europe/Stockholm"
-    open-pull-requests-limit: 100
+    open-pull-requests-limit: 10
     allow:
       - dependency-name: "*"
         dependency-type: "production"
     groups:
-       pixi:
-          patterns:
-            - "@pixi/*"
+      pixi:
+        patterns:
+          - "@pixi/*"
+
+  - package-ecosystem: "npm"
+    directory: "/src/Client"
+    schedule:
+      interval: "daily"
+      time: "17:00"
+      timezone: "Europe/Stockholm"
+    allow:
+      - dependency-name: "*"
+        dependency-type: "development"
+    groups:
+      client-development:
+        patterns:
+          - "*"
