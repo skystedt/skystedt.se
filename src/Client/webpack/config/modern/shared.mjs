@@ -20,6 +20,7 @@ import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-r
 import MoveHtmlWebpackPlugin from '../../plugins/move-html-webpack-plugin.mjs';
 import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.mjs';
 import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
+import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import ThrowOnAssetEmitedPlugin from '../../plugins/throw-on-asset-emited-plugin.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 
@@ -101,6 +102,14 @@ const postcssOptions = {
     })
   ]
 };
+
+const nestedPackagesCaniuseLite = [
+  ['browserslist', 'caniuse-lite'],
+  ['webpack', 'browserslist', 'caniuse-lite'],
+  ['@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite'],
+  ['@babel/preset-env', 'browserslist', 'caniuse-lite'],
+  ['postcss-preset-env', 'browserslist', 'caniuse-lite']
+];
 
 /** @type {CspHtmlWebpackPlugin.Policy} */
 let cspPolicy;
@@ -246,6 +255,7 @@ export default {
       },
       processFn: cspProcessCallback
     }),
+    new ThrowOnNestedPackagePlugin(dir.node_modules, nestedPackagesCaniuseLite),
     new ThrowOnAssetEmitedPlugin(dir.dist, 'polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
     new CopyPlugin({
       patterns: [path.resolve(dir.src, 'favicon.ico')]
