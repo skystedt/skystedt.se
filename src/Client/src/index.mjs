@@ -1,5 +1,5 @@
-import './neutralize.css';
 import './index.css';
+import './neutralize.css';
 
 (async () => {
   const { default: Game } = await import('./game/game.mjs');

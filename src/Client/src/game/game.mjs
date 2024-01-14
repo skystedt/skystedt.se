@@ -1,13 +1,13 @@
-import './game.css';
-import * as PIXI from './pixi.mjs';
-import Display from './display.mjs';
-import Input from './input.mjs';
+import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import Communication, { MessageType } from './communication.mjs';
+import Display from './display.mjs';
+import './game.css';
+import Input from './input.mjs';
+import Minis from './minis.mjs';
+import * as PIXI from './pixi.mjs';
 import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
-import Minis from './minis.mjs';
 import Stars from './stars.mjs';
-import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 /** @typedef { number } DOMHighResTimeStamp */
 

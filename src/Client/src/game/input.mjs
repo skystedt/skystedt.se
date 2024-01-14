@@ -1,5 +1,5 @@
-import './input.css';
 import Display from './display.mjs';
+import './input.css';
 import { AbsolutePosition, GamePosition, Movement } from './primitives.mjs';
 
 /** @typedef { number } DOMHighResTimeStamp */

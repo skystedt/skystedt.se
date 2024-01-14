@@ -1,9 +1,9 @@
-import path from 'node:path';
-import webpack from 'webpack';
 import ESLintPlugin from 'eslint-webpack-plugin';
+import path from 'node:path';
 import StylelintPlugin from 'stylelint-webpack-plugin';
+import webpack from 'webpack';
 import settings from '../../../settings.mjs';
-import { dir, browserslistConfig } from '../../utils.mjs';
+import { browserslistConfig, dir } from '../../utils.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
