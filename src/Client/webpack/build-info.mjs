@@ -1,6 +1,6 @@
-import util from 'util';
-import path from 'path';
-import fs from 'fs';
+import util from 'node:util';
+import path from 'node:path';
+import fs from 'node:fs';
 import bytes from 'bytes';
 import _babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
 const babelTargets = /** @type {_babelTargets} */ (_babelTargets.default);

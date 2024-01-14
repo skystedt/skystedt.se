@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import webpack from 'webpack';
 import { minimatch } from 'minimatch';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';

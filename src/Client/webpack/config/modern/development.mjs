@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import webpack from 'webpack';
 import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';

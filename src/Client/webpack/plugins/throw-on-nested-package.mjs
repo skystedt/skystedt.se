@@ -1,5 +1,5 @@
 import enchancedResolve from 'enhanced-resolve';
-import path from 'path';
+import path from 'node:path';
 import webpack from 'webpack';
 
 const resolver = enchancedResolve.create.sync({

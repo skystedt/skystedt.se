@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import { minimatch } from 'minimatch';
 import webpack from 'webpack';
 import { dir } from '../utils.mjs';
