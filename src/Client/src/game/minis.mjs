@@ -1,7 +1,7 @@
-import * as PIXI from './pixi.mjs';
-import { Uninitialized } from './primitives.mjs';
 import Assets from './assets.mjs';
 import MiniImage from './assets/mini.png';
+import * as PIXI from './pixi.mjs';
+import { Uninitialized } from './primitives.mjs';
 
 const ALPHA_DELTA = 0.025;
 const SHOWN_DURATION = 20;

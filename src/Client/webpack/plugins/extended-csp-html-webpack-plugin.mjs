@@ -1,5 +1,5 @@
-import webpack from 'webpack';
 import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
+import webpack from 'webpack';
 
 // Override method for getShas to find precalculated hashes in integrity attributes
 export default class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {

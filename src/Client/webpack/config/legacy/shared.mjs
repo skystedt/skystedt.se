@@ -1,10 +1,10 @@
-import path from 'node:path';
-import webpack from 'webpack';
-import { minimatch } from 'minimatch';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import { minimatch } from 'minimatch';
+import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
-import cacheGroups from '../chunks.mjs';
+import webpack from 'webpack';
 import { dir, mergeBabelOptions } from '../../utils.mjs';
+import cacheGroups from '../chunks.mjs';
 
 /** @type {webpack.Configuration} */
 export default {

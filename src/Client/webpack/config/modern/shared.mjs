@@ -1,31 +1,32 @@
-import path from 'node:path';
-import webpack from 'webpack';
-import { minimatch } from 'minimatch';
 import babelPresetEnv from '@babel/preset-env';
-import postcssPresetEnv from 'postcss-preset-env';
-import postcssMergeRules from 'postcss-merge-rules';
+/* eslint-disable-line import/default */ import CopyPlugin from 'copy-webpack-plugin';
+import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
+import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import _HtmlInlineCssWebpackPlugin from 'html-inline-css-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import { minimatch } from 'minimatch';
+import path from 'node:path';
+import postcssMergeRules from 'postcss-merge-rules';
+import postcssPresetEnv from 'postcss-preset-env';
 import TerserPlugin from 'terser-webpack-plugin';
-import _HtmlInlineCssWebpackPlugin from 'html-inline-css-webpack-plugin';
-const HtmlInlineCssWebpackPlugin = /** @type {_HtmlInlineCssWebpackPlugin} */ (_HtmlInlineCssWebpackPlugin.default);
+import webpack from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
-import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
-/* eslint-disable-line import/default */ import CopyPlugin from 'copy-webpack-plugin';
-import cacheGroups from '../chunks.mjs';
 import BuildInfo from '../../build-info.mjs';
-import { dir, browserslistBrowsers, mergeBabelOptions } from '../../utils.mjs';
-import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
+import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
+import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
 import MoveHtmlWebpackPlugin from '../../plugins/move-html-webpack-plugin.mjs';
 import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.mjs';
-import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
-import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import ThrowOnAssetEmitedPlugin from '../../plugins/throw-on-asset-emited-plugin.mjs';
-import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
+import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
+import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
+import { browserslistBrowsers, dir, mergeBabelOptions } from '../../utils.mjs';
+import cacheGroups from '../chunks.mjs';
 
 import csp from '../../../content-security-policy.json' assert { type: 'json' };
 import staticwebapp from '../../../staticwebapp.config.template.json' assert { type: 'json' };
+
+const HtmlInlineCssWebpackPlugin = /** @type {_HtmlInlineCssWebpackPlugin} */ (_HtmlInlineCssWebpackPlugin.default);
 
 /** @typedef { import("postcss-load-config").Config } PostcssConfig */
 

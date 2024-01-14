@@ -1,5 +1,5 @@
-import webpack from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import webpack from 'webpack';
 
 // When using [contenthash] then webpack.optimize.RealContentHashPlugin will run
 // calculating the real hashes of the content, updating assets.

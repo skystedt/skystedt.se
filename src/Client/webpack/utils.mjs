@@ -1,9 +1,9 @@
 /* eslint-env node */
-import path from 'node:path';
-import webpack from 'webpack';
-import browserslist from 'browserslist';
 import babel, { loadPartialConfigAsync as loadBabelConfigAsync } from '@babel/core';
 import babelPresetEnv from '@babel/preset-env';
+import browserslist from 'browserslist';
+import path from 'node:path';
+import webpack from 'webpack';
 
 const cwd = process.cwd();
 export const dir = {

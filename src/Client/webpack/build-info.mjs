@@ -1,12 +1,12 @@
-import util from 'node:util';
-import path from 'node:path';
-import fs from 'node:fs';
-import bytes from 'bytes';
 import _babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
-const babelTargets = /** @type {_babelTargets} */ (_babelTargets.default);
+import bytes from 'bytes';
 import { globSync } from 'glob';
 import { minimatch } from 'minimatch';
-import { dir, browserslistBrowsers } from './utils.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import util from 'node:util';
+import { browserslistBrowsers, dir } from './utils.mjs';
+const babelTargets = /** @type {_babelTargets} */ (_babelTargets.default);
 
 import caniuseLite from 'caniuse-lite/package.json' assert { type: 'json' };
 

@@ -1,7 +1,7 @@
 import { glob } from 'glob';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { minimatch } from 'minimatch';
 import webpack from 'webpack';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 export default class ScriptsHtmlWebpackPlugin {
   /** @typedef {{ path: string, directory: string }} AddScript */

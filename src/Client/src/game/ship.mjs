@@ -1,9 +1,9 @@
-import * as PIXI from './pixi.mjs';
-import { GamePosition, Size, Uninitialized } from './primitives.mjs';
 import Assets from './assets.mjs';
 import ShipStraightImage from './assets/ship.png';
 import ShipLeftImage from './assets/ship_left.png';
 import ShipRightImage from './assets/ship_right.png';
+import * as PIXI from './pixi.mjs';
+import { GamePosition, Size, Uninitialized } from './primitives.mjs';
 
 const TURN_STRAIGHT_DELAY = 10;
 
