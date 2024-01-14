@@ -1,5 +1,5 @@
 /* eslint-env node */
-import path from 'path';
+import path from 'node:path';
 import webpack from 'webpack';
 import browserslist from 'browserslist';
 import babel, { loadPartialConfigAsync as loadBabelConfigAsync } from '@babel/core';

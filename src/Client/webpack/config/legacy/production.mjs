@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
 import { dir } from '../../utils.mjs';
