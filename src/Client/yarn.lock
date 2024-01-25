@@ -2042,7 +2042,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jridgewell/trace-mapping@npm:^0.3.21":
+"@jridgewell/trace-mapping@npm:^0.3.20, @jridgewell/trace-mapping@npm:^0.3.21":
   version: 0.3.22
   resolution: "@jridgewell/trace-mapping@npm:0.3.22"
   dependencies:
@@ -2548,10 +2548,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/estree@npm:*, @types/estree@npm:^1.0.0":
+"@types/estree@npm:*":
   version: 1.0.3
   resolution: "@types/estree@npm:1.0.3"
   checksum: c51984ec3003a93b619f25995ceba74428f390747d246833928d0121bb2df3b8bca67deb27fc634da47c5b341837d2ae17d0c5b8d16be5110477a73531ac3528
+  languageName: node
+  linkType: hard
+
+"@types/estree@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "@types/estree@npm:1.0.5"
+  checksum: 7de6d928dd4010b0e20c6919e1a6c27b61f8d4567befa89252055fad503d587ecb9a1e3eab1b1901f923964d7019796db810b7fd6430acb26c32866d126fd408
   languageName: node
   linkType: hard
 
@@ -3482,7 +3489,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:^4.0.0, browserslist@npm:^4.14.5, browserslist@npm:^4.21.10, browserslist@npm:^4.21.9, browserslist@npm:^4.22.1":
+"browserslist@npm:^4.0.0, browserslist@npm:^4.21.10, browserslist@npm:^4.21.9, browserslist@npm:^4.22.1":
   version: 4.22.1
   resolution: "browserslist@npm:4.22.1"
   dependencies:
@@ -4828,9 +4835,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:48.0.2":
-  version: 48.0.2
-  resolution: "eslint-plugin-jsdoc@npm:48.0.2"
+"eslint-plugin-jsdoc@npm:48.0.3":
+  version: 48.0.3
+  resolution: "eslint-plugin-jsdoc@npm:48.0.3"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.41.0"
     are-docs-informative: "npm:^0.0.2"
@@ -4843,7 +4850,7 @@ __metadata:
     spdx-expression-parse: "npm:^4.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 03f55ea97314759450b5e985344c60559907276a905792e9f31af7770f14baba76b28a9a9d9de47a38bb8617c9a0dc6b53d68a77d14b0f2701469d89ed453165
+  checksum: 5bab10a215a7703039feaf972eba9623ac83d3f38b604e141f2aefe6360b2b6ef521e0230425174b3fba65278ec3c0e1227195f71ff1e25057a488de438b6e07
   languageName: node
   linkType: hard
 
@@ -9104,7 +9111,7 @@ __metadata:
     eslint-config-prettier: "npm:9.1.0"
     eslint-plugin-compat: "npm:4.2.0"
     eslint-plugin-import: "npm:2.29.1"
-    eslint-plugin-jsdoc: "npm:48.0.2"
+    eslint-plugin-jsdoc: "npm:48.0.3"
     eslint-plugin-no-unsanitized: "npm:4.0.2"
     eslint-plugin-prettier: "npm:5.1.3"
     eslint-webpack-plugin: "npm:4.0.1"
@@ -9126,7 +9133,7 @@ __metadata:
     stylelint-config-standard: "npm:34.0.0"
     stylelint-webpack-plugin: "npm:4.1.1"
     unfetch: "npm:5.0.0"
-    webpack: "npm:5.89.0"
+    webpack: "npm:5.90.0"
     webpack-cli: "npm:5.1.4"
     webpack-dev-server: "npm:4.15.1"
     webpack-subresource-integrity: "npm:5.1.0"
@@ -9655,15 +9662,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser-webpack-plugin@npm:^5.3.7":
-  version: 5.3.9
-  resolution: "terser-webpack-plugin@npm:5.3.9"
+"terser-webpack-plugin@npm:^5.3.10":
+  version: 5.3.10
+  resolution: "terser-webpack-plugin@npm:5.3.10"
   dependencies:
-    "@jridgewell/trace-mapping": "npm:^0.3.17"
+    "@jridgewell/trace-mapping": "npm:^0.3.20"
     jest-worker: "npm:^27.4.5"
     schema-utils: "npm:^3.1.1"
     serialize-javascript: "npm:^6.0.1"
-    terser: "npm:^5.16.8"
+    terser: "npm:^5.26.0"
   peerDependencies:
     webpack: ^5.1.0
   peerDependenciesMeta:
@@ -9673,11 +9680,11 @@ __metadata:
       optional: true
     uglify-js:
       optional: true
-  checksum: 339737a407e034b7a9d4a66e31d84d81c10433e41b8eae2ca776f0e47c2048879be482a9aa08e8c27565a2a949bc68f6e07f451bf4d9aa347dd61b3d000f5353
+  checksum: fb1c2436ae1b4e983be043fa0a3d355c047b16b68f102437d08c736d7960c001e7420e2f722b9d99ce0dc70ca26a68cc63c0b82bc45f5b48671142b352a9d938
   languageName: node
   linkType: hard
 
-"terser@npm:^5.10.0, terser@npm:^5.16.8":
+"terser@npm:^5.10.0":
   version: 5.22.0
   resolution: "terser@npm:5.22.0"
   dependencies:
@@ -9688,6 +9695,20 @@ __metadata:
   bin:
     terser: bin/terser
   checksum: e5407f9a143e7f9306f1b585b16dbb03df19b93318b55a26b542e12b74cc792dcf6961d9a2cab6778b20d7b591f498c200376d282a300cf9999ca40bccbc047c
+  languageName: node
+  linkType: hard
+
+"terser@npm:^5.26.0":
+  version: 5.27.0
+  resolution: "terser@npm:5.27.0"
+  dependencies:
+    "@jridgewell/source-map": "npm:^0.3.3"
+    acorn: "npm:^8.8.2"
+    commander: "npm:^2.20.0"
+    source-map-support: "npm:~0.5.20"
+  bin:
+    terser: bin/terser
+  checksum: 9b2c5cb00747dea5994034ca064fb3cc7efc1be6b79a35247662d51ab43bdbe9cbf002bbf29170b5f3bd068c811d0212e22d94acd2cf0d8562687b96f1bffc9f
   languageName: node
   linkType: hard
 
@@ -10156,18 +10177,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.89.0":
-  version: 5.89.0
-  resolution: "webpack@npm:5.89.0"
+"webpack@npm:5.90.0":
+  version: 5.90.0
+  resolution: "webpack@npm:5.90.0"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.3"
-    "@types/estree": "npm:^1.0.0"
+    "@types/estree": "npm:^1.0.5"
     "@webassemblyjs/ast": "npm:^1.11.5"
     "@webassemblyjs/wasm-edit": "npm:^1.11.5"
     "@webassemblyjs/wasm-parser": "npm:^1.11.5"
     acorn: "npm:^8.7.1"
     acorn-import-assertions: "npm:^1.9.0"
-    browserslist: "npm:^4.14.5"
+    browserslist: "npm:^4.21.10"
     chrome-trace-event: "npm:^1.0.2"
     enhanced-resolve: "npm:^5.15.0"
     es-module-lexer: "npm:^1.2.1"
@@ -10181,7 +10202,7 @@ __metadata:
     neo-async: "npm:^2.6.2"
     schema-utils: "npm:^3.2.0"
     tapable: "npm:^2.1.1"
-    terser-webpack-plugin: "npm:^5.3.7"
+    terser-webpack-plugin: "npm:^5.3.10"
     watchpack: "npm:^2.4.0"
     webpack-sources: "npm:^3.2.3"
   peerDependenciesMeta:
@@ -10189,7 +10210,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: ee19b070279c9bc3bf21eeaac3ea08e6583c1b8da334e595b3c9badedbd7f9fad071b9f785076081af661ef247bb72441e86e8b903bf253ae9300007a048ea6e
+  checksum: 7ff6286be54e00b2580274d8009b014fd03c6d8ade898434376c739e460da1f3a63a51006966024710061f440d6723813365b8a54ae6bcb93b94867c42cf017e
   languageName: node
   linkType: hard
 
