@@ -8,6 +8,14 @@ indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
+# json does not support BOM
+[*.json]
+charset = utf-8
+
+# dependabot does not support BOM
+[dependabot.yml]
+charset = utf-8
+
 [*.{js,cjs,mjs}]
 indent_size = 2
 
@@ -22,9 +30,6 @@ indent_size = 2
 
 [NuGet.Config]
 indent_size = 2
-
-[dependabot.yml]
-charset = utf-8
 
 [*.cs]
 csharp_style_namespace_declarations = file_scoped:suggestion
