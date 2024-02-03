@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.174023-alpha">
+﻿<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.438991-alpha">
   <PropertyGroup Label="Globals">
     <ProjectGuid>877dcf29-c85a-4571-a659-118df32af090</ProjectGuid>
   </PropertyGroup>
@@ -8,7 +8,6 @@
   <ItemGroup>
     <None Include="*" Exclude="*.esproj;*.lock" Link="configuration\%(RecursiveDir)%(Filename)%(Extension)" />
     <None Remove="jsconfig.json" />
-    <None Remove="staticwebapp.config.json" />
     <None Include="src\**" />
   </ItemGroup>
 </Project>
