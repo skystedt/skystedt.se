@@ -1,14 +1,14 @@
-import _babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
+﻿import _babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
 import bytes from 'bytes';
 import { globSync } from 'glob';
 import { minimatch } from 'minimatch';
 import fs from 'node:fs';
 import path from 'node:path';
 import util from 'node:util';
+import BrowserslistUpdatePlugin from './plugins/browserslist-update-plugin.mjs';
 import { browserslistBrowsers, dir } from './utils.mjs';
-const babelTargets = /** @type {_babelTargets} */ (_babelTargets.default);
 
-import caniuseLite from 'caniuse-lite/package.json' assert { type: 'json' };
+const babelTargets = /** @type {_babelTargets} */ (_babelTargets.default);
 
 export default class BuildInfo {
   /** @type {boolean} */
@@ -28,8 +28,9 @@ export default class BuildInfo {
   }
 
   browsers() {
+    const definitionsVersion = BrowserslistUpdatePlugin.definitionsVersion(dir.node_modules);
     const result = {
-      definitions: caniuseLite.version,
+      definitions: definitionsVersion,
       browserslist: {
         all: this.#browserslistVersions('all'),
         modern: this.#browserslistVersions('modern'),
