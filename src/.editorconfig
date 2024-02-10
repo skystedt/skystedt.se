@@ -12,8 +12,8 @@ trim_trailing_whitespace = true
 [*.json]
 charset = utf-8
 
-# dependabot does not support BOM
-[dependabot.yml]
+# specific files not supporting BOM
+[dependabot.yml, yarn.lock]
 charset = utf-8
 
 [*.{js,cjs,mjs}]
