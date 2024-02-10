@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import pc from 'picocolors';
 import updateDb from 'update-browserslist-db';
 import webpack from 'webpack';
 
@@ -23,7 +24,9 @@ export default class BrowserslistUpdatePlugin {
       const versionAfter = BrowserslistUpdatePlugin.definitionsVersion(this.#node_modules);
 
       if (versionBefore !== versionAfter) {
-        console.warn(`Browserslist (caniuse-lite) updated from ${versionBefore} to ${versionAfter}`);
+        console.warn(
+          pc.bold(pc.bgYellow(pc.black(`Browserslist (caniuse-lite) updated from ${versionBefore} to ${versionAfter}`)))
+        );
       }
     });
   }
