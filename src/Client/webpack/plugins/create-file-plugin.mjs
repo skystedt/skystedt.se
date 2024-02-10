@@ -2,18 +2,20 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import webpack from 'webpack';
 
+/** @typedef { string | { [key: string]: string } } Content */
+
 export default class CreateFilePlugin {
   /** @type {string} */
   #filePath;
   /** @type {string} */
   #fileName;
-  /** @type {string | object | Function<string | object>} */
+  /** @type {Promise<Content> | Content | Function<Promise<Content> | Content>} */
   #content;
 
   /**
    * @param {string} filePath
-   * @param {string} fileName
-   * @param {string | object | Function<string | object>} content
+   * @param {string | number} fileName
+   * @param {Promise<Content> | Content | Function<Promise<Content> | Content>} content
    */
   constructor(filePath, fileName, content) {
     this.#filePath = filePath;
@@ -25,16 +27,19 @@ export default class CreateFilePlugin {
   apply(compiler) {
     // the hook needs to execute after HtmlWebpackPlugin's hooks have fully completed
     compiler.hooks.done.tapPromise('CreateFilePlugin', async () => {
-      const data = this.#contentAsString();
+      const data = await this.#contentAsString();
       await this.#createFile(data);
     });
   }
 
-  /** @returns {string} */
-  #contentAsString() {
+  /** @returns {Promise<string>} */
+  async #contentAsString() {
     let content = this.#content;
     if (typeof content === 'function') {
-      content = this.#content();
+      content = content();
+    }
+    if (content instanceof Promise) {
+      content = await content;
     }
     if (typeof content !== 'string') {
       content = JSON.stringify(content, null, 2);
