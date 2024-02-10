@@ -6,8 +6,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "webpack --config webpack.development.mjs",
-    "production": "webpack --config webpack.production.mjs",
+    "build": "webpack --progress --config webpack.development.mjs",
+    "production": "webpack --progress --config webpack.production.mjs",
     "start": "webpack serve --config webpack.development.mjs --open",
     "update-yarn": "yarn set version stable",
     "ncu": "yarn dlx npm-check-updates"

@@ -3,6 +3,7 @@ import babel, { loadPartialConfigAsync as loadBabelConfigAsync } from '@babel/co
 import babelPresetEnv from '@babel/preset-env';
 import browserslist from 'browserslist';
 import path from 'node:path';
+import pc from 'picocolors';
 import webpack from 'webpack';
 
 const cwd = process.cwd();
@@ -12,6 +13,16 @@ export const dir = {
   dist: path.resolve(cwd, '..', 'publish', 'Client'),
   node_modules: path.resolve(cwd, 'node_modules')
 };
+
+export const printProgress =
+  (environment) =>
+  (percentage, message, ...args) => {
+    const percentageString = percentage
+      .toLocaleString('en', { style: 'percent', minimumFractionDigits: 2 })
+      .padStart('##.##%'.length, ' ');
+    // eslint-disable-next-line no-console
+    console.info(`[${pc.green(environment)}]`, pc.yellow(percentageString), message, ...args);
+  };
 
 /**
  * @param {string} environment

@@ -22,7 +22,7 @@ import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.
 import ThrowOnAssetEmitedPlugin from '../../plugins/throw-on-asset-emited-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
-import { browserslistBrowsers, dir, mergeBabelOptions } from '../../utils.mjs';
+import { browserslistBrowsers, dir, mergeBabelOptions, printProgress } from '../../utils.mjs';
 import cacheGroups from '../chunks.mjs';
 
 import csp from '../../../content-security-policy.json' assert { type: 'json' };
@@ -223,6 +223,7 @@ export default {
   },
   plugins: [
     new BrowserslistUpdatePlugin(dir.node_modules),
+    new webpack.ProgressPlugin(printProgress('modern')),
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
       scriptLoading: 'module'

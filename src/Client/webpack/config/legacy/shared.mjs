@@ -3,7 +3,7 @@ import { minimatch } from 'minimatch';
 import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-import { dir, mergeBabelOptions } from '../../utils.mjs';
+import { dir, mergeBabelOptions, printProgress } from '../../utils.mjs';
 import cacheGroups from '../chunks.mjs';
 
 /** @type {webpack.Configuration} */
@@ -80,5 +80,5 @@ export default {
       }
     ]
   },
-  plugins: [] // needs an array for merging
+  plugins: [new webpack.ProgressPlugin(printProgress('legacy'))]
 };
