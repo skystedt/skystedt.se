@@ -17,6 +17,7 @@ import BrowserslistUpdatePlugin from '../../plugins/browserslist-update-plugin.m
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
 import MoveHtmlWebpackPlugin from '../../plugins/move-html-webpack-plugin.mjs';
+import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
 import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.mjs';
 import ThrowOnAssetEmitedPlugin from '../../plugins/throw-on-asset-emited-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
@@ -266,6 +267,7 @@ export default {
     new CreateFilePlugin(dir.publish, 'staticwebapp.config.json', staticwebappConfig),
     new CreateFilePlugin(dir.dist, 'build/version.json', () => buildInfo.version()),
     new CreateFilePlugin(dir.dist, 'build/browsers.json', () => buildInfo.browsers()),
-    new CreateFilePlugin(dir.dist, 'build/sizes.json', () => buildInfo.sizes())
+    new CreateFilePlugin(dir.dist, 'build/sizes.json', () => buildInfo.sizes()),
+    new PostCompilationPrintPlugin(() => buildInfo.resolved)
   ]
 };
