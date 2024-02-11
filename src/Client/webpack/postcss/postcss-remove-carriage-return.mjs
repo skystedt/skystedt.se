@@ -1,21 +1,26 @@
 import postcss from 'postcss';
 
-/** @type {postcss.PluginCreator} */
+/** @type {postcss.PluginCreator<void>} */
 const postcssRemoveCarriageReturn = () => {
-  /** @param {postcss.Node} node */
+  /** @param {postcss.AnyNode} node */
   const removeCarriageReturn = (node) => {
-    const replace = (str) => str.replace(/\r/g, '');
+    const replace = (/** @type {string} */ str) => str.replace(/\r/g, '');
 
-    // prettier-ignore
-    const props = node.type === 'atrule' ? ['params']
-        : node.type === 'rule' ? ['selector']
-        : node.type === 'decl' ? ['prop', 'value']
-        : node.type === 'comment' ? ['text']
-        : [];
-
-    props.forEach((prop) => {
-      node[prop] = replace(node[prop]);
-    });
+    switch (node.type) {
+      case 'atrule':
+        node.name = replace(node.name);
+        break;
+      case 'rule':
+        node.selector = replace(node.selector);
+        break;
+      case 'decl':
+        node.prop = replace(node.prop);
+        node.value = replace(node.value);
+        break;
+      case 'comment':
+        node.text = replace(node.text);
+        break;
+    }
 
     Object.entries(node.raws).forEach(([key, value]) => {
       if (typeof value === 'string') {

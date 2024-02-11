@@ -42,7 +42,7 @@ export default {
       INSTRUMENTATION_KEY: `"${settings.development.INSTRUMENTATION_KEY}"`
     }),
     new ESLintPlugin({
-      extensions: '.mjs',
+      extensions: ['.mjs'],
       failOnError: false,
       failOnWarning: false,
       overrideConfig: {
@@ -59,7 +59,9 @@ export default {
   ]
 };
 
-export const cspProcessFn = (builtPolicy, ...parameters) => {
+/** @typedef {(builtPolicy: string, ...parameters: any[]) => void} CspProcessFn */
+/** @typedef {CspHtmlWebpackPlugin & { opts: { processFn: CspProcessFn} }} CspHtmlWebpackPlugin_with_processFn */
+export const cspProcessFn = /** @type {CspProcessFn} */ (builtPolicy, ...parameters) => {
   const errorOverlay =
     " 'sha256-dKPMtStvhWirlTIky2ozsboS0Q6fEpiYn8PJwiK2ywo='" +
     " 'sha256-9i4CO/Nl+gX45HxIVK0YGg311ZbVCsEZzl4uJ47ZNOo='" +
@@ -74,5 +76,8 @@ export const cspProcessFn = (builtPolicy, ...parameters) => {
     .replace("; style-src-attr 'none'", "; style-src-attr 'unsafe-hashes'" + errorOverlay);
 
   // call default processFn to add <meta> tag
-  new CspHtmlWebpackPlugin().opts.processFn(builtPolicy, ...parameters);
+  /** @type {CspHtmlWebpackPlugin_with_processFn} */ (new CspHtmlWebpackPlugin()).opts.processFn(
+    builtPolicy,
+    ...parameters
+  );
 };

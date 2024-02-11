@@ -7,17 +7,22 @@
   "$schema": "https://json.schemastore.org/jsconfig",
   "compilerOptions": {
     "target": "es2016",
-    "module": "es2020",
+    "module": "esnext",
+    "allowJs": true,
     "checkJs": true,
     "strict": true,
     "moduleResolution": "node",
-    "rootDir": "src"
+    "resolveJsonModule": true,
+    "rootDir": "."
   },
   "typeAcquisition": {
     "enable": true
   },
   "include": [
-    "src/**/*",
+    "src/**/*.mjs",
+    "webpack/**/*.mjs",
+    "*.mjs",
+    "*.cjs",
     "assets.d.ts" // Workaround for TS2307: (JS) Cannot find module '.png' or its corresponding type declarations.
   ],
   "exclude": ["node_modules", "src/polyfills.mjs"]

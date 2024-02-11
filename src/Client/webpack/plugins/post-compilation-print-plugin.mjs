@@ -1,13 +1,13 @@
 import util from 'node:util';
 import webpack from 'webpack';
 
-/** @typedef { string | { [key: string]: string } } Content */
+/** @typedef { string | { [key: string]: {} } } Content */
 
 export default class PostCompilationPrintPlugin {
-  /** @type {Function<Content>} */
+  /** @type {() => Content} */
   #content;
 
-  /** @param {Function<Content>} content */
+  /** @param {() => Content} content */
   constructor(content) {
     this.#content = content;
   }
@@ -20,7 +20,7 @@ export default class PostCompilationPrintPlugin {
     });
   }
 
-  /** @param {object} data */
+  /** @param {Content} data */
   #print(data) {
     // breakLength is tuned so single element arrays are printed on one line
     // multi element arrays are printed on multiple lines

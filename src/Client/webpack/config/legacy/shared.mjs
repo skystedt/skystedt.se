@@ -31,7 +31,7 @@ export default {
     sideEffects: true
   },
   performance: {
-    assetFilter: (assetFilename) => {
+    assetFilter: (/** @type {string} */ assetFilename) => {
       if (minimatch(assetFilename, 'pixi.*.*js')) {
         return false;
       }

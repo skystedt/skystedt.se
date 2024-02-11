@@ -1,6 +1,5 @@
 import babelPresetEnv from '@babel/preset-env';
 /* eslint-disable-line import/default */ import CopyPlugin from 'copy-webpack-plugin';
-import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import _HtmlInlineCssWebpackPlugin from 'html-inline-css-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -28,11 +27,13 @@ import cacheGroups from '../chunks.mjs';
 import csp from '../../../content-security-policy.json' assert { type: 'json' };
 import staticwebapp from '../../../staticwebapp.config.template.json' assert { type: 'json' };
 
-const HtmlInlineCssWebpackPlugin = /** @type {_HtmlInlineCssWebpackPlugin} */ (_HtmlInlineCssWebpackPlugin.default);
+const HtmlInlineCssWebpackPlugin = /** @type {_HtmlInlineCssWebpackPlugin} */ (
+  /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
+);
 
 /** @typedef { import("postcss-load-config").Config } PostcssConfig */
 
-const buildInfo = new BuildInfo(true);
+const buildInfo = new BuildInfo();
 
 /** @type {babelPresetEnv.Options | { browserslistEnv: string }} */
 const babelPresetEnvOptions = {
@@ -114,15 +115,16 @@ const nestedPackagesCaniuseLite = [
   ['postcss-preset-env', 'browserslist', 'caniuse-lite']
 ];
 
-/** @type {CspHtmlWebpackPlugin.Policy} */
+/** @type {string} */
 let cspPolicy;
-/** @param {CspHtmlWebpackPlugin.Policy} builtPolicy */
-const cspProcessCallback = (builtPolicy) => {
+const cspProcessCallback = (/** @type {string} */ builtPolicy) => {
   cspPolicy = builtPolicy;
 };
 const staticwebappConfig = () => {
-  const rootHeaders = staticwebapp.routes.find((route) => route.route === '/').headers;
-  rootHeaders['Content-Security-Policy'] = cspPolicy;
+  const rootHeaders = staticwebapp.routes.find((route) => route.route === '/')?.headers;
+  if (rootHeaders) {
+    rootHeaders['Content-Security-Policy'] = String(cspPolicy);
+  }
   return staticwebapp;
 };
 
@@ -167,7 +169,7 @@ export default {
     outputModule: false // using modules will force use of import() for loading child scripts, which does not support SRI/integrity
   },
   performance: {
-    assetFilter: (assetFilename) => {
+    assetFilter: (/** @type {string} */ assetFilename) => {
       if (minimatch(assetFilename, 'pixi.*.*js')) {
         return false;
       }

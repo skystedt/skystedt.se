@@ -47,7 +47,7 @@ export default class BuildInfo {
   browsers() {
     const definitionsVersion = BrowserslistUpdatePlugin.definitionsVersion(dir.node_modules);
     const result = {
-      definitions: definitionsVersion,
+      definitions: definitionsVersion ?? '?',
       browserslist: {
         all: this.#browserslistVersions('all'),
         modern: this.#browserslistVersions('modern'),
@@ -68,7 +68,7 @@ export default class BuildInfo {
   async sizes() {
     const fileTypes = ['*.html', '*.mjs', '*.js'];
 
-    /** @type { { [file: string]: string } } */ const result = {};
+    const result = /** @type {Sizes} */ ({});
     const files = await glob('**/*', { cwd: dir.dist });
     for (const file of files) {
       const filePath = path.basename(file);
@@ -94,7 +94,7 @@ export default class BuildInfo {
       const split = value.split(' ');
       map[split[0]] = [...(map[split[0]] || []), split[1]].sort();
       return map;
-    }, {});
+    }, /** @type {BrowserVersions} */ ({}));
     return versions;
   };
 

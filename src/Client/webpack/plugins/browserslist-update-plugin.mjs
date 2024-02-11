@@ -5,7 +5,7 @@ import updateDb from 'update-browserslist-db';
 import webpack from 'webpack';
 
 export default class BrowserslistUpdatePlugin {
-  /** @type {string[]} */
+  /** @type {string} */
   #node_modules;
 
   /** @param {string} node_modules */

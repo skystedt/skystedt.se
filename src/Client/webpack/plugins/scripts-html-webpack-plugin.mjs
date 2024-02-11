@@ -15,8 +15,8 @@ export default class ScriptsHtmlWebpackPlugin {
 
   /** @param {{ add?: AddScript | AddScript[], attributes?: ScriptAttributes | ScriptAttributes[] }} options */
   constructor(options) {
-    this.#add = [].concat(options.add || []);
-    this.#attributes = [].concat(options.attributes || []);
+    this.#add = /** @type {AddScript[]} */ ([]).concat(options.add || []);
+    this.#attributes = /** @type {ScriptAttributes[]} */ ([]).concat(options.attributes || []);
   }
 
   /** @param {webpack.Compiler} compiler */
@@ -25,6 +25,7 @@ export default class ScriptsHtmlWebpackPlugin {
       HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapPromise('ScriptsHtmlWebpackPlugin', async (data) => {
         await this.#addScripts(data.publicPath, data.assetTags.scripts);
         this.#updateAttributes(data.assetTags.scripts);
+        return data;
       });
     });
   }
@@ -62,7 +63,7 @@ export default class ScriptsHtmlWebpackPlugin {
   /**
    * @param {HtmlWebpackPlugin.HtmlTagObject} script
    * @param {ScriptAttributes} attributes
-   * @param {string} attributeName
+   * @param {keyof ScriptAttributes} attributeName
    */
   #booleanAttribute(script, attributes, attributeName) {
     if (attributes[attributeName] === true) {
@@ -76,7 +77,7 @@ export default class ScriptsHtmlWebpackPlugin {
   #updateAttributes(scripts) {
     for (const script of scripts) {
       for (const attributes of this.#attributes) {
-        if (minimatch(script.attributes.src, attributes.path)) {
+        if (minimatch(String(script.attributes.src), attributes.path)) {
           this.#booleanAttribute(script, attributes, 'defer');
           this.#booleanAttribute(script, attributes, 'async');
           this.#booleanAttribute(script, attributes, 'integrity');
