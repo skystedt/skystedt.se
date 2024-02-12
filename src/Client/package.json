@@ -58,7 +58,7 @@
     "update-browserslist-db": "1.0.13",
     "webpack": "5.90.1",
     "webpack-cli": "5.1.4",
-    "webpack-dev-server": "4.15.1",
+    "webpack-dev-server": "5.0.0",
     "webpack-subresource-integrity": "5.1.0"
   },
   "peerDependencies": {
