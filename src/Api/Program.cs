@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Skystedt.Api.Functions;
 using Skystedt.Api.Services;
 using System.Text.Json;
 
