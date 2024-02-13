@@ -2,7 +2,9 @@ import { glob } from 'glob';
 import webpack from 'webpack';
 
 export default class ThrowOnAssetEmitedPlugin {
+  /** @type {string} */
   #directory;
+  /** @type {string[]} */
   #patterns;
 
   /**
@@ -11,7 +13,7 @@ export default class ThrowOnAssetEmitedPlugin {
    */
   constructor(directory, ...patterns) {
     this.#directory = directory;
-    this.#patterns = [].concat(patterns || []);
+    this.#patterns = /** @type {string[]} */ ([]).concat(patterns || []);
   }
 
   /** @param {webpack.Compiler} compiler */

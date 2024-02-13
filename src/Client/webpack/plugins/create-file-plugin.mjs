@@ -2,20 +2,20 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import webpack from 'webpack';
 
-/** @typedef { string | { [key: string]: string } } Content */
+/** @typedef { string | { [key: string]: {} } } Content */
 
 export default class CreateFilePlugin {
   /** @type {string} */
   #filePath;
   /** @type {string} */
   #fileName;
-  /** @type {Promise<Content> | Content | Function<Promise<Content> | Content>} */
+  /** @type {Promise<Content> | Content | (() => (Promise<Content> | Content))} */
   #content;
 
   /**
    * @param {string} filePath
-   * @param {string | number} fileName
-   * @param {Promise<Content> | Content | Function<Promise<Content> | Content>} content
+   * @param {string} fileName
+   * @param {Promise<Content> | Content | function(): (Promise<Content> | Content)} content
    */
   constructor(filePath, fileName, content) {
     this.#filePath = filePath;

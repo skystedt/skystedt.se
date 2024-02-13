@@ -20,7 +20,7 @@ export default {
       INSTRUMENTATION_KEY: `"${settings.production.INSTRUMENTATION_KEY}"`
     }),
     new ESLintPlugin({
-      extensions: '.mjs',
+      extensions: ['.mjs'],
       failOnError: true,
       failOnWarning: true,
       overrideConfig: {

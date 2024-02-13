@@ -7,7 +7,7 @@ import { dir } from '../utils.mjs';
 
 /**
  * @param {...string} patterns
- * @returns {(string) => boolean}
+ * @returns {(value: string) => boolean}
  */
 const wildcardMatch = (...patterns) => {
   return (value) => patterns.some((pattern) => minimatch(value, pattern));
@@ -43,16 +43,18 @@ export default {
     name: 'polyfills'
   },
   vendors: {
-    test: (module) =>
-      module.resource &&
+    test: (/** @type {webpack.NormalModule} */ module) =>
+      module.resource && // ensure module is webpack.NormalModule
       minimatch(module.resource, path.resolve(dir.node_modules, '**'), { windowsPathsNoEscape: true }),
     type: wildcardMatch('javascript/*'),
-    name: (module) => mapVendorModuleToChunk(module.resourceResolveData.descriptionFileData.name)
+    name: (/** @type {webpack.NormalModule} */ module) =>
+      mapVendorModuleToChunk(module.resourceResolveData?.descriptionFileData.name)
   },
   ignored: {
-    test: (module) => module.identifier().startsWith('ignored|'),
+    test: (/** @type {webpack.NormalModule} */ module) =>
+      module.identifier && module.identifier().startsWith('ignored|'),
     type: wildcardMatch('javascript/*'),
-    name: (module) => {
+    name: (/** @type {webpack.NormalModule} */ module) => {
       console.warn(`Using ignored module: ${module.identifier()}`);
       const [, modulePath] = module.identifier().split('|');
       const moduleName = path.relative(dir.node_modules, modulePath);

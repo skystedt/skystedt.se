@@ -1,7 +1,13 @@
 /* eslint-env node */
 const coreJs = require('core-js/package.json');
-const { ConfigFunction } = require('@babel/core');
-const { Options: BabelOptions } = require('@babel/preset-env');
+
+/** Augment types with newer definitions since DefinitelyTyped for @babel/core and @babel/preset-env is not updated - 2024-02-11 */
+/** @typedef { import("@babel/core").SimpleCacheConfigurator & { (forever: boolean): void } } SimpleCacheConfigurator */
+/** @typedef { import("@babel/core").ConfigAPI & { cache: SimpleCacheConfigurator } } ConfigAPI */
+/** @typedef { import("@babel/core").TransformOptions } TransformOptions */
+/** @typedef { (api: ConfigAPI) => TransformOptions } ConfigFunction */
+/** @typedef { import("@babel/preset-env").CorejsVersion | string } CorejsVersion */
+/** @typedef { import("@babel/preset-env").Options & { corejs: CorejsVersion } } BabelOptions */
 
 /** @type {ConfigFunction} */
 module.exports = (api) => {

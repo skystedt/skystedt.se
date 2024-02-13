@@ -1,10 +1,14 @@
 /* eslint-env node */
-import babel, { loadPartialConfigAsync as loadBabelConfigAsync } from '@babel/core';
+import { loadPartialConfigAsync as loadBabelConfigAsync } from '@babel/core';
 import babelPresetEnv from '@babel/preset-env';
 import browserslist from 'browserslist';
 import path from 'node:path';
 import pc from 'picocolors';
 import webpack from 'webpack';
+
+/** @typedef { import("@babel/core").TransformOptions } BabelTransformOptions */
+/** @typedef { import("@babel/core").PartialConfig } BabelPartialConfig */
+/** @typedef { import("@babel/core").ConfigItem } BabelConfigItem */
 
 const cwd = process.cwd();
 export const dir = {
@@ -15,8 +19,8 @@ export const dir = {
 };
 
 export const printProgress =
-  (environment) =>
-  (percentage, message, ...args) => {
+  (/** @type {string} */ environment) =>
+  (/** @type {number} */ percentage, /** @type {string} */ message, /** @type {string[]} */ ...args) => {
     const percentageString = percentage
       .toLocaleString('en', { style: 'percent', minimumFractionDigits: 2 })
       .padStart('##.##%'.length, ' ');
@@ -29,6 +33,7 @@ export const printProgress =
  * @returns { string | undefined }
  */
 export const browserslistConfig = (environment) => {
+  /** @type {string[] | string | undefined} */
   let config = browserslist.loadConfig({ path: dir.src, env: environment });
   config = Array.isArray(config) ? config.join(' or ') : config;
   return config;
@@ -61,23 +66,31 @@ export const mergeConfigurationRules = (configuration) => {
 
 /**
  * @param {babelPresetEnv.Options | { browserslistEnv: string}} presetEnvOptions
- * @returns {Promise<babel.TransformOptions>}
+ * @returns {Promise<BabelTransformOptions>}
  */
 export const mergeBabelOptions = async (presetEnvOptions) => {
   const presetName = '@babel/preset-env';
 
-  /** @type {Readonly<babel.PartialConfig>} */
-  const { options } = await loadBabelConfigAsync();
+  const { options } = /** @type {!Readonly<BabelPartialConfig>} */ (await loadBabelConfigAsync());
+  let presets = options.presets;
 
-  const index = options.presets.findIndex((preset) => preset.file?.request === presetName);
+  if (Array.isArray(options.presets)) {
+    const index = options.presets.findIndex(
+      (preset) => /** @type {BabelConfigItem} */ (preset).file?.request === presetName
+    );
 
-  const mergedOptions = Object.assign({}, options.presets[index].options, presetEnvOptions);
+    if (index !== -1) {
+      const mergedOptions = Object.assign(
+        {},
+        /** @type {BabelConfigItem} */ (options.presets[index]).options,
+        presetEnvOptions
+      );
 
-  const presets = [
-    ...options.presets.slice(0, index - 1),
-    [presetName, mergedOptions],
-    ...options.presets.slice(index + 1)
-  ];
+      presets = [...options.presets];
+      presets[index] = [presetName, mergedOptions];
+    }
+  }
+
   return {
     plugins: options.plugins,
     presets: presets
