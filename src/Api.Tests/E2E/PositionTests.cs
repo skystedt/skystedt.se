@@ -9,6 +9,7 @@ namespace Skystedt.Api.Test.E2E;
 public class PositionTests(ITestOutputHelper output)
 {
     private static readonly TimeSpan TestUpdateInterval = TimeSpan.FromMilliseconds(500); // Use a low value to avoid having to wait too long while testing
+    private static readonly TimeSpan TestUpdateSkew = TimeSpan.FromMilliseconds(100); // Task.Delay is not guaranteed to wait the full requested time
 
     private readonly Func<List<MessageList>, List<MessageList>, bool> _compareMessages = new PubSubMessages(output).CompareMessages;
 
@@ -28,7 +29,7 @@ public class PositionTests(ITestOutputHelper output)
         function = new Position(database, pubsub)
         {
             UpdateInterval = TestUpdateInterval,
-            UpdateSkew = TimeSpan.Zero
+            UpdateSkew = TestUpdateSkew
         };
 
         return (function, pubsub.Messages, pubsub.ConnectClient, pubsub.DisconnectClient);
