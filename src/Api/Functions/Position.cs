@@ -1,11 +1,12 @@
 ﻿using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.Logging;
 using Skystedt.Api.Services;
 using System.Net;
 
 namespace Skystedt.Api.Functions;
 
-public class Position(IDatabase database, IPubSub pubSub)
+public class Position(ILogger<Position> logger, IDatabase database, IPubSub pubSub)
 {
     internal TimeSpan TokenValidTime { get; init; } = TimeSpan.FromHours(1);
     internal TimeSpan UpdateInterval { get; init; } = TimeSpan.FromSeconds(10);
@@ -70,6 +71,21 @@ public class Position(IDatabase database, IPubSub pubSub)
                 X = Round(x),
                 Y = Round(y)
             });
+        }
+        else
+        {
+            logger.LogInformation(
+                "Update skipped" +
+                ", CurrentTimestamp: {CurrentTimestamp}" +
+                ", PreviousTimestamp: {PreviousTimestamp}" +
+                ", Difference: {Difference}" +
+                ", UpdateInterval: {UpdateInterval}" +
+                ", UpdateSkew: {UpdateSkew}",
+                timestamps.Value.Current.Ticks,
+                timestamps.Value.Previous.Ticks,
+                timeSinceLastUpdate,
+                UpdateInterval,
+                UpdateSkew);
         }
 
         return request.CreateResponse();

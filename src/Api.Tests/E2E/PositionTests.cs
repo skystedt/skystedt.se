@@ -23,9 +23,10 @@ public class PositionTests(ITestOutputHelper output)
         async Task Connected(HttpRequestData request) => await function.Connected(request);
         async Task Disconnected(HttpRequestData request) => await function.Disconnected(request);
 
+        var logger = new TestLogger<Position>(output);
         await using var database = new InMemoryDatabase();
         var pubsub = new CallbackPubSub(Connected, Disconnected);
-        function = new Position(database, pubsub)
+        function = new Position(logger, database, pubsub)
         {
             UpdateInterval = TestUpdateInterval,
             UpdateSkew = TimeSpan.Zero
