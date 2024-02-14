@@ -27,7 +27,7 @@ import cacheGroups from '../chunks.mjs';
 import csp from '../../../content-security-policy.json' assert { type: 'json' };
 import staticwebapp from '../../../staticwebapp.config.template.json' assert { type: 'json' };
 
-const HtmlInlineCssWebpackPlugin = /** @type {_HtmlInlineCssWebpackPlugin} */ (
+const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin} */ (
   /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
 );
 
@@ -77,6 +77,9 @@ const pixiBabelPresetEnvOptions = {
     'es.typed-array.uint8-array',
     'es.typed-array.uint8-clamped-array',
     'es.typed-array.with',
+    'esnext.array-buffer.detached',
+    'esnext.array-buffer.transfer',
+    'esnext.array-buffer.transfer-to-fixed-length',
     'esnext.typed-array.at',
     'esnext.typed-array.find-last',
     'esnext.typed-array.find-last-index',
