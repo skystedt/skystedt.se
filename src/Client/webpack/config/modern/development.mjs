@@ -1,4 +1,4 @@
-import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
+﻿import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import path from 'node:path';
 import StylelintPlugin from 'stylelint-webpack-plugin';
@@ -33,6 +33,7 @@ export default {
     ],
     client: {
       overlay: {
+        // @ts-ignore
         trustedTypesPolicyName: 'webpack#dev-overlay'
       }
     }
