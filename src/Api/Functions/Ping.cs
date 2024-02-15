@@ -10,6 +10,7 @@ public class Ping
     public string Get(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = $"{nameof(Ping)}")] HttpRequestData request)
     {
-        return DateTimeOffset.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff");
+        const string Format = "yyyy-MM-dd HH:mm:ss.fff";
+        return DateTimeOffset.UtcNow.ToString(Format);
     }
 }

@@ -21,7 +21,7 @@ public class InMemoryDatabase : IDatabase, IAsyncDisposable
     {
         if (!_initialized)
         {
-            await _connection.OpenAsync(cancellationToken); // Dapper closes the connection if Dapper opened it, so we need to open it outselves
+            await _connection.OpenAsync(cancellationToken); // Dapper closes the connection if Dapper opened it, so we need to open it ourselves
             const string Query = $"CREATE TABLE {TableName} (Id VARCHAR(20) PRIMARY KEY, Timestamp DATETIMEOFFSET)";
             await _connection.ExecuteAsync(new CommandDefinition(Query, cancellationToken: cancellationToken));
             _initialized = true;
