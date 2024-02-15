@@ -2,10 +2,12 @@
 
 public class User
 {
+    private static readonly long UserIdMaxNumberExclusive = (long)Math.Pow(10, 12); // 12 digits
+    private const string UserIdPrefix = "User";
+
     public static string GenerateId()
     {
-        const long UserIdMaxNumberExclusive = 1_000_000_000_000; // 12 digits
         var number = Random.Shared.NextInt64(UserIdMaxNumberExclusive);
-        return $"User_{number:D12}";
+        return $"{UserIdPrefix}_{number:D12}";
     }
 }
