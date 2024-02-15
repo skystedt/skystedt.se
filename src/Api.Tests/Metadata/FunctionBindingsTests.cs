@@ -39,14 +39,14 @@ public class FunctionBindingsTests
 
         // Assert
         var httpTriggerFunctions = metadata.Where(m => m.InputBindings().Any(b => b.Type == "httpTrigger")).ToList();
-        var httpReponseFunctions = metadata.Where(m => m.OutputBindings().Any(b => b.Type == "http")).ToList();
-        Assert.Equal(httpTriggerFunctions, httpReponseFunctions);
+        var httpResponseFunctions = metadata.Where(m => m.OutputBindings().Any(b => b.Type == "http")).ToList();
+        Assert.Equal(httpTriggerFunctions, httpResponseFunctions);
     }
 
     [Fact]
     public async Task CanReadSourceGeneratedFunctionMetadata()
     {
-        // Soruce generators for function metadata is not yet GA
+        // Source generators for function metadata is not yet GA
         // https://github.com/Azure/azure-functions-dotnet-worker/milestone/65
 
         // Arrange

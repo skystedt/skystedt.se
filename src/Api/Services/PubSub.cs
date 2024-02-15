@@ -123,7 +123,7 @@ public class PubSub : IPubSub
     {
         // https://learn.microsoft.com/en-us/azure/azure-web-pubsub/reference-cloud-events#attributes
 
-        var signatures = request.Headers.TryGetValues(CloudEventsHeaderSignature, out var outSgnatures) ? outSgnatures.SelectMany(signature => signature.Split(",")) : Array.Empty<string>();
+        var signatures = request.Headers.TryGetValues(CloudEventsHeaderSignature, out var outSignatures) ? outSignatures.SelectMany(signature => signature.Split(",")) : Array.Empty<string>();
         var connectionId = request.Headers.TryGetValues(CloudEventsHeaderConnectionId, out var outConnectionId) ? outConnectionId.FirstOrDefault() : null;
         var userId = request.Headers.TryGetValues(CloudEventsHeaderUserId, out var outUserId) ? outUserId.FirstOrDefault() : null;
 

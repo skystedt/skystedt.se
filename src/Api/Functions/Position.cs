@@ -127,7 +127,7 @@ public class Position(IDatabase database, IPubSub pubSub)
         return request.CreateResponse();
     }
 
-    // Abuse protecton
+    // Abuse protection
     [Function($"{nameof(Position)}-Callback-{nameof(Validate)}")]
     public HttpResponseData Validate(
         [HttpTrigger(AuthorizationLevel.Anonymous, "options", Route = $"{nameof(Position)}/callback/validate")] HttpRequestData request)

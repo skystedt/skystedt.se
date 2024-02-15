@@ -60,7 +60,7 @@ public class CallbackPubSub(
 
     public Task<(PubSub.ValidationStatus Status, string? UserId)> ValidateUser(string token)
     {
-        var userId = token;  // Tthe token is the the userId in plain text
+        var userId = token;  // The token is the the userId in plain text
         return Task.FromResult((PubSub.ValidationStatus.Valid, (string?)userId));
     }
 
