@@ -17,7 +17,7 @@ import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
 import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
 import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.mjs';
-import ThrowOnAssetEmitedPlugin from '../../plugins/throw-on-asset-emited-plugin.mjs';
+import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
 import { browserslistBrowsers, dir, mergeBabelOptions, printProgress } from '../../utils.mjs';
@@ -264,7 +264,7 @@ export default {
       processFn: cspProcessCallback
     }),
     new ThrowOnNestedPackagePlugin(dir.node_modules, nestedPackagesCaniuseLite),
-    new ThrowOnAssetEmitedPlugin(dir.dist, 'polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
+    new ThrowOnAssetEmittedPlugin('polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
     new CopyPlugin({
       patterns: [path.resolve(dir.src, 'favicon.ico')]
     }),
