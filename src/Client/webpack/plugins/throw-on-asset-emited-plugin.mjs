@@ -18,7 +18,7 @@ export default class ThrowOnAssetEmitedPlugin {
 
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
-    compiler.hooks.afterEmit.tapPromise('ThrowOnAssetEmitedWebpackPlugin', async () => {
+    compiler.hooks.afterEmit.tapPromise(ThrowOnAssetEmitedPlugin.name, async () => {
       const found = [];
       for (const pattern of this.#patterns) {
         const files = await glob(pattern, { cwd: this.#directory });
