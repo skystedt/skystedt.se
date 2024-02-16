@@ -65,7 +65,7 @@
     "tslib": "*"
   },
   "dependencies": {
-    "@microsoft/applicationinsights-web": "3.0.8",
+    "@microsoft/applicationinsights-web": "3.1.0",
     "@pixi/app": "7.4.0",
     "@pixi/core": "7.4.0",
     "@pixi/display": "7.4.0",
