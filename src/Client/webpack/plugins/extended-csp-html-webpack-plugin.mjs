@@ -1,4 +1,5 @@
 import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 import webpack from 'webpack';
 
 /** @typedef {import("cheerio").CheerioAPI} cheerio */
@@ -6,19 +7,8 @@ import webpack from 'webpack';
 /** @typedef {($: cheerio, policyName: string, selector: string) => string[]} CspHtmlWebpackPlugin_getShas */
 /** @typedef {CspHtmlWebpackPlugin & { opts: { processFn: CspHtmlWebpackPlugin_processFn} }} CspHtmlWebpackPlugin_with_processFn */
 
-// Override method for getShas to find precalculated hashes in integrity attributes
+/** Extend CspHtmlWebpackPlugin to work with SRI hashes on scripts */
 export default class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {
-  /** @type {CspHtmlWebpackPlugin_getShas} */
-  getShas($, policyName, selector) {
-    // @ts-ignore
-    const shas = /** @type {string[]} */ (super.getShas($, policyName, selector));
-    const integritySelector = selector.replace(/:not\((\[.+\])\)/, '$1[integrity]');
-    const integrityShas = $(integritySelector)
-      .map((_i, element) => `'${$(element).attr('integrity')}'`)
-      .get();
-    return shas.concat(integrityShas);
-  }
-
   /**
    * @param {CspHtmlWebpackPlugin.Policy} policy
    * @param {CspHtmlWebpackPlugin.AdditionalOptions & { processFn: CspHtmlWebpackPlugin_processFn }} options
@@ -27,9 +17,45 @@ export default class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {
     super(policy, options);
   }
 
+  /** @param {webpack.Compiler} compiler */
   // @ts-ignore
   apply(compiler) {
+    // @ts-ignore
     super.apply(compiler);
+
+    // When using [contenthash] with realContentHash = true,
+    // then webpack.optimize.RealContentHashPlugin will recalculate the hashes of assets
+    // To be able to get the recalculated hashes in getShas, we need to move HtmlWebpackPlugin to after RealContentHashPlugin
+    compiler.hooks.compilation.tap(ExtendedCspHtmlWebpackPlugin.name, (compilation) => {
+      compilation.hooks.processAssets.intercept({
+        register: (tap) => {
+          if (
+            tap.name === HtmlWebpackPlugin.name &&
+            tap.stage === webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
+          ) {
+            // move HtmlWebpackPlugin to after optimize.RealContentHashPlugin
+            tap.stage = webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_HASH + 1;
+          }
+          return tap;
+        }
+      });
+    });
+  }
+
+  /**
+   * Override getShas to include calculated hashes from integrity attributes
+   * @type {CspHtmlWebpackPlugin_getShas}
+   */
+  getShas($, policyName, selector) {
+    // @ts-ignore
+    const originalShas = /** @type {string[]} */ (super.getShas($, policyName, selector));
+
+    const integritySelector = selector.replace(/:not\((\[.+\])\)/, '$1[integrity]');
+    const integrityShas = $(integritySelector)
+      .map((_i, element) => `'${$(element).attr('integrity')}'`)
+      .get();
+
+    return originalShas.concat(integrityShas);
   }
 }
 

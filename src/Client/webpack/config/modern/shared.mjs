@@ -15,7 +15,6 @@ import BuildInfo from '../../build-info.mjs';
 import BrowserslistUpdatePlugin from '../../plugins/browserslist-update-plugin.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
-import MoveHtmlWebpackPlugin from '../../plugins/move-html-webpack-plugin.mjs';
 import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
 import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.mjs';
 import ThrowOnAssetEmitedPlugin from '../../plugins/throw-on-asset-emited-plugin.mjs';
@@ -233,7 +232,6 @@ export default {
       template: path.resolve(dir.src, 'index.html'),
       scriptLoading: 'module'
     }),
-    new MoveHtmlWebpackPlugin(),
     new ScriptsHtmlWebpackPlugin({
       add: [
         { path: 'legacy/insights.*.js', directory: dir.dist },
