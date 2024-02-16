@@ -26,7 +26,7 @@ export default class CreateFilePlugin {
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
     // the hook needs to execute after HtmlWebpackPlugin's hooks have fully completed
-    compiler.hooks.done.tapPromise('CreateFilePlugin', async () => {
+    compiler.hooks.done.tapPromise(CreateFilePlugin.name, async () => {
       const data = await this.#contentAsString();
       await this.#createFile(data);
     });

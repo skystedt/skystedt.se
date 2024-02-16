@@ -15,7 +15,7 @@ export default class BrowserslistUpdatePlugin {
 
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
-    compiler.hooks.environment.tap('BrowserslistUpdatePlugin', () => {
+    compiler.hooks.environment.tap(BrowserslistUpdatePlugin.name, () => {
       const versionBefore = BrowserslistUpdatePlugin.definitionsVersion(this.#node_modules);
 
       const print = () => {}; // empty print function

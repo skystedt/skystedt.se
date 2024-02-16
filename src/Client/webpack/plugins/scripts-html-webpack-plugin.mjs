@@ -21,8 +21,8 @@ export default class ScriptsHtmlWebpackPlugin {
 
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
-    compiler.hooks.compilation.tap('ScriptsHtmlWebpackPlugin', (compilation) => {
-      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapPromise('ScriptsHtmlWebpackPlugin', async (data) => {
+    compiler.hooks.compilation.tap(ScriptsHtmlWebpackPlugin.name, (compilation) => {
+      HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapPromise(ScriptsHtmlWebpackPlugin.name, async (data) => {
         await this.#addScripts(data.publicPath, data.assetTags.scripts);
         this.#updateAttributes(data.assetTags.scripts);
         return data;

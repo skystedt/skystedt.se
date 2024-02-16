@@ -14,7 +14,7 @@ export default class PostCompilationPrintPlugin {
 
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
-    compiler.hooks.afterDone.tap('PostCompilationPrintPlugin', () => {
+    compiler.hooks.afterDone.tap(PostCompilationPrintPlugin.name, () => {
       const data = this.#content();
       this.#print(data);
     });
