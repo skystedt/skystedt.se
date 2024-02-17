@@ -1,4 +1,4 @@
-import * as PIXI from '@pixi/app';
+import * as PIXI from 'pixi.js';
 import Display from './display.mjs';
 
 /** @typedef {import("../../contract").Application} Contract */
