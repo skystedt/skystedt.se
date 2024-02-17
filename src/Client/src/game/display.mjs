@@ -1,6 +1,6 @@
-import { Container } from './pixi.mjs';
+import { Container } from 'pixi.js';
 import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Movement, Offset, Size } from './primitives.mjs';
-/** @typedef {import("./pixi.mjs").IRenderer} Renderer */
+/** @typedef {import("pixi.js").Renderer} Renderer */
 
 const WIDTH = 380;
 const HEIGHT = 200;

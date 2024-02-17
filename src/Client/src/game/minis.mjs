@@ -1,6 +1,6 @@
+import { Container, Sprite, Texture } from 'pixi.js';
 import Assets from './assets.mjs';
 import MiniImage from './assets/mini.png';
-import { Container, Sprite, Texture } from './pixi.mjs';
 import { Uninitialized } from './primitives.mjs';
 
 const ALPHA_DELTA = 0.025;

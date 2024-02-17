@@ -1,11 +1,11 @@
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+import { Application } from 'pixi.js';
 import Communication, { MessageType } from './communication.mjs';
 import Display from './display.mjs';
 import './game.css';
 import Input from './input.mjs';
 import Minis from './minis.mjs';
-import pixiSettings from './pixi-settings.mjs';
-import { Application } from './pixi.mjs';
+import Pixi from './pixi-initialize.mjs';
 import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Stars from './stars.mjs';
@@ -43,11 +43,9 @@ export default class Game {
   }
 
   async init() {
-    pixiSettings();
+    const app = await Pixi();
 
-    const app = new Application();
-
-    this.#parent.appendChild(/** @type {HTMLCanvasElement} */ (app.view));
+    this.#parent.appendChild(app.canvas);
 
     await this.load(app);
     this.#startFrameLoop();
@@ -57,7 +55,7 @@ export default class Game {
   /** @param {Application} app */
   async load(app) {
     this.#currentFps = () => app.ticker.FPS;
-    this.#display = new Display(app.renderer, app.stage, /** @type {HTMLCanvasElement} */ (app.view), true);
+    this.#display = new Display(app.renderer, app.stage, app.canvas, true);
     this.#input = new Input(this.#display);
     this.#communication = new Communication(
       this.#communicationReceived.bind(this),
