@@ -186,7 +186,7 @@ export default {
         include: dir.src,
         exclude: [
           path.resolve(dir.src, 'polyfills.mjs'),
-          path.resolve(dir.src, 'game', 'pixi.mjs') // needed for @pixi/unsafe-eval
+          path.resolve(dir.src, 'game', 'pixi-settings.mjs') // side effects for pixi
         ],
         sideEffects: false
       },
@@ -265,9 +265,7 @@ export default {
     }),
     new ThrowOnNestedPackagePlugin(dir.node_modules, nestedPackagesCaniuseLite),
     new ThrowOnAssetEmittedPlugin('polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
-    new CopyPlugin({
-      patterns: [path.resolve(dir.src, 'favicon.ico')]
-    }),
+    new CopyPlugin({ patterns: [path.resolve(dir.src, 'favicon.ico')] }),
     new CreateFilePlugin(dir.publish, 'staticwebapp.config.json', staticwebappConfig),
     new CreateFilePlugin(dir.dist, 'build/version.json', () => buildInfo.version()),
     new CreateFilePlugin(dir.dist, 'build/browsers.json', () => buildInfo.browsers()),

@@ -1,9 +1,9 @@
-import * as PIXI from './pixi.mjs';
+import { Texture } from './pixi.mjs';
 
 export default class Assets {
   /**
    * @param {string} url
-   * @returns {Promise<PIXI.Texture>}
+   * @returns {Promise<Texture>}
    */
   static async loadImage(url) {
     const image = /** @type HTMLImageElement */ (
@@ -14,7 +14,7 @@ export default class Assets {
         element.src = url;
       })
     );
-    const texture = PIXI.Texture.from(image);
+    const texture = Texture.from(image);
     return texture;
   }
 }

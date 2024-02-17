@@ -1,6 +1,6 @@
 import Assets from './assets.mjs';
 import MiniImage from './assets/mini.png';
-import * as PIXI from './pixi.mjs';
+import { Container, Sprite, Texture } from './pixi.mjs';
 import { Uninitialized } from './primitives.mjs';
 
 const ALPHA_DELTA = 0.025;
@@ -14,30 +14,28 @@ const MiniState = {
   FadeOut: 3
 };
 
-class Sprite extends PIXI.Sprite {
-  /** @type {any} */ data;
-}
+/** @typedef {{ sprite: Sprite, state: MiniState, wait: number }} Item */
 
-export default class Minis extends PIXI.Container {
-  #texture = /** @type {PIXI.Texture} */ (Uninitialized);
+export default class Minis extends Container {
+  #texture = /** @type {Texture} */ (Uninitialized);
 
-  /** @type {Map<string, Sprite>} */
+  /** @type {Map<string, Item>} */
   #map = new Map();
 
-  /** @param {PIXI.Container} stage */
+  /** @param {Container} stage */
   constructor(stage) {
     super();
     stage.addChild(this);
   }
 
   async load() {
-    this.#texture = /** @type {PIXI.Texture} */ (await Assets.loadImage(MiniImage));
+    this.#texture = await Assets.loadImage(MiniImage);
   }
 
   /** @param {string} id */
   add(id) {
-    const sprite = this.#createSprite();
-    this.#map.set(id, sprite);
+    const item = this.#createItem();
+    this.#map.set(id, item);
   }
 
   /**
@@ -46,18 +44,20 @@ export default class Minis extends PIXI.Container {
    * @param {number} y
    */
   update(id, x, y) {
-    const sprite = this.#map.get(id);
-    if (sprite) {
+    const item = this.#map.get(id);
+    if (item) {
+      const { sprite } = item;
       sprite.position.set(x - sprite.width / 2, y - sprite.height / 2);
       sprite.alpha = 0;
-      sprite.data.state = MiniState.FadeIn;
+      item.state = MiniState.FadeIn;
     }
   }
 
   /** @param {string} id */
   remove(id) {
-    const sprite = this.#map.get(id);
-    if (sprite) {
+    const item = this.#map.get(id);
+    if (item) {
+      const { sprite } = item;
       this.removeChild(sprite);
       sprite.destroy();
       this.#map.delete(id);
@@ -69,40 +69,39 @@ export default class Minis extends PIXI.Container {
   }
 
   tick() {
-    for (const sprite of this.#map.values()) {
-      switch (sprite.data.state) {
+    for (const item of this.#map.values()) {
+      const { sprite, state } = item;
+      switch (state) {
         case MiniState.FadeIn:
           sprite.alpha += ALPHA_DELTA;
           if (sprite.alpha >= 1) {
-            sprite.data.wait = 0;
-            sprite.data.state = MiniState.Shown;
+            item.wait = 0;
+            item.state = MiniState.Shown;
           }
           break;
 
         case MiniState.Shown:
-          sprite.data.wait += 1;
-          if (sprite.data.wait >= SHOWN_DURATION) {
-            sprite.data.state = MiniState.FadeOut;
+          item.wait += 1;
+          if (item.wait >= SHOWN_DURATION) {
+            item.state = MiniState.FadeOut;
           }
           break;
 
         case MiniState.FadeOut:
           sprite.alpha -= ALPHA_DELTA;
           if (sprite.alpha <= 0) {
-            sprite.data.state = MiniState.Hidden;
+            item.state = MiniState.Hidden;
           }
           break;
       }
     }
   }
 
-  /** @returns {Sprite} */
-  #createSprite() {
-    const sprite = /** @type {Sprite} */ (PIXI.Sprite.from(this.#texture));
-    sprite.data = {};
+  /** @returns {Item} */
+  #createItem() {
+    const sprite = /** @type {Sprite} */ (Sprite.from(this.#texture));
     sprite.alpha = 0;
-    sprite.data.state = MiniState.Hidden;
     this.addChild(sprite);
-    return sprite;
+    return { sprite, state: MiniState.Hidden, wait: 0 };
   }
 }
