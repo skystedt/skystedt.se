@@ -4,7 +4,8 @@ import Display from './display.mjs';
 import './game.css';
 import Input from './input.mjs';
 import Minis from './minis.mjs';
-import * as PIXI from './pixi.mjs';
+import { pixiSettings } from './pixi-settings.mjs';
+import { Application } from './pixi.mjs';
 import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Stars from './stars.mjs';
@@ -19,7 +20,8 @@ const MAX_LOG_METRIC_RETRIES = 10;
 const STARS = 100;
 
 export default class Game {
-  #app;
+  #parent;
+  #currentFps = /** @type {() => number} */ (Uninitialized);
   #display = /** @type {Display} */ (Uninitialized);
   #input = /** @type {Input} */ (Uninitialized);
   #communication = /** @type {Communication} */ (Uninitialized);
@@ -35,14 +37,27 @@ export default class Game {
   #minis = /** @type {Minis} */ (Uninitialized);
   #stars = /** @type {Stars} */ (Uninitialized);
 
-  get canvas() {
-    return /** @type {HTMLCanvasElement} */ (this.#app.view);
+  /** @param {HTMLElement} parent */
+  constructor(parent) {
+    this.#parent = parent;
   }
 
-  constructor() {
-    this.#app = new PIXI.Application();
+  async init() {
+    pixiSettings();
 
-    this.#display = new Display(this.#app.renderer, this.#app.stage, this.canvas, true);
+    const app = new Application();
+
+    this.#parent.appendChild(/** @type {HTMLCanvasElement} */ (app.view));
+
+    await this.load(app);
+    this.#startFrameLoop();
+    await this.#communication.connect();
+  }
+
+  /** @param {Application} app */
+  async load(app) {
+    this.#currentFps = () => app.ticker.FPS;
+    this.#display = new Display(app.renderer, app.stage, /** @type {HTMLCanvasElement} */ (app.view), true);
     this.#input = new Input(this.#display);
     this.#communication = new Communication(
       this.#communicationReceived.bind(this),
@@ -50,26 +65,13 @@ export default class Game {
     );
 
     // order determines z order, last will be on top
-    this.#stars = new Stars(this.#app.stage);
-    this.#minis = new Minis(this.#app.stage);
-    this.#ship = new Ship(this.#app.stage);
-  }
+    this.#stars = new Stars(app.stage);
+    this.#minis = new Minis(app.stage);
+    this.#ship = new Ship(app.stage);
 
-  async load() {
-    try {
-      await this.#ship.load(this.#display.gameSize);
-      await this.#minis.load();
-      this.#stars.load(this.#display.gameSize, STARS);
-
-      this.#startFrameLoop();
-    } catch (e) {
-      console.error(e);
-      throw e;
-    }
-  }
-
-  async start() {
-    await this.#communication.connect();
+    await this.#ship.load(this.#display.gameSize);
+    await this.#minis.load();
+    this.#stars.load(this.#display.gameSize, STARS);
   }
 
   #startFrameLoop() {
@@ -124,7 +126,7 @@ export default class Game {
   }
 
   #checkFps() {
-    const fps = Math.round(this.#app.ticker.FPS);
+    const fps = Math.round(this.#currentFps());
 
     this.#logFpsMetric(fps, 0);
 

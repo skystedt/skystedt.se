@@ -2,7 +2,7 @@ import Assets from './assets.mjs';
 import ShipStraightImage from './assets/ship.png';
 import ShipLeftImage from './assets/ship_left.png';
 import ShipRightImage from './assets/ship_right.png';
-import * as PIXI from './pixi.mjs';
+import { Container, Sprite } from './pixi.mjs';
 import { GamePosition, Size, Uninitialized } from './primitives.mjs';
 
 const TURN_STRAIGHT_DELAY = 10;
@@ -15,30 +15,30 @@ export const ShipDirection = {
 };
 
 export default class Ship {
-  #container = /** @type {PIXI.Container} */ (Uninitialized);
-  #spriteStraight = /** @type {PIXI.Sprite} */ (Uninitialized);
-  #spriteLeft = /** @type {PIXI.Sprite} */ (Uninitialized);
-  #spriteRight = /** @type {PIXI.Sprite} */ (Uninitialized);
+  #container = /** @type {Container} */ (Uninitialized);
+  #spriteStraight = /** @type {Sprite} */ (Uninitialized);
+  #spriteLeft = /** @type {Sprite} */ (Uninitialized);
+  #spriteRight = /** @type {Sprite} */ (Uninitialized);
   #startPosition = /** @type {GamePosition} */ (Uninitialized);
   #straightDelay = 0;
 
   /**
-   * @param {PIXI.Container} stage
+   * @param {Container} stage
    */
   constructor(stage) {
-    this.#container = new PIXI.Container();
+    this.#container = new Container();
     stage.addChild(this.#container);
   }
 
   /** @param {Size} gameSize */
   async load(gameSize) {
-    const shipStraightTexture = /** @type {PIXI.Texture} */ (await Assets.loadImage(ShipStraightImage));
-    const shipLeftTexture = /** @type {PIXI.Texture} */ (await Assets.loadImage(ShipLeftImage));
-    const shipRightTexture = /** @type {PIXI.Texture} */ (await Assets.loadImage(ShipRightImage));
+    const shipStraightTexture = await Assets.loadImage(ShipStraightImage);
+    const shipLeftTexture = await Assets.loadImage(ShipLeftImage);
+    const shipRightTexture = await Assets.loadImage(ShipRightImage);
 
-    this.#spriteStraight = PIXI.Sprite.from(shipStraightTexture);
-    this.#spriteLeft = PIXI.Sprite.from(shipLeftTexture);
-    this.#spriteRight = PIXI.Sprite.from(shipRightTexture);
+    this.#spriteStraight = Sprite.from(shipStraightTexture);
+    this.#spriteLeft = Sprite.from(shipLeftTexture);
+    this.#spriteRight = Sprite.from(shipRightTexture);
 
     this.#container.addChild(this.#spriteStraight);
     this.#container.addChild(this.#spriteLeft);

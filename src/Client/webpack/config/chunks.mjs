@@ -1,4 +1,4 @@
-import { minimatch } from 'minimatch';
+﻿import { minimatch } from 'minimatch';
 import path from 'node:path';
 import webpack from 'webpack';
 import { dir } from '../utils.mjs';
@@ -84,7 +84,6 @@ const mapVendorModuleToChunk = (moduleName) => {
     case 'events':
     case 'mini-css-extract-plugin':
       return 'development';
-    case 'colord':
     case 'earcut':
     case 'eventemitter3':
     case 'ismobilejs':

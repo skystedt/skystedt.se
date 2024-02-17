@@ -1,4 +1,4 @@
-import * as PIXI from './pixi.mjs';
+import { Container, Graphics } from './pixi.mjs';
 import { Size, Uninitialized } from './primitives.mjs';
 
 const BLINK_PROBABILITY = 0.0001;
@@ -11,8 +11,8 @@ const SPEED_PROBABILITIES = [
   { speed: 0.50, p: 0.59 }
 ];
 
-export default class Stars extends PIXI.Container {
-  /** @param {PIXI.Container} stage */
+export default class Stars extends Container {
+  /** @param {Container} stage */
   constructor(stage) {
     super();
     stage.addChild(this);
@@ -35,7 +35,7 @@ export default class Stars extends PIXI.Container {
   }
 }
 
-export class Star extends PIXI.Graphics {
+export class Star extends Graphics {
   #gameSize;
   #speed = /** @type {number} */ (Uninitialized);
   #blinking = /** @type {number} */ (Uninitialized);

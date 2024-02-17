@@ -1,5 +1,6 @@
-import * as PIXI from './pixi.mjs';
+import { Container } from './pixi.mjs';
 import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Movement, Offset, Size } from './primitives.mjs';
+/** @typedef {import("./pixi.mjs").IRenderer} Renderer */
 
 const WIDTH = 380;
 const HEIGHT = 200;
@@ -14,8 +15,8 @@ export default class Display {
   #gameOutsideDisplay;
 
   /**
-   * @param {PIXI.IRenderer} renderer
-   * @param {PIXI.Container} stage
+   * @param {Renderer} renderer
+   * @param {Container} stage
    * @param {HTMLCanvasElement} canvas
    * @param {boolean} ignoreBorders
    */

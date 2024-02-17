@@ -10,5 +10,6 @@
   "eslint.useESLintClass": true,
   "eslint.codeActionsOnSave.rules": ["curly", "no-var"],
   "css.validate": false,
-  "stylelint.validate": ["css"]
+  "stylelint.validate": ["css"],
+  "cSpell.words": ["pixi"]
 }
