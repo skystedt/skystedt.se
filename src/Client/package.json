@@ -10,7 +10,8 @@
     "production": "webpack --progress --config webpack.production.mjs",
     "start": "webpack serve --config webpack.development.mjs --open",
     "update-yarn": "yarn set version stable",
-    "ncu": "yarn dlx npm-check-updates"
+    "ncu": "yarn dlx npm-check-updates",
+    "transitive-update": "yarn dlx rimraf yarn.lock && yarn install"
   },
   "engines": {
     "yarn": "4.x",
