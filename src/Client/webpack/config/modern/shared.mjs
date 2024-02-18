@@ -24,7 +24,7 @@ import { browserslistBrowsers, dir, mergeBabelOptions, printProgress } from '../
 import cacheGroups from '../chunks.mjs';
 
 import csp from '../../../content-security-policy.json' assert { type: 'json' };
-import staticwebapp from '../../../staticwebapp.config.template.json' assert { type: 'json' };
+import staticWebApp from '../../../staticwebapp.config.template.json' assert { type: 'json' };
 
 const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin} */ (
   /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
@@ -37,7 +37,7 @@ const buildInfo = new BuildInfo();
 /** @type {babelPresetEnv.Options | { browserslistEnv: string }} */
 const babelPresetEnvOptions = {
   browserslistEnv: 'modern',
-  debug: false, // when ThrowOnAssetEmitedWebpackPlugin is thrown for polyfills.*.mjs, set this to true to debug why
+  debug: false, // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set this to true to debug why
   // http://zloirock.github.io/core-js/compat/
   exclude: [
     'web.dom-collections.iterator', // needed for older ios, added when using any for-of, but is not needed if not using for-of on DOM collections, https://github.com/zloirock/core-js/issues/1003
@@ -51,7 +51,7 @@ const babelPresetEnvOptions = {
 /** @type {babelPresetEnv.Options | { browserslistEnv: string }} */
 const pixiBabelPresetEnvOptions = {
   browserslistEnv: 'modern',
-  debug: false, // when ThrowOnAssetEmitedWebpackPlugin is thrown for polyfills.*.mjs, set this to true to debug why
+  debug: false, // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set this to true to debug why
   // http://zloirock.github.io/core-js/compat/
   exclude: [
     'es.array.push',
@@ -122,12 +122,12 @@ let cspPolicy;
 const cspProcessCallback = (/** @type {string} */ builtPolicy) => {
   cspPolicy = builtPolicy;
 };
-const staticwebappConfig = () => {
-  const rootHeaders = staticwebapp.routes.find((route) => route.route === '/')?.headers;
+const staticWebAppConfig = () => {
+  const rootHeaders = staticWebApp.routes.find((route) => route.route === '/')?.headers;
   if (rootHeaders) {
     rootHeaders['Content-Security-Policy'] = String(cspPolicy);
   }
-  return staticwebapp;
+  return staticWebApp;
 };
 
 /** @type {webpack.Configuration} */
@@ -266,7 +266,7 @@ export default {
     new ThrowOnNestedPackagePlugin(dir.node_modules, nestedPackagesCaniuseLite),
     new ThrowOnAssetEmittedPlugin('polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
     new CopyPlugin({ patterns: [path.resolve(dir.src, 'favicon.ico')] }),
-    new CreateFilePlugin(dir.publish, 'staticwebapp.config.json', staticwebappConfig),
+    new CreateFilePlugin(dir.publish, 'staticwebapp.config.json', staticWebAppConfig),
     new CreateFilePlugin(dir.dist, 'build/version.json', () => buildInfo.version()),
     new CreateFilePlugin(dir.dist, 'build/browsers.json', () => buildInfo.browsers()),
     new CreateFilePlugin(dir.dist, 'build/sizes.json', () => buildInfo.sizes()),

@@ -217,7 +217,7 @@ export default class Input {
     const down = gamepad.buttons[GAMEPAD_BUTTON_DOWN]?.pressed;
     const left = gamepad.buttons[GAMEPAD_BUTTON_LEFT]?.pressed;
     if (up || right || down || left) {
-      return this.#absolutDirection(up, right, down, left);
+      return this.#absoluteDirection(up, right, down, left);
     }
 
     return null;
@@ -246,7 +246,7 @@ export default class Input {
    * @param {boolean} left
    * @returns {Movement}
    */
-  #absolutDirection(up, right, down, left) {
+  #absoluteDirection(up, right, down, left) {
     const dx = (left ? -1 : 0) + (right ? 1 : 0);
     const dy = (up ? -1 : 0) + (down ? 1 : 0);
     return new Movement(dx, dy);
@@ -271,6 +271,6 @@ export default class Input {
       return this.#relativeDirection(this.#mouse, relativeTo);
     }
 
-    return this.#absolutDirection(this.#keys.up, this.#keys.right, this.#keys.down, this.#keys.left);
+    return this.#absoluteDirection(this.#keys.up, this.#keys.right, this.#keys.down, this.#keys.left);
   }
 }

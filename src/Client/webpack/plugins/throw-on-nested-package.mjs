@@ -1,8 +1,8 @@
-import enchancedResolve from 'enhanced-resolve';
+import enhancedResolve from 'enhanced-resolve';
 import path from 'node:path';
 import webpack from 'webpack';
 
-const resolver = enchancedResolve.create.sync({
+const resolver = enhancedResolve.create.sync({
   mainFiles: ['package'],
   extensions: ['.json'],
   enforceExtension: true

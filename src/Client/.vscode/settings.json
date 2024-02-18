@@ -11,5 +11,5 @@
   "eslint.codeActionsOnSave.rules": ["curly", "no-var"],
   "css.validate": false,
   "stylelint.validate": ["css"],
-  "cSpell.words": ["pixi"]
+  "cSpell.words": ["Skystedt", "pixi"]
 }
