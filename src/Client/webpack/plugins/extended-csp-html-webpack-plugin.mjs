@@ -23,9 +23,12 @@ export default class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {
     // @ts-ignore
     super.apply(compiler);
 
-    // When using [contenthash] with realContentHash = true,
-    // then webpack.optimize.RealContentHashPlugin will recalculate the hashes of assets
+    // HtmlWebpackPlugin hooks processAssets with stage PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
+    // https://github.com/jantimon/html-webpack-plugin/blob/v5.6.0/index.js#L159
+    // When using [contenthash] with realContentHash = true then webpack.optimize.RealContentHashPlugin will recalculate the hashes of assets
     // To be able to get the recalculated hashes in getShas, we need to move HtmlWebpackPlugin to after RealContentHashPlugin
+    // example of moving HtmlWebpackPlugin:
+    // https://github.com/jantimon/html-webpack-plugin/issues/1700#issuecomment-964433198
     compiler.hooks.compilation.tap(ExtendedCspHtmlWebpackPlugin.name, (compilation) => {
       compilation.hooks.processAssets.intercept({
         register: (tap) => {

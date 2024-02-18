@@ -26,7 +26,7 @@ export default class ThrowOnNestedPackagePlugin {
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
     if (this.#packageArray.length > 0) {
-      compiler.hooks.afterEmit.tapPromise(ThrowOnNestedPackagePlugin.name, async () => {
+      compiler.hooks.afterEnvironment.tap(ThrowOnNestedPackagePlugin.name, () => {
         for (const packages of this.#packageArray) {
           const [firstPackage, ...otherPackages] = /** @type {string[]} */ ([]).concat(packages || []);
           const finalPackage = otherPackages.at(-1) ?? '';
