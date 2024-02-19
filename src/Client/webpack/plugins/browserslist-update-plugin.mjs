@@ -6,22 +6,22 @@ import webpack from 'webpack';
 
 export default class BrowserslistUpdatePlugin {
   /** @type {string} */
-  #node_modules;
+  #nodeModules;
 
-  /** @param {string} node_modules */
-  constructor(node_modules) {
-    this.#node_modules = node_modules;
+  /** @param {string} nodeModules */
+  constructor(nodeModules) {
+    this.#nodeModules = nodeModules;
   }
 
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
     compiler.hooks.environment.tap(BrowserslistUpdatePlugin.name, () => {
-      const versionBefore = BrowserslistUpdatePlugin.definitionsVersion(this.#node_modules);
+      const versionBefore = BrowserslistUpdatePlugin.definitionsVersion(this.#nodeModules);
 
       const print = () => {}; // empty print function
       updateDb(print);
 
-      const versionAfter = BrowserslistUpdatePlugin.definitionsVersion(this.#node_modules);
+      const versionAfter = BrowserslistUpdatePlugin.definitionsVersion(this.#nodeModules);
 
       if (versionBefore !== versionAfter) {
         console.warn(
@@ -32,11 +32,11 @@ export default class BrowserslistUpdatePlugin {
   }
 
   /**
-   * @param {string} node_modules
+   * @param {string} nodeModules
    * @returns {string?}
    */
-  static definitionsVersion(node_modules) {
-    const file = path.resolve(node_modules, 'caniuse-lite', 'package.json');
+  static definitionsVersion(nodeModules) {
+    const file = path.resolve(nodeModules, 'caniuse-lite', 'package.json');
     if (!fs.existsSync(file)) {
       return null;
     }

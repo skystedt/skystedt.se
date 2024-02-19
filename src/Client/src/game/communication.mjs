@@ -50,7 +50,7 @@ export default class Communication {
   /** @param {any} data */
   sendBeacon(data) {
     if (this.#connection) {
-      const body = Object.assign({ token: this.#connection.token }, data);
+      const body = { token: this.#connection.token, ...data };
       navigator.sendBeacon('/api/position/update', JSON.stringify(body));
     }
   }
@@ -109,7 +109,7 @@ export default class Communication {
     ws.onclose = (event) => {
       if (this.#connection) {
         clearInterval(this.#connection.intervalId);
-        const reconnect = this.#connection.reconnect;
+        const { reconnect } = this.#connection;
         this.#connection = null;
         if (reconnect) {
           this.connect(); // Not awaiting
@@ -117,7 +117,7 @@ export default class Communication {
       }
 
       if (event.code !== WebsocketNormalClose) {
-        this.#connectionAttempt++;
+        this.#connectionAttempt += 1;
         const delay = Communication.#retryDelay(this.#connectionAttempt);
         setTimeout(() => {
           this.#createWebsocket(token, expiresAt, websocketUrl, updateInterval);

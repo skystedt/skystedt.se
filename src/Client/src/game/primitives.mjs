@@ -1,3 +1,5 @@
+/* eslint-disable max-classes-per-file */
+
 /* eslint-disable-line jsdoc/no-undefined-types */
 /** @type {unknown} */
 export const Uninitialized = undefined;
@@ -6,9 +8,11 @@ export const Uninitialized = undefined;
 class Position {
   #x;
   #y;
+
   get x() {
     return this.#x;
   }
+
   get y() {
     return this.#y;
   }
@@ -37,9 +41,11 @@ export class DisplayPosition extends Position {
 export class Movement {
   #dx;
   #dy;
+
   get dx() {
     return this.#dx;
   }
+
   get dy() {
     return this.#dy;
   }
@@ -57,9 +63,11 @@ export class Movement {
 export class Size {
   #width;
   #height;
+
   get width() {
     return this.#width;
   }
+
   get height() {
     return this.#height;
   }
@@ -77,9 +85,11 @@ export class Size {
 export class Offset {
   #left;
   #top;
+
   get left() {
     return this.#left;
   }
+
   get top() {
     return this.#top;
   }
@@ -99,15 +109,19 @@ export class Borders {
   #right;
   #bottom;
   #left;
+
   get top() {
     return this.#top;
   }
+
   get right() {
     return this.#right;
   }
+
   get bottom() {
     return this.#bottom;
   }
+
   get left() {
     return this.#left;
   }

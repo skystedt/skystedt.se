@@ -9,6 +9,10 @@ const KEY_CODE_UP = 38;
 const KEY_CODE_RIGHT = 39;
 const KEY_CODE_DOWN = 40;
 
+const MOUSE_PRIMARY_BUTTON = 1;
+const MOUSE_SECONDARY_BUTTON = 2;
+const MOUSE_BUTTONS = [MOUSE_PRIMARY_BUTTON, MOUSE_SECONDARY_BUTTON, MOUSE_PRIMARY_BUTTON + MOUSE_SECONDARY_BUTTON];
+
 const GAMEPAD_BUTTON_UP = 12;
 const GAMEPAD_BUTTON_DOWN = 13;
 const GAMEPAD_BUTTON_LEFT = 14;
@@ -33,7 +37,15 @@ export default class Input {
    * @returns {any}
    */
   static #minBy(array, by) {
-    return array.reduce((best, next) => (!best ? next : Math.min(by(best), by(next)) === by(best) ? best : next), null);
+    return array.reduce((best, next) => {
+      if (!best) {
+        return next;
+      }
+      if (by(best) <= by(next)) {
+        return best;
+      }
+      return next;
+    }, null);
   }
 
   /** @param {Display} display */
@@ -83,48 +95,48 @@ export default class Input {
 
   /** @param {TouchEvent} event */
   #touchstart(event) {
-    for (let touch of event.changedTouches) {
+    Array.from(event.changedTouches).forEach((touch) => {
       this.#addTouch(touch, event.timeStamp);
-    }
+    });
   }
 
   /** @param {TouchEvent} event */
   #touchmove(event) {
-    for (let touch of event.changedTouches) {
+    Array.from(event.changedTouches).forEach((touch) => {
       const foundTouch = this.#touches.find((t) => t.id === touch.identifier);
       if (foundTouch) {
         foundTouch.position = new AbsolutePosition(touch.clientX, touch.clientY);
       } else {
         this.#addTouch(touch, event.timeStamp);
       }
-    }
+    });
   }
 
   /** @param {TouchEvent} event */
   #touchend(event) {
-    for (let touch of event.changedTouches) {
+    Array.from(event.changedTouches).forEach((touch) => {
       this.#deleteTouch(touch);
-    }
+    });
     event.preventDefault();
   }
 
   /** @param {TouchEvent} event */
   #touchcancel(event) {
-    for (let touch of event.changedTouches) {
+    Array.from(event.changedTouches).forEach((touch) => {
       this.#deleteTouch(touch);
-    }
+    });
   }
 
   /** @param {MouseEvent} event */
   #mousedown(event) {
-    if ((event.buttons & (1 + 2)) != 0) {
+    if (MOUSE_BUTTONS.includes(event.buttons)) {
       this.#mouse = new AbsolutePosition(event.clientX, event.clientY);
     }
   }
 
   /** @param {MouseEvent} event */
   #mousemove(event) {
-    if ((event.buttons & (1 + 2)) != 0) {
+    if (MOUSE_BUTTONS.includes(event.buttons)) {
       this.#mouse = new AbsolutePosition(event.clientX, event.clientY);
     }
   }
@@ -179,7 +191,7 @@ export default class Input {
   #addTouch(touch, timestamp) {
     this.#touches.push({
       id: touch.identifier,
-      timestamp: timestamp,
+      timestamp,
       position: new AbsolutePosition(touch.clientX, touch.clientY)
     });
   }

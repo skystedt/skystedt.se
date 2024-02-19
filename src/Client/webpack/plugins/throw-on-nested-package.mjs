@@ -10,16 +10,16 @@ const resolver = enhancedResolve.create.sync({
 
 export default class ThrowOnNestedPackagePlugin {
   /** @type {string} */
-  #node_modules;
+  #nodeModules;
   /** @type {string[][]} */
   #packageArray;
 
   /**
-   * @param {string} node_modules
+   * @param {string} nodeModules
    * @param {string[][]} packages
    */
-  constructor(node_modules, packages) {
-    this.#node_modules = node_modules;
+  constructor(nodeModules, packages) {
+    this.#nodeModules = nodeModules;
     this.#packageArray = /** @type {string[][]} */ ([]).concat(packages || []);
   }
 
@@ -27,26 +27,26 @@ export default class ThrowOnNestedPackagePlugin {
   apply(compiler) {
     if (this.#packageArray.length > 0) {
       compiler.hooks.afterEnvironment.tap(ThrowOnNestedPackagePlugin.name, () => {
-        for (const packages of this.#packageArray) {
+        this.#packageArray.forEach((packages) => {
           const [firstPackage, ...otherPackages] = /** @type {string[]} */ ([]).concat(packages || []);
           const finalPackage = otherPackages.at(-1) ?? '';
 
-          const firstPath = path.resolve(this.#node_modules, firstPackage, 'package.json');
-          const targetPath = path.resolve(this.#node_modules, finalPackage, 'package.json');
+          const firstPath = path.resolve(this.#nodeModules, firstPackage, 'package.json');
+          const targetPath = path.resolve(this.#nodeModules, finalPackage, 'package.json');
 
           let nestedPath = path.resolve(firstPath, firstPackage);
-          for (const module of otherPackages) {
+          otherPackages.forEach((module) => {
             const resolvedPath = resolver(nestedPath, module);
             if (!resolvedPath) {
               return;
             }
             nestedPath = resolvedPath;
-          }
+          });
 
           if (targetPath !== nestedPath) {
             throw new Error(`found nested version of '${finalPackage}' in '${firstPackage}'`);
           }
-        }
+        });
       });
     }
   }

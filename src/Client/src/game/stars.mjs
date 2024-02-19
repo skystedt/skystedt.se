@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { Container, Graphics } from './pixi.mjs';
 import { Size, Uninitialized } from './primitives.mjs';
 
@@ -23,15 +24,16 @@ export default class Stars extends Container {
    * @param {number} numberOfStars
    */
   load(gameSize, numberOfStars) {
-    for (let i = 0; i < numberOfStars; i++) {
+    for (let i = 0; i < numberOfStars; i += 1) {
+      // eslint-disable-next-line no-use-before-define
       this.addChild(new Star(gameSize));
     }
   }
 
   tick() {
-    for (let star of this.children) {
+    this.children.forEach((star) => {
       /** @type {Star} */ (star).move();
-    }
+    });
   }
 }
 
@@ -70,13 +72,17 @@ export class Star extends Graphics {
   #randomSpeed() {
     const random = Math.random();
     let p = 0;
-    for (let sp of SPEED_PROBABILITIES) {
+    const speed = SPEED_PROBABILITIES.reduce((speed, sp) => {
+      if (speed) {
+        return speed;
+      }
       p += sp.p;
-      if (random < p) {
+      if (random <= p) {
         return sp.speed;
       }
-    }
-    return 1;
+      return null;
+    }, /** @type {number?} */ (null));
+    return speed ?? 1;
   }
 
   /** @param {number} value */
@@ -92,11 +98,11 @@ export class Star extends Graphics {
     if (this.y >= this.#gameSize.height) {
       this.#newStar(true);
     }
-    if (this.#blinking == 1) {
-      this.#blinking--;
+    if (this.#blinking === 1) {
+      this.#blinking -= 1;
       this.#setColor(this.#originalColor);
     } else if (this.#blinking > 1) {
-      this.#blinking--;
+      this.#blinking -= 1;
     } else if (Math.random() < BLINK_PROBABILITY) {
       this.#blinking = BLINK_DURATION;
       this.#setColor(0x000000);

@@ -69,8 +69,9 @@ export default class Minis extends Container {
   }
 
   tick() {
-    for (const item of this.#map.values()) {
+    Array.from(this.#map.values()).forEach((item) => {
       const { sprite, state } = item;
+      /* eslint-disable no-param-reassign */
       switch (state) {
         case MiniState.FadeIn:
           sprite.alpha += ALPHA_DELTA;
@@ -93,8 +94,12 @@ export default class Minis extends Container {
             item.state = MiniState.Hidden;
           }
           break;
+
+        default:
+        // do nothing
       }
-    }
+      /* eslint-enable no-param-reassign */
+    });
   }
 
   /** @returns {Item} */

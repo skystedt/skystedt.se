@@ -42,7 +42,9 @@ export default class ScriptsHtmlWebpackPlugin {
     if (!path1) {
       return path2;
     }
-    return path1.replace(/\/+$/, '') + '/' + path2.replace(/^\/+/, '');
+    const p1 = path1.replace(/\/+$/, '');
+    const p2 = path2.replace(/^\/+/, '');
+    return `${p1}/${p2}`;
   }
 
   /**
@@ -50,53 +52,67 @@ export default class ScriptsHtmlWebpackPlugin {
    * @param {HtmlWebpackPlugin.HtmlTagObject[]} scripts
    */
   async #addScripts(publicPath, scripts) {
-    for (const script of this.#add) {
-      const files = await glob(script.path, { cwd: script.directory });
-      for (const file of files) {
-        const url = this.#urlJoin(publicPath, file);
-        const tag = HtmlWebpackPlugin.createHtmlTagObject('script', { src: url });
-        scripts.push(tag);
-      }
+    await Promise.all(
+      this.#add.map(async (script) => {
+        const files = await glob(script.path, { cwd: script.directory });
+        files.forEach((file) => {
+          const url = this.#urlJoin(publicPath, file);
+          const tag = HtmlWebpackPlugin.createHtmlTagObject('script', { src: url });
+          scripts.push(tag);
+        });
+      })
+    );
+  }
+
+  /**
+   * @param {HtmlWebpackPlugin.HtmlTagObject} script
+   * @param {ScriptAttributes} newAttributes
+   * @param {keyof ScriptAttributes} attributeName
+   */
+  #booleanAttribute(script, newAttributes, attributeName) {
+    const { attributes } = script;
+    if (newAttributes[attributeName] === true) {
+      attributes[attributeName] = true;
+    } else if (newAttributes[attributeName] === false) {
+      attributes[attributeName] = undefined;
     }
   }
 
   /**
    * @param {HtmlWebpackPlugin.HtmlTagObject} script
-   * @param {ScriptAttributes} attributes
-   * @param {keyof ScriptAttributes} attributeName
+   * @param {ScriptAttributes} newAttributes
    */
-  #booleanAttribute(script, attributes, attributeName) {
-    if (attributes[attributeName] === true) {
-      script.attributes[attributeName] = true;
-    } else if (attributes[attributeName] === false) {
-      script.attributes[attributeName] = undefined;
+  #moduleAttribute(script, newAttributes) {
+    const { attributes } = script;
+    switch (newAttributes.type) {
+      case 'module':
+        attributes.type = 'module';
+        attributes.nomodule = false;
+        break;
+      case 'nomodule':
+        attributes.type = false;
+        attributes.nomodule = true;
+        break;
+      case false:
+        attributes.type = false;
+        attributes.nomodule = true;
+        break;
+      default:
+      // do nothing
     }
   }
 
   /** @param {HtmlWebpackPlugin.HtmlTagObject[]} scripts */
   #updateAttributes(scripts) {
-    for (const script of scripts) {
-      for (const attributes of this.#attributes) {
-        if (minimatch(String(script.attributes.src), attributes.path)) {
-          this.#booleanAttribute(script, attributes, 'defer');
-          this.#booleanAttribute(script, attributes, 'async');
-          this.#booleanAttribute(script, attributes, 'integrity');
-          switch (attributes.type) {
-            case 'module':
-              script.attributes.type = 'module';
-              script.attributes.nomodule = false;
-              break;
-            case 'nomodule':
-              script.attributes.type = false;
-              script.attributes.nomodule = true;
-              break;
-            case false:
-              script.attributes.type = false;
-              script.attributes.nomodule = true;
-              break;
-          }
+    scripts.forEach((script) => {
+      this.#attributes.forEach((newAttributes) => {
+        if (minimatch(String(script.attributes.src), newAttributes.path)) {
+          this.#booleanAttribute(script, newAttributes, 'defer');
+          this.#booleanAttribute(script, newAttributes, 'async');
+          this.#booleanAttribute(script, newAttributes, 'integrity');
+          this.#moduleAttribute(script, newAttributes);
         }
-      }
-    }
+      });
+    });
   }
 }
