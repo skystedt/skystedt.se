@@ -1,20 +1,20 @@
-﻿# https://editorconfig.org
+# https://editorconfig.org
+
+### File settings ###
 
 [*]
-charset = utf-8-bom
+charset = utf-8
 end_of_line = crlf
 insert_final_newline = true
 indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 
-# json does not support BOM
-[*.json]
-charset = utf-8
+# files should use BOM for better compatibility with Visual Studio
+# BOM is not liked in many other ecosystems
 
-# specific files not supporting BOM
-[dependabot.yml, yarn.lock]
-charset = utf-8
+[*.cs]
+charset = utf-8-bom
 
 [*.{js,cjs,mjs}]
 indent_size = 2
@@ -26,10 +26,14 @@ indent_size = 2
 indent_size = 2
 
 [*.{*proj,props,targets}]
+charset = utf-8-bom
 indent_size = 2
 
 [NuGet.Config]
+charset = utf-8-bom
 indent_size = 2
+
+### Code rules ###
 
 [*.cs]
 csharp_style_namespace_declarations = file_scoped:suggestion
