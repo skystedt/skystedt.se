@@ -9,6 +9,7 @@ import { dir } from '../utils.mjs';
  * @param {...string} patterns
  * @returns {(value: string) => boolean}
  */
+// eslint-disable-next-line arrow-body-style
 const wildcardMatch = (...patterns) => {
   return (value) => patterns.some((pattern) => minimatch(value, pattern));
 };
@@ -67,7 +68,7 @@ export default {
  * @param {string} moduleName
  * @returns {string}
  */
-const mapVendorModuleToChunk = (moduleName) => {
+function mapVendorModuleToChunk(moduleName) {
   // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunksname
   // "You can also use on demand named chunks, but you must be careful that the selected modules are only used under this chunk."
   switch (true) {
@@ -75,6 +76,8 @@ const mapVendorModuleToChunk = (moduleName) => {
       return 'pixi';
     case moduleName.startsWith('@microsoft/applicationinsights-'):
       return 'insights';
+    default:
+    // fallthrough to below
   }
   switch (moduleName) {
     case 'webpack':
@@ -98,6 +101,7 @@ const mapVendorModuleToChunk = (moduleName) => {
     case '@nevware21/ts-async':
     case '@nevware21/ts-utils':
       return 'insights';
+    default:
+      throw Error(`Unspecified cache group for node_modules package: ${moduleName}`);
   }
-  throw Error(`Unspecified cache group for node_modules package: ${moduleName}`);
-};
+}

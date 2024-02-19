@@ -53,16 +53,14 @@ export const browserslistBrowsers = (environment) => {
  * @param {webpack.Configuration} configuration
  * @returns {ImmutabilityHelperSpec}
  */
-export const mergeConfigurationRules = (configuration) => {
-  return {
-    mode: { $set: configuration.mode },
-    devtool: { $set: configuration.devtool },
-    entry: { $set: configuration.entry },
-    optimization: { $merge: configuration.optimization || {} },
-    devServer: { $set: configuration.devServer },
-    plugins: { $push: configuration.plugins || [] }
-  };
-};
+export const mergeConfigurationRules = (configuration) => ({
+  mode: { $set: configuration.mode },
+  devtool: { $set: configuration.devtool },
+  entry: { $set: configuration.entry },
+  optimization: { $merge: configuration.optimization || {} },
+  devServer: { $set: configuration.devServer },
+  plugins: { $push: configuration.plugins || [] }
+});
 
 /**
  * @param {babelPresetEnv.Options | { browserslistEnv: string}} presetEnvOptions
@@ -72,7 +70,7 @@ export const mergeBabelOptions = async (presetEnvOptions) => {
   const presetName = '@babel/preset-env';
 
   const { options } = /** @type {!Readonly<BabelPartialConfig>} */ (await loadBabelConfigAsync());
-  let presets = options.presets;
+  let { presets } = options;
 
   if (Array.isArray(options.presets)) {
     const index = options.presets.findIndex(
@@ -80,11 +78,10 @@ export const mergeBabelOptions = async (presetEnvOptions) => {
     );
 
     if (index !== -1) {
-      const mergedOptions = Object.assign(
-        {},
-        /** @type {BabelConfigItem} */ (options.presets[index]).options,
-        presetEnvOptions
-      );
+      const mergedOptions = {
+        .../** @type {BabelConfigItem} */ (options.presets[index]).options,
+        ...presetEnvOptions
+      };
 
       presets = [...options.presets];
       presets[index] = [presetName, mergedOptions];
@@ -93,6 +90,6 @@ export const mergeBabelOptions = async (presetEnvOptions) => {
 
   return {
     plugins: options.plugins,
-    presets: presets
+    presets
   };
 };

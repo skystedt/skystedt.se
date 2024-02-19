@@ -13,6 +13,7 @@ export default class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {
    * @param {CspHtmlWebpackPlugin.Policy} policy
    * @param {CspHtmlWebpackPlugin.AdditionalOptions & { processFn: CspHtmlWebpackPlugin_processFn }} options
    */
+  // eslint-disable-next-line no-useless-constructor
   constructor(policy, options) {
     super(policy, options);
   }
@@ -37,6 +38,7 @@ export default class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {
             tap.stage === webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
           ) {
             // move HtmlWebpackPlugin to after optimize.RealContentHashPlugin
+            // eslint-disable-next-line no-param-reassign
             tap.stage = webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_HASH + 1;
           }
           return tap;
@@ -72,7 +74,7 @@ export const extendCspPluginProcessFn = (configuration, processFn) => {
   );
   if (cspPlugin) {
     const originalProcessFn = cspPlugin.opts.processFn;
-    const options = Object.assign({}, cspPlugin.opts);
+    const options = { ...cspPlugin.opts };
     options.processFn = (...parameters) => {
       originalProcessFn(...parameters);
       processFn(...parameters);

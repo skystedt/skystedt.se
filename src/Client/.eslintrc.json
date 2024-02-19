@@ -8,7 +8,7 @@
     "sourceType": "module"
   },
   "extends": [
-    "eslint:recommended",
+    "airbnb-base",
     "plugin:no-unsanitized/DOM",
     "plugin:import/recommended",
     "plugin:jsdoc/recommended",
@@ -19,10 +19,17 @@
     "polyfills": ["Promise", "fetch", "navigator.sendBeacon"]
   },
   "rules": {
+    // override airbnb-base rules
     "curly": ["error", "all"],
-    "no-var": "error",
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "import/extensions": ["error", "always"],
+    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+    "no-shadow": ["error", { "ignoreOnInitialization": true }],
+    "no-use-before-define": ["error", { "functions": false, "classes": false, "variables": true }],
+    "class-methods-use-this": "off",
+    // project customization for airbnb-base
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": ["!src/**"] }],
+    // other rules
     "compat/compat": "warn",
     "jsdoc/valid-types": "off",
     "jsdoc/require-param-description": "off",

@@ -70,15 +70,17 @@ export default class BuildInfo {
 
     const result = /** @type {Sizes} */ ({});
     const files = await glob('**/*', { cwd: dir.dist });
-    for (const file of files) {
-      const filePath = path.basename(file);
-      const matches = fileTypes.some((fileType) => minimatch(filePath, fileType));
-      if (matches) {
-        const stat = await fs.stat(path.resolve(dir.dist, file));
-        const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' });
-        result[file] = size;
-      }
-    }
+    await Promise.all(
+      files.map(async (file) => {
+        const filePath = path.basename(file);
+        const matches = fileTypes.some((fileType) => minimatch(filePath, fileType));
+        if (matches) {
+          const stat = await fs.stat(path.resolve(dir.dist, file));
+          const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' });
+          result[file] = size;
+        }
+      })
+    );
 
     this.#resolved.sizes = result;
     return result;

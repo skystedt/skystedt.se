@@ -80,14 +80,12 @@ export default class Ship {
       this.#spriteLeft.visible = false;
       this.#spriteRight.visible = true;
       this.#straightDelay = TURN_STRAIGHT_DELAY;
+    } else if (this.#straightDelay === 0) {
+      this.#spriteStraight.visible = true;
+      this.#spriteLeft.visible = false;
+      this.#spriteRight.visible = false;
     } else {
-      if (this.#straightDelay === 0) {
-        this.#spriteStraight.visible = true;
-        this.#spriteLeft.visible = false;
-        this.#spriteRight.visible = false;
-      } else {
-        this.#straightDelay--;
-      }
+      this.#straightDelay -= 1;
     }
   }
 

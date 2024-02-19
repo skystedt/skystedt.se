@@ -70,15 +70,15 @@ export const cspProcessFn = /** @type {CspProcessFn} */ (builtPolicy, ...paramet
     " 'sha256-2j+NsrE/qRlmhkADxLdqK0AALIC4Gcc77SVRgwXmYCc='";
 
   // modify CSP for local development
-  builtPolicy = builtPolicy
+  const newBuiltPolicy = builtPolicy
     .replace('webpack', "webpack 'allow-duplicates' webpack#dev-overlay")
     .replace("'strict-dynamic'", '')
     .replace('; report-uri /api/report/csp', '') // Not allowed in <meta> tag
-    .replace("; style-src-attr 'none'", "; style-src-attr 'unsafe-hashes'" + errorOverlay);
+    .replace("; style-src-attr 'none'", `; style-src-attr 'unsafe-hashes'${errorOverlay}`);
 
   // call default processFn to add <meta> tag
   /** @type {CspHtmlWebpackPlugin_with_processFn} */ (new CspHtmlWebpackPlugin()).opts.processFn(
-    builtPolicy,
+    newBuiltPolicy,
     ...parameters
   );
 };

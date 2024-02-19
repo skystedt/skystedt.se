@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { Container } from './pixi.mjs';
 import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Movement, Offset, Size } from './primitives.mjs';
 /** @typedef {import("./pixi.mjs").IRenderer} Renderer */
@@ -79,9 +80,8 @@ export default class Display {
     if (ratio < 1) {
       const scaleDown = 4;
       return Math.max(1 / scaleDown, Math.ceil(ratio * scaleDown) / scaleDown);
-    } else {
-      return Math.ceil(ratio);
     }
+    return Math.ceil(ratio);
   }
 
   /**

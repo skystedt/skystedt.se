@@ -4,7 +4,7 @@ import Display from './display.mjs';
 import './game.css';
 import Input from './input.mjs';
 import Minis from './minis.mjs';
-import { pixiSettings } from './pixi-settings.mjs';
+import pixiSettings from './pixi-settings.mjs';
 import { Application } from './pixi.mjs';
 import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
@@ -111,7 +111,8 @@ export default class Game {
       this.#frameState.backgroundRemaining += elapsed - (backgroundTick ? backgroundWait : 0);
     }
 
-    while (logicTicks--) {
+    while (logicTicks) {
+      logicTicks -= 1;
       this.#updateLogic();
     }
 
@@ -143,12 +144,13 @@ export default class Game {
    * @param {number} logTry
    */
   #logFpsMetric(fps, logTry) {
-    const insights = /** @type {ApplicationInsights} */ (/** @type {any} */ (window).insights);
+    /** @type {{ insights: ApplicationInsights }} */
+    const { insights } = /** @type {any} */ (window);
 
     if (insights) {
       insights.trackMetric({ name: 'fps', average: fps });
     } else if (logTry < MAX_LOG_METRIC_RETRIES) {
-      setTimeout(this.#logFpsMetric.bind(this), 1000, fps, ++logTry);
+      setTimeout(this.#logFpsMetric.bind(this), 1000, fps, logTry + 1);
     }
   }
 
@@ -178,9 +180,9 @@ export default class Game {
     switch (data.type) {
       case MessageType.Init: {
         this.#minis.clear();
-        for (const id of data.ids) {
+        data.ids.forEach((/** @type {string} */ id) => {
           this.#minis.add(id);
-        }
+        });
         break;
       }
 
@@ -198,6 +200,10 @@ export default class Game {
         this.#minis.update(data.id, data.x, data.y);
         break;
       }
+
+      default:
+        console.warn('Unknown communication type', data);
+        break;
     }
   }
 
