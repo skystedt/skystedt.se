@@ -16,13 +16,14 @@
     "prettier" // disables unnecessary/conflicting rules when using prettier, should be last, https://github.com/prettier/eslint-config-prettier#installation
   ],
   "settings": {
-    "polyfills": ["Promise", "fetch", "navigator.sendBeacon"]
+    "polyfills": ["Promise", "fetch", "navigator.sendBeacon"],
+    "import/resolver": { "exports": {} } // use eslint-import-resolver-exports
   },
   "rules": {
     // override airbnb-base rules
     "curly": ["error", "all"],
     "no-console": ["error", { "allow": ["warn", "error"] }],
-    "import/extensions": ["error", "always"],
+    "import/extensions": ["error", "ignorePackages"],
     "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "no-shadow": ["error", { "ignoreOnInitialization": true }],
     "no-use-before-define": ["error", { "functions": false, "classes": false, "variables": true }],
