@@ -70,36 +70,29 @@ export default class Minis extends Container {
 
   tick() {
     Array.from(this.#map.values()).forEach((item) => {
-      const { sprite, state } = item;
-      /* eslint-disable no-param-reassign */
-      switch (state) {
-        case MiniState.FadeIn:
-          sprite.alpha += ALPHA_DELTA;
-          if (sprite.alpha >= 1) {
-            item.wait = 0;
-            item.state = MiniState.Shown;
-          }
-          break;
-
-        case MiniState.Shown:
-          item.wait += 1;
-          if (item.wait >= SHOWN_DURATION) {
-            item.state = MiniState.FadeOut;
-          }
-          break;
-
-        case MiniState.FadeOut:
-          sprite.alpha -= ALPHA_DELTA;
-          if (sprite.alpha <= 0) {
-            item.state = MiniState.Hidden;
-          }
-          break;
-
-        default:
-        // do nothing
-      }
-      /* eslint-enable no-param-reassign */
+      const { state, wait, alpha } = this.#tickMini(item);
+      item.state = state;
+      item.wait = wait;
+      item.sprite.alpha = alpha;
     });
+  }
+
+  /**
+   * @param {Item} item
+   * @returns {{ state: number, wait: number, alpha: number }}
+   */
+  #tickMini({ sprite, state, wait }) {
+    const { alpha } = sprite;
+    // prettier-ignore
+    switch (true) {
+      case state === MiniState.FadeIn && alpha < 1:             return { state,                    wait,           alpha: Math.min(alpha + ALPHA_DELTA, 1) };
+      case state === MiniState.FadeIn:                          return { state: MiniState.Shown,   wait: 0,        alpha };
+      case state === MiniState.Shown && wait < SHOWN_DURATION:  return { state,                    wait: wait + 1, alpha };
+      case state === MiniState.Shown:                           return { state: MiniState.FadeOut, wait,           alpha };
+      case state === MiniState.FadeOut && alpha >= ALPHA_DELTA: return { state,                    wait,           alpha: alpha - ALPHA_DELTA };
+      case state === MiniState.FadeOut:                         return { state: MiniState.Hidden,  wait,           alpha };
+      default:                                                  return { state,                    wait,           alpha };
+    }
   }
 
   /** @returns {Item} */

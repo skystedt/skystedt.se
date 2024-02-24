@@ -1,3 +1,4 @@
+// cSpell:ignore atrule
 import postcss from 'postcss';
 
 /** @type {postcss.PluginCreator<void>} */
@@ -6,7 +7,6 @@ const postcssRemoveCarriageReturn = () => {
   const removeCarriageReturn = (node) => {
     const replace = (/** @type {string} */ str) => str.replace(/\r/g, '');
 
-    /* eslint-disable no-param-reassign */
     switch (node.type) {
       case 'atrule':
         node.name = replace(node.name);
@@ -22,7 +22,8 @@ const postcssRemoveCarriageReturn = () => {
         node.text = replace(node.text);
         break;
       default:
-      // do nothing
+        // do nothing
+        break;
     }
 
     Object.entries(node.raws).forEach(([key, value]) => {
@@ -30,7 +31,6 @@ const postcssRemoveCarriageReturn = () => {
         node.raws[key] = replace(value);
       }
     });
-    /* eslint-enable no-param-reassign */
   };
 
   return {

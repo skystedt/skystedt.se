@@ -1,5 +1,3 @@
-/* eslint-disable max-classes-per-file */
-
 /* eslint-disable-line jsdoc/no-undefined-types */
 /** @type {unknown} */
 export const Uninitialized = undefined;

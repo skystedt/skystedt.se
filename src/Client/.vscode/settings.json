@@ -8,8 +8,9 @@
   },
   "eslint.enable": true,
   "eslint.useESLintClass": true,
-  "eslint.codeActionsOnSave.rules": ["curly", "no-var"],
+  "eslint.codeActionsOnSave.rules": ["curly", "no-var", "prefer-const"],
   "css.validate": false,
   "stylelint.validate": ["css"],
-  "cSpell.words": ["Skystedt", "pixi"]
+  "cSpell.words": ["Skystedt", "pixi"],
+  "cSpell.ignorePaths": [".vscode", "node_modules", "package.json", ".eslintrc.json"]
 }

@@ -38,7 +38,6 @@ export default class ExtendedCspHtmlWebpackPlugin extends CspHtmlWebpackPlugin {
             tap.stage === webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE
           ) {
             // move HtmlWebpackPlugin to after optimize.RealContentHashPlugin
-            // eslint-disable-next-line no-param-reassign
             tap.stage = webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_HASH + 1;
           }
           return tap;

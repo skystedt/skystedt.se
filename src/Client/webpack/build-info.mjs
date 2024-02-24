@@ -1,4 +1,4 @@
-﻿import _babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
+import _babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
 import bytes from 'bytes';
 import { glob } from 'glob';
 import { minimatch } from 'minimatch';

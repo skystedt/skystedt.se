@@ -1,10 +1,10 @@
-﻿import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
+import CspHtmlWebpackPlugin from 'csp-html-webpack-plugin';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import path from 'node:path';
 import StylelintPlugin from 'stylelint-webpack-plugin';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
-import { browserslistConfig, dir } from '../../utils.mjs';
+import { dir } from '../../utils.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
@@ -47,8 +47,8 @@ export default {
       failOnError: false,
       failOnWarning: false,
       overrideConfig: {
-        rules: {
-          'compat/compat': ['warn', browserslistConfig('all-exclude-opera-mini')]
+        settings: {
+          browserslistOpts: { env: 'all-exclude-opera-mini' } // used by eslint-plugin-compat
         }
       }
     }),

@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 import { Container } from './pixi.mjs';
 import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Movement, Offset, Size } from './primitives.mjs';
 /** @typedef {import("./pixi.mjs").IRenderer} Renderer */

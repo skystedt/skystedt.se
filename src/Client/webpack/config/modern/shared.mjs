@@ -1,3 +1,4 @@
+// cSpell:ignore staticwebapp, subresource, caniuse
 import babelPresetEnv from '@babel/preset-env';
 /* eslint-disable-line import/default */ import CopyPlugin from 'copy-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';

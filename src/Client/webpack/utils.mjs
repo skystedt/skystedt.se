@@ -1,4 +1,5 @@
 /* eslint-env node */
+// cSpell:ignore picocolors
 import { loadPartialConfigAsync as loadBabelConfigAsync } from '@babel/core';
 import babelPresetEnv from '@babel/preset-env';
 import browserslist from 'browserslist';
@@ -27,17 +28,6 @@ export const printProgress =
     // eslint-disable-next-line no-console
     console.info(`[${pc.green(environment)}]`, pc.yellow(percentageString), message, ...args);
   };
-
-/**
- * @param {string} environment
- * @returns { string | undefined }
- */
-export const browserslistConfig = (environment) => {
-  /** @type {string[] | string | undefined} */
-  let config = browserslist.loadConfig({ path: dir.src, env: environment });
-  config = Array.isArray(config) ? config.join(' or ') : config;
-  return config;
-};
 
 /**
  * @param {string} environment
