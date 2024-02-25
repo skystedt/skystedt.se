@@ -1,4 +1,4 @@
-﻿import { minimatch } from 'minimatch';
+import { minimatch } from 'minimatch';
 import path from 'node:path';
 import webpack from 'webpack';
 import { dir } from '../utils.mjs';
@@ -77,8 +77,10 @@ function mapVendorModuleToChunk(moduleName) {
     case moduleName.startsWith('@microsoft/applicationinsights-'):
       return 'insights';
     default:
-    // fallthrough to below
+      // check specific module name below
+      break;
   }
+  // cSpell:disable
   switch (moduleName) {
     case 'webpack':
     case 'webpack-dev-server':
@@ -104,4 +106,5 @@ function mapVendorModuleToChunk(moduleName) {
     default:
       throw Error(`Unspecified cache group for node_modules package: ${moduleName}`);
   }
+  // cSpell:enable
 }

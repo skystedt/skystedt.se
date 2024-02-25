@@ -8,15 +8,15 @@
     "sourceType": "module"
   },
   "extends": [
-    "airbnb-base",
-    "plugin:no-unsanitized/DOM",
-    "plugin:import/recommended",
+    "plugin:eslint-comments/recommended",
     "plugin:jsdoc/recommended",
+    "plugin:promise/recommended",
     "plugin:compat/recommended",
+    "airbnb-base",
     "prettier" // disables unnecessary/conflicting rules when using prettier, should be last, https://github.com/prettier/eslint-config-prettier#installation
   ],
   "settings": {
-    "polyfills": ["Promise", "fetch", "navigator.sendBeacon"],
+    "polyfills": ["Promise", "fetch", "navigator.sendBeacon"], // browserslist for eslint-plugin-compat is set during build
     "import/resolver": { "exports": {} } // use eslint-import-resolver-exports
   },
   "rules": {
@@ -28,10 +28,11 @@
     "no-shadow": ["error", { "ignoreOnInitialization": true }],
     "no-use-before-define": ["error", { "functions": false, "classes": false, "variables": true }],
     "class-methods-use-this": "off",
+    "max-classes-per-file": "off",
+    "no-param-reassign": ["error", { "props": false }],
     // project customization for airbnb-base
     "import/no-extraneous-dependencies": ["error", { "devDependencies": ["!src/**"] }],
     // other rules
-    "compat/compat": "warn",
     "jsdoc/valid-types": "off",
     "jsdoc/require-param-description": "off",
     "jsdoc/require-returns-description": "off"

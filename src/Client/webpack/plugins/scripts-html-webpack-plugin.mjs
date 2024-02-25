@@ -98,7 +98,8 @@ export default class ScriptsHtmlWebpackPlugin {
         attributes.nomodule = true;
         break;
       default:
-      // do nothing
+        // do nothing
+        break;
     }
   }
 

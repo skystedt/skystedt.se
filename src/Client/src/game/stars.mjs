@@ -1,4 +1,3 @@
-/* eslint-disable max-classes-per-file */
 import { Container, Graphics } from './pixi.mjs';
 import { Size, Uninitialized } from './primitives.mjs';
 

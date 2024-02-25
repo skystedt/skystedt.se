@@ -1,3 +1,4 @@
+// cSpell:ignore picocolors, caniuse
 import fs from 'node:fs';
 import path from 'node:path';
 import pc from 'picocolors';
