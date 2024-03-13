@@ -31,7 +31,7 @@
     "csp-html-webpack-plugin": "5.1.0",
     "css-loader": "6.10.0",
     "css-minimizer-webpack-plugin": "6.0.0",
-    "enhanced-resolve": "5.15.1",
+    "enhanced-resolve": "5.16.0",
     "eslint": "8.57.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "9.1.0",
@@ -64,7 +64,7 @@
     "update-browserslist-db": "1.0.13",
     "webpack": "5.90.3",
     "webpack-cli": "5.1.4",
-    "webpack-dev-server": "5.0.2",
+    "webpack-dev-server": "5.0.3",
     "webpack-subresource-integrity": "5.1.0"
   },
   "peerDependencies": {
