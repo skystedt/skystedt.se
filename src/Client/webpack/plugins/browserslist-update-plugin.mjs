@@ -8,10 +8,16 @@ import webpack from 'webpack';
 export default class BrowserslistUpdatePlugin {
   /** @type {string} */
   #nodeModules;
+  /** @type {boolean} */
+  #throwWhenOutdated;
 
-  /** @param {string} nodeModules */
-  constructor(nodeModules) {
+  /**
+   * @param {string} nodeModules
+   * @param {boolean} throwWhenOutdated
+   */
+  constructor(nodeModules, throwWhenOutdated) {
     this.#nodeModules = nodeModules;
+    this.#throwWhenOutdated = throwWhenOutdated;
   }
 
   /** @param {webpack.Compiler} compiler */
@@ -25,9 +31,15 @@ export default class BrowserslistUpdatePlugin {
       const versionAfter = BrowserslistUpdatePlugin.definitionsVersion(this.#nodeModules);
 
       if (versionBefore !== versionAfter) {
-        console.warn(
-          pc.bold(pc.bgYellow(pc.black(`Browserslist (caniuse-lite) updated from ${versionBefore} to ${versionAfter}`)))
-        );
+        if (this.#throwWhenOutdated) {
+          throw new Error(`Browserslist (caniuse-lite) is outdated, using: ${versionBefore}, latest: ${versionAfter}`);
+        } else {
+          console.warn(
+            pc.bold(
+              pc.bgYellow(pc.black(`Browserslist (caniuse-lite) updated from ${versionBefore} to ${versionAfter}`))
+            )
+          );
+        }
       }
     });
   }

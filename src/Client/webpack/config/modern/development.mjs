@@ -4,6 +4,7 @@ import path from 'node:path';
 import StylelintPlugin from 'stylelint-webpack-plugin';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
+import BrowserslistUpdatePlugin from '../../plugins/browserslist-update-plugin.mjs';
 import { dir } from '../../utils.mjs';
 
 /** @type {webpack.Configuration} */
@@ -42,6 +43,7 @@ export default {
     new webpack.DefinePlugin({
       INSTRUMENTATION_KEY: `"${settings.development.INSTRUMENTATION_KEY}"`
     }),
+    new BrowserslistUpdatePlugin(dir.node_modules, false),
     new ESLintPlugin({
       extensions: ['.mjs'],
       failOnError: false,
