@@ -51,7 +51,7 @@ const babelPresetEnvOptions = {
 /** @type {babelPresetEnv.Options | { browserslistEnv: string }} */
 const pixiBabelPresetEnvOptions = {
   browserslistEnv: 'modern',
-  debug: false, // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set this to true to debug why
+  debug: true, // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set this to true to debug why
   // http://zloirock.github.io/core-js/compat/
   exclude: [
     'es.array.push',
