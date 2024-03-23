@@ -13,7 +13,6 @@ import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import BuildInfo from '../../build-info.mjs';
-import BrowserslistUpdatePlugin from '../../plugins/browserslist-update-plugin.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
 import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
@@ -227,7 +226,6 @@ export default {
     ]
   },
   plugins: [
-    new BrowserslistUpdatePlugin(dir.node_modules),
     new webpack.ProgressPlugin(printProgress('modern')),
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
