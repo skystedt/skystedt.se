@@ -37,7 +37,7 @@ const buildInfo = new BuildInfo();
 /** @type {babelPresetEnv.Options | { browserslistEnv: string }} */
 const babelPresetEnvOptions = {
   browserslistEnv: 'modern',
-  debug: false, // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set this to true to debug why
+  debug: true, // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set this to true to debug why
   // http://zloirock.github.io/core-js/compat/
   exclude: [
     'web.dom-collections.iterator', // needed for older ios, added when using any for-of, but is not needed if not using for-of on DOM collections, https://github.com/zloirock/core-js/issues/1003
@@ -51,7 +51,7 @@ const babelPresetEnvOptions = {
 /** @type {babelPresetEnv.Options | { browserslistEnv: string }} */
 const pixiBabelPresetEnvOptions = {
   browserslistEnv: 'modern',
-  debug: false, // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set this to true to debug why
+  debug: true, // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set this to true to debug why
   // http://zloirock.github.io/core-js/compat/
   exclude: [
     'es.array.push',
