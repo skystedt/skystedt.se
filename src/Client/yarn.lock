@@ -2423,6 +2423,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@pixi/utils@patch:@pixi/utils@npm%3A7.4.2#~/.yarn/patches/@pixi-utils-npm-7.4.2-0fd06125d9.patch":
+  version: 7.4.2
+  resolution: "@pixi/utils@patch:@pixi/utils@npm%3A7.4.2#~/.yarn/patches/@pixi-utils-npm-7.4.2-0fd06125d9.patch::version=7.4.2&hash=93e88e"
+  dependencies:
+    "@pixi/color": "npm:7.4.2"
+    "@pixi/constants": "npm:7.4.2"
+    "@pixi/settings": "npm:7.4.2"
+    "@types/earcut": "npm:^2.1.0"
+    earcut: "npm:^2.2.4"
+    eventemitter3: "npm:^4.0.0"
+    url: "npm:^0.11.0"
+  checksum: 10/fd88f611fb91b3b140448869eb0ea8598439a052d07096bbf6ecf4a896890a6c1c775719be4c509cc3f31afd09d42ec798b8f36284a6acc163e6cdce4b7430fd
+  languageName: node
+  linkType: hard
+
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"

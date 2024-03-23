@@ -83,6 +83,6 @@
     "unfetch": "5.0.0"
   },
   "resolutions": {
-    "@pixi/utils@npm:7.4.0": "patch:@pixi/utils@npm%3A7.4.0#~/.yarn/patches/@pixi-utils-npm-7.4.0-06e5be1e32.patch"
+    "@pixi/utils@npm:7.4.2": "patch:@pixi/utils@npm%3A7.4.2#~/.yarn/patches/@pixi-utils-npm-7.4.2-0fd06125d9.patch"
   }
 }
