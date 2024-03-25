@@ -1,4 +1,4 @@
-import { BaseTexture, CanvasResource, Texture } from './pixi.mjs';
+import { CanvasSource, Texture } from 'pixi.js';
 
 export default class Assets {
   /**
@@ -21,7 +21,7 @@ export default class Assets {
     const context = canvas.getContext('2d');
     context?.drawImage(image, 0, 0);
 
-    const texture = new Texture(new BaseTexture(new CanvasResource(canvas)));
+    const texture = new Texture({ source: new CanvasSource({ resource: canvas }) });
     return texture;
   }
 }

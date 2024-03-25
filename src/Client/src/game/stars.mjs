@@ -1,4 +1,4 @@
-import { Container, Graphics } from './pixi.mjs';
+import { Container, Graphics } from 'pixi.js';
 import { Size, Uninitialized } from './primitives.mjs';
 
 const BLINK_PROBABILITY = 0.0001;
@@ -87,9 +87,8 @@ export class Star extends Graphics {
   /** @param {number} value */
   #setColor(value) {
     this.clear();
-    this.beginFill(value);
-    this.drawRect(0, 0, 1, 1);
-    this.endFill();
+    this.rect(0, 0, 1, 1);
+    this.fill(value);
   }
 
   move() {
