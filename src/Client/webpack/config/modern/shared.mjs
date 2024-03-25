@@ -5,7 +5,6 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import _HtmlInlineCssWebpackPlugin from 'html-inline-css-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import { minimatch } from 'minimatch';
 import path from 'node:path';
 import postcssMergeRules from 'postcss-merge-rules';
 import postcssPresetEnv from 'postcss-preset-env';
@@ -21,7 +20,7 @@ import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plug
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
 import { browserslistBrowsers, dir, mergeBabelOptions, printProgress } from '../../utils.mjs';
-import cacheGroups from '../chunks.mjs';
+import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 
 import csp from '../../../content-security-policy.json' assert { type: 'json' };
 import staticWebApp from '../../../staticwebapp.config.template.json' assert { type: 'json' };
@@ -175,23 +174,15 @@ export default {
     outputModule: false // using modules will force use of import() for loading child scripts, which does not support SRI/integrity
   },
   performance: {
-    assetFilter: (/** @type {string} */ assetFilename) => {
-      if (minimatch(assetFilename, 'pixi.*.*js')) {
-        return false;
-      }
-      return true;
-    }
+    assetFilter: performanceFilter
   },
   module: {
     rules: [
       {
         // used to set sideEffects: false
         test: /\.m?js$/i,
-        include: dir.src,
-        exclude: [
-          path.resolve(dir.src, 'polyfills.mjs'),
-          path.resolve(dir.src, 'game', 'pixi-settings.mjs') // side effects for pixi
-        ],
+        include: sideEffects.include,
+        exclude: sideEffects.exclude,
         sideEffects: false
       },
       {

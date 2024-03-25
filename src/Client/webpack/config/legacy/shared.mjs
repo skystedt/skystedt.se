@@ -1,10 +1,9 @@
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import { minimatch } from 'minimatch';
 import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { dir, mergeBabelOptions, printProgress } from '../../utils.mjs';
-import cacheGroups from '../chunks.mjs';
+import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
@@ -31,23 +30,15 @@ export default {
     sideEffects: true
   },
   performance: {
-    assetFilter: (/** @type {string} */ assetFilename) => {
-      if (minimatch(assetFilename, 'pixi.*.*js')) {
-        return false;
-      }
-      return true;
-    }
+    assetFilter: performanceFilter
   },
   module: {
     rules: [
       {
         // used to set sideEffects: false
         test: /\.m?js$/i,
-        include: dir.src,
-        exclude: [
-          path.resolve(dir.src, 'polyfills.mjs'),
-          path.resolve(dir.src, 'game', 'pixi.mjs') // needed for @pixi/unsafe-eval
-        ],
+        include: sideEffects.include,
+        exclude: sideEffects.exclude,
         sideEffects: false
       },
       {

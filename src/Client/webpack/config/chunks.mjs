@@ -3,6 +3,7 @@ import path from 'node:path';
 import webpack from 'webpack';
 import { dir } from '../utils.mjs';
 
+/** @typedef { Pick<webpack.RuleSetRule, 'include' | 'exclude'> } SideEffects */
 /** @typedef { Exclude<NonNullable<webpack.Configuration["optimization"]>["splitChunks"], boolean | undefined>["cacheGroups"] } CacheGroups */
 
 /**
@@ -14,8 +15,25 @@ const wildcardMatch = (...patterns) => {
   return (value) => patterns.some((pattern) => minimatch(value, pattern));
 };
 
+/** @type {SideEffects} */
+export const sideEffects = {
+  include: dir.src,
+  exclude: [
+    path.resolve(dir.src, 'polyfills.mjs'),
+    path.resolve(dir.src, 'game', 'pixi.mjs') // needed for @pixi/unsafe-eval
+  ]
+};
+
+/** @type {(assetFilename: string) => boolean} */
+export const performanceFilter = (assetFilename) => {
+  if (minimatch(assetFilename, 'pixi.*.*js')) {
+    return false;
+  }
+  return true;
+};
+
 /** @type {CacheGroups} */
-export default {
+export const cacheGroups = {
   default: false, // disable default/defaultVendors cache groups, to prevent entrypoints to end up in their own chunks
   defaultVendors: false,
   app: {
