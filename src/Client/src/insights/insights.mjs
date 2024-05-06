@@ -8,6 +8,11 @@ const appInsights = new ApplicationInsights({
     cookieCfg: {
       enabled: false
     },
+    extensionConfig: {
+      AppInsightsCfgSyncPlugin: {
+        cfgUrl: '' // this will block fetching from default cdn, https://github.com/microsoft/ApplicationInsights-JS/blob/main/docs/WebConfig.md#disable-fetching-from-cdn
+      }
+    },
     distributedTracingMode: DistributedTracingModes.W3C,
     disablePageUnloadEvents: ['unload'],
     disableFetchTracking: false,
