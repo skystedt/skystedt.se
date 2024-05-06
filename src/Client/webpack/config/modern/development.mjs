@@ -43,7 +43,7 @@ export default {
     new webpack.DefinePlugin({
       INSTRUMENTATION_KEY: `"${settings.development.INSTRUMENTATION_KEY}"`
     }),
-    new BrowserslistUpdatePlugin(dir.node_modules, false),
+    new BrowserslistUpdatePlugin(dir.node_modules),
     new ESLintPlugin({
       extensions: ['.mjs'],
       failOnError: false,
