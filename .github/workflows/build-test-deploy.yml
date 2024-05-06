@@ -57,7 +57,7 @@ jobs:
       - name: Node Setup
         uses: actions/setup-node@v4
         with:
-          node-version: 'latest'
+          node-version: '21.x'
           
       - name: Corepack Enable
         run: corepack enable
