@@ -22,8 +22,8 @@ import { browserslistBrowsers, dir, mergeBabelOptions, printProgress } from '../
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 import { babelOptions, pixiBabelOptions } from './babel-options.mjs';
 
-import csp from '../../../content-security-policy.json' assert { type: 'json' };
-import staticWebApp from '../../../staticwebapp.config.template.json' assert { type: 'json' };
+import csp from '../../../content-security-policy.json' with { type: 'json' };
+import staticWebApp from '../../../staticwebapp.config.template.json' with { type: 'json' };
 
 const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin} */ (
   /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
