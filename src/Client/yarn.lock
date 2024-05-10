@@ -463,7 +463,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-syntax-import-assertions@npm:7.24.1, @babel/plugin-syntax-import-assertions@npm:^7.24.1":
+"@babel/plugin-syntax-import-assertions@npm:^7.24.1":
   version: 7.24.1
   resolution: "@babel/plugin-syntax-import-assertions@npm:7.24.1"
   dependencies:
@@ -3501,10 +3501,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:1.0.30001616, caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001524, caniuse-lite@npm:^1.0.30001587, caniuse-lite@npm:^1.0.30001599":
-  version: 1.0.30001616
-  resolution: "caniuse-lite@npm:1.0.30001616"
-  checksum: 10/779c126bbe4be99500f52bf4f03df27058a26a4f37a335288bfef8859078edbd42a0fa75acd74464154c5e8c74c62f7248be4af8db3af3ed705bd989fb160569
+"caniuse-lite@npm:1.0.30001617, caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001524, caniuse-lite@npm:^1.0.30001587, caniuse-lite@npm:^1.0.30001599":
+  version: 1.0.30001617
+  resolution: "caniuse-lite@npm:1.0.30001617"
+  checksum: 10/eac442b9ad12801086be19f6dc17056827fe398f1c05983357e2531c8183ee890ffc8fb973d54519ad7114a2fd47de8f33ec66d98565b995fef1c6ba02b5bc5b
   languageName: node
   linkType: hard
 
@@ -8944,7 +8944,6 @@ __metadata:
     "@babel/core": "npm:7.24.5"
     "@babel/eslint-parser": "npm:7.24.5"
     "@babel/helper-compilation-targets": "npm:7.23.6"
-    "@babel/plugin-syntax-import-assertions": "npm:7.24.1"
     "@babel/preset-env": "npm:7.24.5"
     "@microsoft/applicationinsights-web": "npm:3.2.0"
     "@pixi/app": "npm:7.4.2"
@@ -8956,7 +8955,7 @@ __metadata:
     babel-loader: "npm:9.1.3"
     browserslist: "npm:4.23.0"
     bytes: "npm:3.1.2"
-    caniuse-lite: "npm:1.0.30001616"
+    caniuse-lite: "npm:1.0.30001617"
     copy-webpack-plugin: "npm:12.0.2"
     core-js: "npm:3.37.0"
     csp-html-webpack-plugin: "npm:5.1.0"
