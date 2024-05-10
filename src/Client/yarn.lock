@@ -474,7 +474,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-syntax-import-attributes@npm:^7.24.1":
+"@babel/plugin-syntax-import-attributes@npm:7.24.1, @babel/plugin-syntax-import-attributes@npm:^7.24.1":
   version: 7.24.1
   resolution: "@babel/plugin-syntax-import-attributes@npm:7.24.1"
   dependencies:
@@ -8944,6 +8944,7 @@ __metadata:
     "@babel/core": "npm:7.24.5"
     "@babel/eslint-parser": "npm:7.24.5"
     "@babel/helper-compilation-targets": "npm:7.23.6"
+    "@babel/plugin-syntax-import-attributes": "npm:7.24.1"
     "@babel/preset-env": "npm:7.24.5"
     "@microsoft/applicationinsights-web": "npm:3.2.0"
     "@pixi/app": "npm:7.4.2"

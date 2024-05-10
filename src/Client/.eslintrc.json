@@ -3,9 +3,12 @@
     "browser": true,
     "es2016": true
   },
-  "parser": "@babel/eslint-parser",
+  "parser": "@babel/eslint-parser/experimental-worker", // experimental-worker is needed to run asyncronously, which is needed when using esm configuration
   "parserOptions": {
-    "sourceType": "module"
+    "sourceType": "module",
+    "babelOptions": {
+      "plugins": ["@babel/plugin-syntax-import-attributes"] // required for "import with json" in the configuration file
+    }
   },
   "extends": [
     "plugin:eslint-comments/recommended",
@@ -16,7 +19,7 @@
     "prettier" // disables unnecessary/conflicting rules when using prettier, should be last, https://github.com/prettier/eslint-config-prettier#installation
   ],
   "settings": {
-    "polyfills": ["Promise", "fetch", "navigator.sendBeacon"], // browserslist for eslint-plugin-compat is set during build
+    "polyfills": ["Promise", "fetch", "navigator.sendBeacon", "Array.from"], // browserslist for eslint-plugin-compat is set during build
     "import/resolver": { "exports": {} } // use eslint-import-resolver-exports
   },
   "rules": {
