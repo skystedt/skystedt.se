@@ -23,11 +23,6 @@ export default {
       extensions: ['.mjs'],
       failOnError: true,
       failOnWarning: true,
-      overrideConfig: {
-        settings: {
-          browserslistOpts: { env: 'all-exclude-opera-mini' } // used by eslint-plugin-compat
-        }
-      },
       baseConfig: {
         // customize eslint by enforcing prettier (make sure prettier has been used)
         // only for production so to not disrupt development, https://prettier.io/docs/en/integrating-with-linters.html
