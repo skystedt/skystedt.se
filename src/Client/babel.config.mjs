@@ -1,5 +1,5 @@
 /* eslint-env node */
-const coreJs = require('core-js/package.json');
+import coreJs from 'core-js/package.json' with { type: 'json' };
 
 /** Augment types with newer definitions since DefinitelyTyped for @babel/core and @babel/preset-env is not updated - 2024-02-11 */
 /** @typedef { import("@babel/core").SimpleCacheConfigurator & { (forever: boolean): void } } SimpleCacheConfigurator */
@@ -10,7 +10,7 @@ const coreJs = require('core-js/package.json');
 /** @typedef { import("@babel/preset-env").Options & { corejs: CorejsVersion } } BabelOptions */
 
 /** @type {ConfigFunction} */
-module.exports = (api) => {
+export default (api) => {
   api.cache(true);
 
   return {
