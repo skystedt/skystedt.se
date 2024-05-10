@@ -14,7 +14,6 @@ module.exports = (api) => {
   api.cache(true);
 
   return {
-    plugins: ['@babel/plugin-syntax-import-assertions'],
     presets: [
       [
         '@babel/preset-env',
