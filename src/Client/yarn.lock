@@ -1821,6 +1821,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint-community/eslint-plugin-eslint-comments@npm:4.3.0":
+  version: 4.3.0
+  resolution: "@eslint-community/eslint-plugin-eslint-comments@npm:4.3.0"
+  dependencies:
+    escape-string-regexp: "npm:^4.0.0"
+    ignore: "npm:^5.2.4"
+  peerDependencies:
+    eslint: ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
+  checksum: 10/9c9c3e402cdadda0a1e1a62a4cc1a43df71e90021ce479831fd6ea410579e3d60c15248ef4c5ed41b058309bfb7f9be405b498c160f2f7e2c65b6f00455754e4
+  languageName: node
+  linkType: hard
+
 "@eslint-community/eslint-utils@npm:^4.2.0":
   version: 4.4.0
   resolution: "@eslint-community/eslint-utils@npm:4.4.0"
@@ -4749,18 +4761,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-eslint-comments@npm:3.2.0":
-  version: 3.2.0
-  resolution: "eslint-plugin-eslint-comments@npm:3.2.0"
-  dependencies:
-    escape-string-regexp: "npm:^1.0.5"
-    ignore: "npm:^5.0.5"
-  peerDependencies:
-    eslint: ">=4.19.1"
-  checksum: 10/4aa0d31a78ac7746002e37ca0cb436f3e5b481a97d28be07bad831e161a2ffcc4dedff44820edef9a1e80f6a0ab1ef44ed9a46e3a4c4a050350438451908972b
-  languageName: node
-  linkType: hard
-
 "eslint-plugin-import@npm:2.29.1":
   version: 2.29.1
   resolution: "eslint-plugin-import@npm:2.29.1"
@@ -5890,7 +5890,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ignore@npm:^5.0.5, ignore@npm:^5.2.0, ignore@npm:^5.2.4, ignore@npm:^5.3.1":
+"ignore@npm:^5.2.0, ignore@npm:^5.2.4, ignore@npm:^5.3.1":
   version: 5.3.1
   resolution: "ignore@npm:5.3.1"
   checksum: 10/0a884c2fbc8c316f0b9f92beaf84464253b73230a4d4d286697be45fca081199191ca33e1c2e82d9e5f851f5e9a48a78e25a35c951e7eb41e59f150db3530065
@@ -8946,6 +8946,7 @@ __metadata:
     "@babel/helper-compilation-targets": "npm:7.23.6"
     "@babel/plugin-syntax-import-attributes": "npm:7.24.1"
     "@babel/preset-env": "npm:7.24.5"
+    "@eslint-community/eslint-plugin-eslint-comments": "npm:4.3.0"
     "@microsoft/applicationinsights-web": "npm:3.2.0"
     "@pixi/app": "npm:7.4.2"
     "@pixi/core": "npm:7.4.2"
@@ -8968,7 +8969,6 @@ __metadata:
     eslint-config-prettier: "npm:9.1.0"
     eslint-import-resolver-exports: "npm:1.0.0-beta.5"
     eslint-plugin-compat: "npm:4.2.0"
-    eslint-plugin-eslint-comments: "npm:3.2.0"
     eslint-plugin-import: "npm:2.29.1"
     eslint-plugin-jsdoc: "npm:48.2.3"
     eslint-plugin-prettier: "npm:5.1.3"

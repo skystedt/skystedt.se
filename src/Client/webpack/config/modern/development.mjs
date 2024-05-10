@@ -47,12 +47,7 @@ export default {
     new ESLintPlugin({
       extensions: ['.mjs'],
       failOnError: false,
-      failOnWarning: false,
-      overrideConfig: {
-        settings: {
-          browserslistOpts: { env: 'all-exclude-opera-mini' } // used by eslint-plugin-compat
-        }
-      }
+      failOnWarning: false
     }),
     new StylelintPlugin({
       extensions: '.css',

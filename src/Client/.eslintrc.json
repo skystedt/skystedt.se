@@ -11,7 +11,7 @@
     }
   },
   "extends": [
-    "plugin:eslint-comments/recommended",
+    "plugin:@eslint-community/eslint-comments/recommended",
     "plugin:jsdoc/recommended",
     "plugin:promise/recommended",
     "plugin:compat/recommended",
@@ -19,7 +19,8 @@
     "prettier" // disables unnecessary/conflicting rules when using prettier, should be last, https://github.com/prettier/eslint-config-prettier#installation
   ],
   "settings": {
-    "polyfills": ["Promise", "fetch", "navigator.sendBeacon", "Array.from"], // browserslist for eslint-plugin-compat is set during build
+    "polyfills": ["Promise", "fetch", "navigator.sendBeacon", "Array.from"], // used by eslint-plugin-compat
+    "browserslistOpts": { "env": "all-exclude-opera-mini" }, // used by eslint-plugin-compat
     "import/resolver": { "exports": {} } // use eslint-import-resolver-exports
   },
   "rules": {
