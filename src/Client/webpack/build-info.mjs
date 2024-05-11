@@ -12,8 +12,8 @@ const babelTargets = /** @type {_babelTargets} */ (/** @type {any} */ (_babelTar
 export default class BuildInfo {
   /** @typedef {{ built: string }} Version */
   /**
-   * @typedef {{ all: T, modern: T, legacy: T }} Environments
    * @template T
+   * @typedef {{ all: T, modern: T, legacy: T }} Environments
    */
   /**
    * @typedef {{ [browser: string]: string[] }} BrowserVersions

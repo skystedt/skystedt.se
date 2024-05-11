@@ -7,8 +7,7 @@
     "source.organizeImports": "explicit"
   },
   "eslint.enable": true,
-  "eslint.runtime": "node", // Use system installed node instead f node shipped with vscode
-  "eslint.useESLintClass": true,
+  "eslint.runtime": "node", // Use system installed node instead of node shipped with vscode
   "eslint.codeActionsOnSave.rules": ["curly", "no-var", "prefer-const"],
   "css.validate": false,
   "stylelint.validate": ["css"],
