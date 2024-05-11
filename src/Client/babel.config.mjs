@@ -1,4 +1,3 @@
-/* eslint-env node */
 import coreJs from 'core-js/package.json' with { type: 'json' };
 
 /** Augment types with newer definitions since DefinitelyTyped for @babel/core and @babel/preset-env is not updated - 2024-02-11 */

@@ -208,7 +208,7 @@ export default class Input {
     if (!navigator.getGamepads) {
       return null;
     }
-    // eslint-disable-next-line compat/compat
+    // eslint-disable-next-line compat/compat, navigator.getGamepads() is not supported in IE 11 (we don't support gamepads in old browsers)
     const gamepads = Array.from(navigator.getGamepads());
     const gamepad = gamepads.find((gamepad) => gamepad?.index === this.#gamepadIndex);
     if (!gamepad) {
