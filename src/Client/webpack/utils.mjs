@@ -1,4 +1,3 @@
-/* eslint-env node */
 // cSpell:ignore picocolors
 import { loadPartialConfigAsync as loadBabelConfigAsync } from '@babel/core';
 import babelPresetEnv from '@babel/preset-env';
