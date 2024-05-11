@@ -20,14 +20,15 @@ export default {
       INSTRUMENTATION_KEY: `"${settings.production.INSTRUMENTATION_KEY}"`
     }),
     new ESLintPlugin({
+      configType: 'flat',
       extensions: ['.mjs'],
       failOnError: true,
       failOnWarning: true,
       baseConfig: {
         // customize eslint by enforcing prettier (make sure prettier has been used)
         // only for production so to not disrupt development, https://prettier.io/docs/en/integrating-with-linters.html
-        // should be last, https://github.com/prettier/eslint-plugin-prettier#recommended-configuration
-        extends: ['plugin:prettier/recommended']
+        // should be last, https://github.com/prettier/eslint-plugin-prettier#configuration-new-eslintconfigjs
+        extends: ['plugin:prettier/recommended'] // TODO: import prettier from 'eslint-plugin-prettier/recommended';
       }
     }),
     new StylelintPlugin({
