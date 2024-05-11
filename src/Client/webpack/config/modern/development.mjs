@@ -45,6 +45,7 @@ export default {
     }),
     new BrowserslistUpdatePlugin(dir.node_modules),
     new ESLintPlugin({
+      configType: 'flat',
       extensions: ['.mjs'],
       failOnError: false,
       failOnWarning: false
