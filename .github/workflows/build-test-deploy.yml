@@ -47,6 +47,8 @@ jobs:
   build_client:
     name: Build Client
     runs-on: ubuntu-latest
+    env:
+      YARN_ENABLE_HARDENED_MODE: 1
     defaults:
       run:
         working-directory: ${{ env.SRC_DIR }}
