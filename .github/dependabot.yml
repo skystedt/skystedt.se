@@ -5,7 +5,7 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      day: saturday
+      day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
     groups:
@@ -17,7 +17,7 @@ updates:
     directory: "/src"
     schedule:
       interval: "weekly"
-      day: saturday
+      day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
     groups:
@@ -29,7 +29,7 @@ updates:
     directory: "/src/Api.Tests"
     schedule:
       interval: "weekly"
-      day: saturday
+      day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
     groups:
@@ -41,7 +41,7 @@ updates:
     directory: "/src/Client"
     schedule:
       interval: "weekly"
-      day: saturday
+      day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
     open-pull-requests-limit: 10
@@ -51,3 +51,14 @@ updates:
           - "@pixi/*"
       client-development:
         dependency-type: "development"
+
+  - package-ecosystem: "npm"
+    directory: "/src/Client"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "10:00"
+      timezone: "Europe/Stockholm"
+    versioning-strategy: lockfile-only
+    allow:
+      - dependency-name: "caniuse-lite"
