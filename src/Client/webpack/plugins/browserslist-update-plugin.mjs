@@ -25,9 +25,15 @@ export default class BrowserslistUpdatePlugin {
       const versionAfter = BrowserslistUpdatePlugin.definitionsVersion(this.#nodeModules);
 
       if (versionBefore !== versionAfter) {
-        console.warn(
-          pc.bold(pc.bgYellow(pc.black(`Browserslist (caniuse-lite) updated from ${versionBefore} to ${versionAfter}`)))
+        const message = pc.bold(
+          pc.bgYellow(pc.black(`Browserslist (caniuse-lite) updated from ${versionBefore} to ${versionAfter}`))
         );
+
+        console.warn(message);
+
+        compiler.hooks.afterDone.tap(BrowserslistUpdatePlugin.name, () => {
+          console.warn(message);
+        });
       }
     });
   }
