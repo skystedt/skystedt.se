@@ -11,6 +11,6 @@
     <PackageVersion Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.2.0" />
     <PackageVersion Include="Microsoft.Azure.Functions.Worker.Sdk" Version="1.17.2" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.0" />
-    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.5.2" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
   </ItemGroup>
 </Project>
