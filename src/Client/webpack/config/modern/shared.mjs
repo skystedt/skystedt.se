@@ -18,9 +18,9 @@ import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.
 import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
-import { browserslistBrowsers, dir, mergeBabelOptions, printProgress } from '../../utils.mjs';
+import { browserslistBrowsers, dir, mergeBabelPresetEnvOptions, printProgress } from '../../utils.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
-import { babelOptions, pixiBabelOptions } from './babel-options.mjs';
+import { babelPresetEnvOptions, pixiBabelPresetEnvOptions } from './babel-options.mjs';
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
 import staticWebApp from '../../../staticwebapp.config.template.json' with { type: 'json' };
@@ -125,7 +125,9 @@ export default {
         include: dir.src,
         use: {
           loader: 'babel-loader',
-          options: await mergeBabelOptions(babelOptions)
+          options: {
+            presets: [['@babel/preset-env', await mergeBabelPresetEnvOptions(babelPresetEnvOptions)]]
+          }
         }
       },
       {
@@ -133,7 +135,9 @@ export default {
         include: path.resolve(dir.node_modules, '@pixi'), // pixi.js v7+ doesn't ship polyfills
         use: {
           loader: 'babel-loader',
-          options: await mergeBabelOptions(pixiBabelOptions)
+          options: {
+            presets: [['@babel/preset-env', await mergeBabelPresetEnvOptions(pixiBabelPresetEnvOptions)]]
+          }
         }
       },
       {

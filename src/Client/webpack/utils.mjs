@@ -1,14 +1,13 @@
 // cSpell:ignore picocolors
 import { loadPartialConfigAsync as loadBabelConfigAsync } from '@babel/core';
-import babelPresetEnv from '@babel/preset-env';
 import browserslist from 'browserslist';
 import path from 'node:path';
 import pc from 'picocolors';
 import webpack from 'webpack';
 
-/** @typedef { import("@babel/core").TransformOptions } BabelTransformOptions */
 /** @typedef { import("@babel/core").PartialConfig } BabelPartialConfig */
 /** @typedef { import("@babel/core").ConfigItem } BabelConfigItem */
+/** @typedef { import("@babel/preset-env").Options } BabelPresetEnvOptions */
 
 const cwd = process.cwd();
 export const dir = {
@@ -52,33 +51,26 @@ export const mergeConfigurationRules = (configuration) => ({
 });
 
 /**
- * @param {babelPresetEnv.Options | { browserslistEnv: string}} presetEnvOptions
- * @returns {Promise<BabelTransformOptions>}
+ * @param {BabelPresetEnvOptions | { browserslistEnv: string}} additionalOptions
+ * @returns {Promise<BabelPresetEnvOptions>}
  */
-export const mergeBabelOptions = async (presetEnvOptions) => {
+export const mergeBabelPresetEnvOptions = async (additionalOptions) => {
   const presetName = '@babel/preset-env';
 
-  const { options } = /** @type {!Readonly<BabelPartialConfig>} */ (await loadBabelConfigAsync());
-  let { presets } = options;
+  const { options } = /** @type {Readonly<BabelPartialConfig>} */ (await loadBabelConfigAsync());
 
-  if (Array.isArray(options.presets)) {
-    const index = options.presets.findIndex(
-      (preset) => /** @type {BabelConfigItem} */ (preset).file?.request === presetName
-    );
+  const preset = Array.isArray(options.presets)
+    ? /** @type {BabelConfigItem | undefined} */ (
+        options.presets.find((preset) => /** @type {BabelConfigItem} */ (preset).file?.request === presetName)
+      )
+    : null;
 
-    if (index !== -1) {
-      const mergedOptions = {
-        .../** @type {BabelConfigItem} */ (options.presets[index]).options,
-        ...presetEnvOptions
-      };
+  const configOptions = /** @type {BabelPresetEnvOptions} */ (preset?.options || {});
 
-      presets = [...options.presets];
-      presets[index] = [presetName, mergedOptions];
-    }
-  }
-
-  return {
-    plugins: options.plugins,
-    presets
+  const mergedOptions = {
+    ...configOptions,
+    ...additionalOptions
   };
+
+  return mergedOptions;
 };

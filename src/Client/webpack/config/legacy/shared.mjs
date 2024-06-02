@@ -2,7 +2,7 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-import { dir, mergeBabelOptions, printProgress } from '../../utils.mjs';
+import { dir, mergeBabelPresetEnvOptions, printProgress } from '../../utils.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 
 /** @type {webpack.Configuration} */
@@ -46,9 +46,16 @@ export default {
         include: dir.src,
         use: {
           loader: 'babel-loader',
-          options: await mergeBabelOptions({
-            browserslistEnv: 'legacy'
-          })
+          options: {
+            presets: [
+              [
+                '@babel/preset-env',
+                await mergeBabelPresetEnvOptions({
+                  browserslistEnv: 'legacy'
+                })
+              ]
+            ]
+          }
         }
       },
       {
@@ -56,9 +63,16 @@ export default {
         include: path.resolve(dir.node_modules, '@pixi'), // pixi.js v7+ doesn't ship polyfills
         use: {
           loader: 'babel-loader',
-          options: await mergeBabelOptions({
-            browserslistEnv: 'legacy'
-          })
+          options: {
+            presets: [
+              [
+                '@babel/preset-env',
+                await mergeBabelPresetEnvOptions({
+                  browserslistEnv: 'legacy'
+                })
+              ]
+            ]
+          }
         }
       },
       {

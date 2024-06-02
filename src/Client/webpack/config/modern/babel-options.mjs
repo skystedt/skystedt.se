@@ -4,7 +4,7 @@
 // http://zloirock.github.io/core-js/compat/
 
 /** @type {BabelPresetEnvOptions} */
-export const babelOptions = {
+export const babelPresetEnvOptions = {
   browserslistEnv: 'modern',
   debug: false,
   exclude: [
@@ -17,7 +17,7 @@ export const babelOptions = {
 };
 
 /** @type {BabelPresetEnvOptions} */
-export const pixiBabelOptions = {
+export const pixiBabelPresetEnvOptions = {
   browserslistEnv: 'modern',
   debug: false,
   exclude: [
