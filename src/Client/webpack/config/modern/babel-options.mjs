@@ -21,9 +21,6 @@ export const pixiBabelPresetEnvOptions = {
   browserslistEnv: 'modern',
   debug: false,
   exclude: [
-    'es.array.push',
-    'es.array.reduce',
-    'es.array.unshift',
     'es.array-buffer.detached',
     'es.array-buffer.transfer',
     'es.array-buffer.transfer-to-fixed-length',
@@ -58,7 +55,6 @@ export const pixiBabelPresetEnvOptions = {
     'web.dom-collections.iterator',
     'web.dom-exception.stack',
     'web.url',
-    'web.url.to-json',
     'web.url-search-params',
     'web.url-search-params.delete',
     'web.url-search-params.has',
