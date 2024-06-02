@@ -1,13 +1,12 @@
-import { Container } from './pixi.mjs';
 import { AbsolutePosition, Borders, GamePosition, Movement, Offset, Size, ViewPosition } from './primitives.mjs';
-/** @typedef {import("./pixi.mjs").IRenderer} Renderer */
+
+/** @typedef {import("./renderer/contract").Display} Display */
 
 const WIDTH = 380;
 const HEIGHT = 200;
 
 export default class View {
-  #renderer;
-  #stage;
+  #display;
 
   #converter;
   #gameSize;
@@ -15,14 +14,12 @@ export default class View {
   #gameOutsideView;
 
   /**
-   * @param {Renderer} renderer
-   * @param {Container} stage
+   * @param {Display} display
    * @param {HTMLCanvasElement} canvas
    * @param {boolean} ignoreBorders
    */
-  constructor(renderer, stage, canvas, ignoreBorders = false) {
-    this.#renderer = renderer;
-    this.#stage = stage;
+  constructor(display, canvas, ignoreBorders = false) {
+    this.#display = display;
 
     this.#converter = new ViewConverter(this, canvas, ignoreBorders);
 
@@ -45,7 +42,7 @@ export default class View {
   }
 
   get resolution() {
-    return this.#renderer.resolution;
+    return this.#display.resolution;
   }
 
   get viewSize() {
@@ -60,18 +57,18 @@ export default class View {
     const previousWidth = this.#viewSize.width;
     const previousHeight = this.#viewSize.height;
 
-    this.#renderer.resolution = this.#calculateResolution();
+    this.#display.resolution = this.#calculateResolution();
     this.#viewSize = new Size(
       Math.floor(window.innerWidth / this.resolution / 2) * 2,
       Math.floor(window.innerHeight / this.resolution / 2) * 2
     );
 
-    this.#renderer.resize(this.#viewSize.width, this.#viewSize.height);
+    this.#display.resize(this.#viewSize.width, this.#viewSize.height);
 
     const offsetX = this.#gameOutsideView.left + (previousWidth - this.#viewSize.width) / 2;
     const offsetY = this.#gameOutsideView.top + (previousHeight - this.#viewSize.height) / 2;
     this.#gameOutsideView = new Offset(offsetX, offsetY);
-    this.#stage.position.set(-offsetX, -offsetY);
+    this.#display.position = { x: -offsetX, y: -offsetY };
   }
 
   #calculateResolution() {

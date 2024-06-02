@@ -13,7 +13,10 @@
     "strict": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": {
+      "$renderer": ["./src/game/renderer/pixi/pixi.mjs"]
+    }
   },
   "typeAcquisition": {
     "enable": true

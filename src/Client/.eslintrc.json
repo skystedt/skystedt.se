@@ -21,7 +21,14 @@
   "settings": {
     "polyfills": ["Promise", "fetch", "navigator.sendBeacon", "Array.from"], // used by eslint-plugin-compat
     "browserslistOpts": { "env": "all-exclude-opera-mini" }, // used by eslint-plugin-compat
-    "import/resolver": { "exports": {} } // use eslint-import-resolver-exports
+    "import/resolver": {
+      "eslint-import-resolver-exports": {},
+      "eslint-import-resolver-custom-alias": {
+        "alias": {
+          "$renderer": "./src/game/renderer/pixi/pixi.mjs"
+        }
+      }
+    }
   },
   "rules": {
     // override airbnb-base rules

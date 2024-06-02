@@ -32,6 +32,11 @@ export default {
   performance: {
     assetFilter: performanceFilter
   },
+  resolve: {
+    alias: {
+      $renderer: path.resolve(dir.src, 'game/renderer', 'pixi/pixi.mjs')
+    }
+  },
   module: {
     rules: [
       {

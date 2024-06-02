@@ -1,7 +1,11 @@
+import { Container, createSprite } from '$renderer';
 import Assets from './assets.mjs';
 import MiniImage from './assets/mini.png';
-import { Container, Sprite, Texture } from './pixi.mjs';
 import { Uninitialized } from './primitives.mjs';
+
+/** @typedef { import("./renderer/contract").Display } Display */
+/** @typedef { import("./renderer/contract").Texture } Texture */
+/** @typedef { import("./renderer/contract").Sprite } Sprite */
 
 const ALPHA_DELTA = 0.025;
 const SHOWN_DURATION = 20;
@@ -22,7 +26,7 @@ export default class Minis extends Container {
   /** @type {Map<string, Item>} */
   #map = new Map();
 
-  /** @param {Container} display */
+  /** @param {Display} display */
   constructor(display) {
     super();
     display.addChild(this);
@@ -47,7 +51,7 @@ export default class Minis extends Container {
     const item = this.#map.get(id);
     if (item) {
       const { sprite } = item;
-      sprite.position.set(x - sprite.width / 2, y - sprite.height / 2);
+      sprite.position = { x: x - sprite.width / 2, y: y - sprite.height / 2 };
       sprite.alpha = 0;
       item.state = MiniState.FadeIn;
     }
@@ -97,7 +101,7 @@ export default class Minis extends Container {
 
   /** @returns {Item} */
   #createItem() {
-    const sprite = /** @type {Sprite} */ (Sprite.from(this.#texture));
+    const sprite = createSprite(this.#texture);
     sprite.alpha = 0;
     this.addChild(sprite);
     return { sprite, state: MiniState.Hidden, wait: 0 };
