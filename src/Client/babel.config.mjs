@@ -6,7 +6,7 @@ import coreJs from 'core-js/package.json' with { type: 'json' };
 /** @typedef { import("@babel/core").TransformOptions } TransformOptions */
 /** @typedef { (api: ConfigAPI) => TransformOptions } ConfigFunction */
 /** @typedef { import("@babel/preset-env").CorejsVersion | string } CorejsVersion */
-/** @typedef { import("@babel/preset-env").Options & { corejs: CorejsVersion } } BabelOptions */
+/** @typedef { import("@babel/preset-env").Options & { corejs: CorejsVersion } } BabelPresetEnvOptions */
 
 /** @type {ConfigFunction} */
 export default (api) => {
@@ -16,7 +16,7 @@ export default (api) => {
     presets: [
       [
         '@babel/preset-env',
-        /** @type {BabelOptions} */
+        /** @type {BabelPresetEnvOptions} */
         ({
           useBuiltIns: 'usage',
           // https://github.com/zloirock/core-js#babelpreset-env
