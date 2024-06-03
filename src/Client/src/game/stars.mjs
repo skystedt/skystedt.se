@@ -1,5 +1,7 @@
-import { Container, Graphics } from './pixi.mjs';
+import { Container, Graphics } from '$renderer';
 import { Size, Uninitialized } from './primitives.mjs';
+
+/** @typedef { import("./renderer/contract").Display } Display */
 
 const BLINK_PROBABILITY = 0.0001;
 const BLINK_DURATION = 30;
@@ -12,7 +14,7 @@ const SPEED_PROBABILITIES = [
 ];
 
 export default class Stars extends Container {
-  /** @param {Container} display */
+  /** @param {Display} display */
   constructor(display) {
     super();
     display.addChild(this);
@@ -87,9 +89,7 @@ export class Star extends Graphics {
   /** @param {number} value */
   #setColor(value) {
     this.clear();
-    this.beginFill(value);
-    this.drawRect(0, 0, 1, 1);
-    this.endFill();
+    this.fillRect(value, 0, 0, 1, 1);
   }
 
   move() {

@@ -1,9 +1,12 @@
+import { Container, createSprite } from '$renderer';
 import Assets from './assets.mjs';
 import ShipStraightImage from './assets/ship.png';
 import ShipLeftImage from './assets/ship_left.png';
 import ShipRightImage from './assets/ship_right.png';
-import { Container, Sprite } from './pixi.mjs';
 import { GamePosition, Size, Uninitialized } from './primitives.mjs';
+
+/** @typedef { import("./renderer/contract").Display } Display */
+/** @typedef { import("./renderer/contract").Sprite } Sprite */
 
 const TURN_STRAIGHT_DELAY = 10;
 
@@ -23,7 +26,7 @@ export default class Ship {
   #straightDelay = 0;
 
   /**
-   * @param {Container} display
+   * @param {Display} display
    */
   constructor(display) {
     this.#container = new Container();
@@ -36,9 +39,9 @@ export default class Ship {
     const shipLeftTexture = await Assets.loadImage(ShipLeftImage);
     const shipRightTexture = await Assets.loadImage(ShipRightImage);
 
-    this.#spriteStraight = Sprite.from(shipStraightTexture);
-    this.#spriteLeft = Sprite.from(shipLeftTexture);
-    this.#spriteRight = Sprite.from(shipRightTexture);
+    this.#spriteStraight = createSprite(shipStraightTexture);
+    this.#spriteLeft = createSprite(shipLeftTexture);
+    this.#spriteRight = createSprite(shipRightTexture);
 
     this.#container.addChild(this.#spriteStraight);
     this.#container.addChild(this.#spriteLeft);
@@ -61,7 +64,7 @@ export default class Ship {
 
   /** @param {GamePosition} position */
   set position(position) {
-    this.#container.position.set(position.x, position.y);
+    this.#container.position = { x: position.x, y: position.y };
   }
 
   get centerPosition() {

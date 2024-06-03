@@ -1,16 +1,16 @@
+import { initializeApplication } from '$renderer';
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import Communication, { MessageType } from './communication.mjs';
 import './game.css';
 import Input from './input.mjs';
 import Minis from './minis.mjs';
-import pixiSettings from './pixi-settings.mjs';
-import { Application } from './pixi.mjs';
 import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Stars from './stars.mjs';
 import View from './view.mjs';
 
 /** @typedef { number } DOMHighResTimeStamp */
+/** @typedef { import("./renderer/contract").Application } Application */
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;
@@ -43,11 +43,9 @@ export default class Game {
   }
 
   async init() {
-    pixiSettings();
+    const app = await initializeApplication();
 
-    const app = new Application();
-
-    this.#parent.appendChild(/** @type {HTMLCanvasElement} */ (app.view));
+    this.#parent.appendChild(app.canvas);
 
     await this.load(app);
     this.#startFrameLoop();
@@ -57,7 +55,7 @@ export default class Game {
   /** @param {Application} app */
   async load(app) {
     this.#currentFps = () => app.ticker.FPS;
-    this.#view = new View(app.renderer, app.stage, /** @type {HTMLCanvasElement} */ (app.view), true);
+    this.#view = new View(app.display, app.canvas, true);
     this.#input = new Input(this.#view);
     this.#communication = new Communication(
       this.#communicationReceived.bind(this),
@@ -65,9 +63,9 @@ export default class Game {
     );
 
     // order determines z order, last will be on top
-    this.#stars = new Stars(app.stage);
-    this.#minis = new Minis(app.stage);
-    this.#ship = new Ship(app.stage);
+    this.#stars = new Stars(app.display);
+    this.#minis = new Minis(app.display);
+    this.#ship = new Ship(app.display);
 
     await this.#ship.load(this.#view.gameSize);
     await this.#minis.load();
