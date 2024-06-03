@@ -1,6 +1,5 @@
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import Communication, { MessageType } from './communication.mjs';
-import Display from './display.mjs';
 import './game.css';
 import Input from './input.mjs';
 import Minis from './minis.mjs';
@@ -9,6 +8,7 @@ import { Application } from './pixi.mjs';
 import { Uninitialized } from './primitives.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Stars from './stars.mjs';
+import View from './view.mjs';
 
 /** @typedef { number } DOMHighResTimeStamp */
 
@@ -22,7 +22,7 @@ const STARS = 100;
 export default class Game {
   #parent;
   #currentFps = /** @type {() => number} */ (Uninitialized);
-  #display = /** @type {Display} */ (Uninitialized);
+  #view = /** @type {View} */ (Uninitialized);
   #input = /** @type {Input} */ (Uninitialized);
   #communication = /** @type {Communication} */ (Uninitialized);
 
@@ -57,8 +57,8 @@ export default class Game {
   /** @param {Application} app */
   async load(app) {
     this.#currentFps = () => app.ticker.FPS;
-    this.#display = new Display(app.renderer, app.stage, /** @type {HTMLCanvasElement} */ (app.view), true);
-    this.#input = new Input(this.#display);
+    this.#view = new View(app.renderer, app.stage, /** @type {HTMLCanvasElement} */ (app.view), true);
+    this.#input = new Input(this.#view);
     this.#communication = new Communication(
       this.#communicationReceived.bind(this),
       this.#communicationSendUpdate.bind(this)
@@ -69,9 +69,9 @@ export default class Game {
     this.#minis = new Minis(app.stage);
     this.#ship = new Ship(app.stage);
 
-    await this.#ship.load(this.#display.gameSize);
+    await this.#ship.load(this.#view.gameSize);
     await this.#minis.load();
-    this.#stars.load(this.#display.gameSize, STARS);
+    this.#stars.load(this.#view.gameSize, STARS);
   }
 
   #startFrameLoop() {
@@ -165,7 +165,7 @@ export default class Game {
 
   #updateShip() {
     const movement = this.#input.movement(this.#ship.centerPosition);
-    this.#ship.position = this.#display.restrictGamePositionToDisplay(this.#ship.position, movement, this.#ship.size);
+    this.#ship.position = this.#view.restrictGamePositionToView(this.#ship.position, movement, this.#ship.size);
     if (movement.dx < 0) {
       this.#ship.direction = ShipDirection.Left;
     } else if (movement.dx > 0) {

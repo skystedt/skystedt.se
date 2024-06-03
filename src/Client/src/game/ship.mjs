@@ -23,11 +23,11 @@ export default class Ship {
   #straightDelay = 0;
 
   /**
-   * @param {Container} stage
+   * @param {Container} display
    */
-  constructor(stage) {
+  constructor(display) {
     this.#container = new Container();
-    stage.addChild(this.#container);
+    display.addChild(this.#container);
   }
 
   /** @param {Size} gameSize */

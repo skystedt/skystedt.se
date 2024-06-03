@@ -12,10 +12,10 @@ const SPEED_PROBABILITIES = [
 ];
 
 export default class Stars extends Container {
-  /** @param {Container} stage */
-  constructor(stage) {
+  /** @param {Container} display */
+  constructor(display) {
     super();
-    stage.addChild(this);
+    display.addChild(this);
   }
 
   /**

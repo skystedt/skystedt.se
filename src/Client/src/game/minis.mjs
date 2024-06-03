@@ -22,10 +22,10 @@ export default class Minis extends Container {
   /** @type {Map<string, Item>} */
   #map = new Map();
 
-  /** @param {Container} stage */
-  constructor(stage) {
+  /** @param {Container} display */
+  constructor(display) {
     super();
-    stage.addChild(this);
+    display.addChild(this);
   }
 
   async load() {
