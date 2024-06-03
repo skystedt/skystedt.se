@@ -1,4 +1,4 @@
-import * as PIXI from '@pixi/sprite';
+import * as PIXI from 'pixi.js';
 
 /** @type { import("../../contract").createSprite } */
 const createSprite = PIXI.Sprite.from;

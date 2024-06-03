@@ -1,5 +1,4 @@
-import * as PIXI_C from '@pixi/core';
-import * as PIXI_D from '@pixi/display';
+import * as PIXI from 'pixi.js';
 
 /** @typedef {import("../../contract").Display} Contract */
 
@@ -8,8 +7,8 @@ export default class Display {
   #stage;
 
   /**
-   * @param {PIXI_C.IRenderer<PIXI_C.ICanvas>} viewport
-   * @param {PIXI_D.Container} stage
+   * @param {PIXI.Renderer} viewport
+   * @param {PIXI.Container} stage
    */
   constructor(viewport, stage) {
     this.#viewport = viewport;
@@ -36,6 +35,6 @@ export default class Display {
 
   /** @type {Contract["addChild"] } */
   addChild(child) {
-    this.#stage.addChild(/** @type { PIXI_D.Container } */ (child));
+    this.#stage.addChild(/** @type { PIXI.Container } */ (child));
   }
 }

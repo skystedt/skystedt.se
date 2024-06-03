@@ -1,3 +1,3 @@
-import * as PIXI from '@pixi/core';
+import * as PIXI from 'pixi.js';
 
 export default class Texture extends PIXI.Texture {}

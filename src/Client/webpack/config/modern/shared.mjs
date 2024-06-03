@@ -137,7 +137,7 @@ export default {
       },
       {
         test: /\.m?js$/i,
-        include: path.resolve(dir.node_modules, '@pixi'), // pixi.js v7+ doesn't ship polyfills
+        include: dir.pixi,
         use: {
           loader: 'babel-loader',
           options: {

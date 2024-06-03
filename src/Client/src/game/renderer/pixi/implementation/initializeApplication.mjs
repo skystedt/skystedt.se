@@ -1,15 +1,23 @@
-import { BaseTexture, SCALE_MODES } from '@pixi/core';
+import * as PIXI from 'pixi.js';
 import Application from './application.mjs';
 
-import '@pixi/unsafe-eval';
+// https://pixijs.com/8.x/guides/migrations/v8#custom-builds
+import 'pixi.js/app';
+import 'pixi.js/graphics';
+import 'pixi.js/unsafe-eval';
 
 /** @type { import("../../contract").initializeApplication } */
 const initializeApplication = async () => {
-  BaseTexture.defaultOptions.scaleMode = SCALE_MODES.NEAREST;
+  PIXI.TextureSource.defaultOptions.scaleMode = 'nearest';
 
   const app = new Application();
 
-  return Promise.resolve(app);
+  await app.init({
+    preference: 'webgpu',
+    manageImports: false
+  });
+
+  return app;
 };
 
 export default initializeApplication;
