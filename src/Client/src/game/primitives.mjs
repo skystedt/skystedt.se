@@ -32,8 +32,8 @@ export class AbsolutePosition extends Position {
 export class GamePosition extends Position {
   #GamePosition() {}
 }
-export class DisplayPosition extends Position {
-  #DisplayPosition() {}
+export class ViewPosition extends Position {
+  #ViewPosition() {}
 }
 
 export class Movement {

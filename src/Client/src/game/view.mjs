@@ -1,18 +1,18 @@
 import { Container } from './pixi.mjs';
-import { AbsolutePosition, Borders, DisplayPosition, GamePosition, Movement, Offset, Size } from './primitives.mjs';
+import { AbsolutePosition, Borders, GamePosition, Movement, Offset, Size, ViewPosition } from './primitives.mjs';
 /** @typedef {import("./pixi.mjs").IRenderer} Renderer */
 
 const WIDTH = 380;
 const HEIGHT = 200;
 
-export default class Display {
+export default class View {
   #renderer;
   #stage;
 
   #converter;
   #gameSize;
-  #displaySize;
-  #gameOutsideDisplay;
+  #viewSize;
+  #gameOutsideView;
 
   /**
    * @param {Renderer} renderer
@@ -24,13 +24,13 @@ export default class Display {
     this.#renderer = renderer;
     this.#stage = stage;
 
-    this.#converter = new DisplayConverter(this, canvas, ignoreBorders);
+    this.#converter = new ViewConverter(this, canvas, ignoreBorders);
 
     canvas.addEventListener('contextmenu', (event) => event.preventDefault());
 
     this.#gameSize = new Size(WIDTH, HEIGHT);
-    this.#displaySize = new Size(WIDTH, HEIGHT);
-    this.#gameOutsideDisplay = new Offset(0, 0);
+    this.#viewSize = new Size(WIDTH, HEIGHT);
+    this.#gameOutsideView = new Offset(0, 0);
     this.#resize();
 
     window.addEventListener('resize', this.#resize.bind(this));
@@ -48,29 +48,29 @@ export default class Display {
     return this.#renderer.resolution;
   }
 
-  get displaySize() {
-    return this.#displaySize;
+  get viewSize() {
+    return this.#viewSize;
   }
 
-  get gameOutsideDisplay() {
-    return this.#gameOutsideDisplay;
+  get gameOutsideView() {
+    return this.#gameOutsideView;
   }
 
   #resize() {
-    const previousWidth = this.#displaySize.width;
-    const previousHeight = this.#displaySize.height;
+    const previousWidth = this.#viewSize.width;
+    const previousHeight = this.#viewSize.height;
 
     this.#renderer.resolution = this.#calculateResolution();
-    this.#displaySize = new Size(
+    this.#viewSize = new Size(
       Math.floor(window.innerWidth / this.resolution / 2) * 2,
       Math.floor(window.innerHeight / this.resolution / 2) * 2
     );
 
-    this.#renderer.resize(this.#displaySize.width, this.#displaySize.height);
+    this.#renderer.resize(this.#viewSize.width, this.#viewSize.height);
 
-    const offsetX = this.#gameOutsideDisplay.left + (previousWidth - this.#displaySize.width) / 2;
-    const offsetY = this.#gameOutsideDisplay.top + (previousHeight - this.#displaySize.height) / 2;
-    this.#gameOutsideDisplay = new Offset(offsetX, offsetY);
+    const offsetX = this.#gameOutsideView.left + (previousWidth - this.#viewSize.width) / 2;
+    const offsetY = this.#gameOutsideView.top + (previousHeight - this.#viewSize.height) / 2;
+    this.#gameOutsideView = new Offset(offsetX, offsetY);
     this.#stage.position.set(-offsetX, -offsetY);
   }
 
@@ -99,28 +99,28 @@ export default class Display {
    * @param {Size} objectSize
    * @returns {GamePosition}
    */
-  restrictGamePositionToDisplay(gamePosition, movement, objectSize) {
-    let displayX = gamePosition.x - this.gameOutsideDisplay.left + movement.dx;
-    let displayY = gamePosition.y - this.gameOutsideDisplay.top + movement.dy;
-    displayX = Display.#clamp(displayX, 0, this.displaySize.width - objectSize.width);
-    displayY = Display.#clamp(displayY, 0, this.displaySize.height - objectSize.height);
-    return new GamePosition(displayX + this.gameOutsideDisplay.left, displayY + this.gameOutsideDisplay.top);
+  restrictGamePositionToView(gamePosition, movement, objectSize) {
+    let viewX = gamePosition.x - this.gameOutsideView.left + movement.dx;
+    let viewY = gamePosition.y - this.gameOutsideView.top + movement.dy;
+    viewX = View.#clamp(viewX, 0, this.viewSize.width - objectSize.width);
+    viewY = View.#clamp(viewY, 0, this.viewSize.height - objectSize.height);
+    return new GamePosition(viewX + this.gameOutsideView.left, viewY + this.gameOutsideView.top);
   }
 }
 
 /** @private */
-class DisplayConverter {
-  #display;
+class ViewConverter {
+  #view;
   #canvas;
   #ignoreBorders;
 
   /**
-   * @param {Display} display
+   * @param {View} view
    * @param {HTMLCanvasElement} canvas
    * @param {boolean} ignoreBorders
    */
-  constructor(display, canvas, ignoreBorders) {
-    this.#display = display;
+  constructor(view, canvas, ignoreBorders) {
+    this.#view = view;
     this.#canvas = canvas;
     this.#ignoreBorders = ignoreBorders;
   }
@@ -139,12 +139,12 @@ class DisplayConverter {
 
   /**
    * @param {GamePosition} gamePosition
-   * @returns {DisplayPosition}
+   * @returns {ViewPosition}
    */
-  gameToDisplay(gamePosition) {
-    return new DisplayPosition(
-      gamePosition.x - this.#display.gameOutsideDisplay.left,
-      gamePosition.y - this.#display.gameOutsideDisplay.top
+  gameToView(gamePosition) {
+    return new ViewPosition(
+      gamePosition.x - this.#view.gameOutsideView.left,
+      gamePosition.y - this.#view.gameOutsideView.top
     );
   }
 
@@ -153,29 +153,29 @@ class DisplayConverter {
    * @returns {AbsolutePosition}
    */
   gameToAbsolute(gamePosition) {
-    return this.displayToAbsolute(this.gameToDisplay(gamePosition));
+    return this.viewToAbsolute(this.gameToView(gamePosition));
   }
 
   /**
-   * @param {DisplayPosition} displayPosition
+   * @param {ViewPosition} viewPosition
    * @returns {GamePosition}
    */
-  displayToGame(displayPosition) {
+  viewToGame(viewPosition) {
     return new GamePosition(
-      displayPosition.x + this.#display.gameOutsideDisplay.left,
-      displayPosition.y + this.#display.gameOutsideDisplay.top
+      viewPosition.x + this.#view.gameOutsideView.left,
+      viewPosition.y + this.#view.gameOutsideView.top
     );
   }
 
   /**
-   * @param {DisplayPosition} displayPosition
+   * @param {ViewPosition} viewPosition
    * @returns {AbsolutePosition}
    */
-  displayToAbsolute(displayPosition) {
+  viewToAbsolute(viewPosition) {
     const canvasPosition = this.#canvas.getBoundingClientRect();
     const borders = this.#borders();
-    const x = displayPosition.x * this.#display.resolution + canvasPosition.left + borders.left;
-    const y = displayPosition.y * this.#display.resolution + canvasPosition.top + borders.top;
+    const x = viewPosition.x * this.#view.resolution + canvasPosition.left + borders.left;
+    const y = viewPosition.y * this.#view.resolution + canvasPosition.top + borders.top;
     return new AbsolutePosition(x, y);
   }
 }

@@ -1,6 +1,6 @@
-import Display from './display.mjs';
 import './input.css';
 import { AbsolutePosition, GamePosition, Movement } from './primitives.mjs';
+import View from './view.mjs';
 
 /** @typedef { number } DOMHighResTimeStamp */
 
@@ -21,7 +21,7 @@ const GAMEPAD_BUTTON_RIGHT = 15;
 const GAMEPAD_AXIS_MINIMUM_VALUE = 0.2;
 
 export default class Input {
-  #display;
+  #view;
 
   #keys = { up: false, right: false, down: false, left: false };
   /** @type {{ id: number, timestamp: DOMHighResTimeStamp, position: AbsolutePosition }[]} */
@@ -48,9 +48,9 @@ export default class Input {
     }, null);
   }
 
-  /** @param {Display} display */
-  constructor(display) {
-    this.#display = display;
+  /** @param {View} view */
+  constructor(view) {
+    this.#view = view;
 
     window.addEventListener('blur', this.#blur.bind(this));
 
@@ -242,13 +242,13 @@ export default class Input {
    * @returns {Movement}
    */
   #relativeDirection(position, relativeTo) {
-    const absolutePosition = this.#display.convert.gameToAbsolute(relativeTo);
+    const absolutePosition = this.#view.convert.gameToAbsolute(relativeTo);
     const directionX = position.x - absolutePosition.x;
     const directionY = position.y - absolutePosition.y;
     const max = Math.max(Math.abs(directionX), Math.abs(directionY));
     // the condition for larger than resolution is to prevent "flip-flopping" movements (jumping back and forth)
-    const dx = Math.abs(directionX) > this.#display.resolution ? directionX / max : 0;
-    const dy = Math.abs(directionY) > this.#display.resolution ? directionY / max : 0;
+    const dx = Math.abs(directionX) > this.#view.resolution ? directionX / max : 0;
+    const dy = Math.abs(directionY) > this.#view.resolution ? directionY / max : 0;
     return new Movement(dx, dy);
   }
 
