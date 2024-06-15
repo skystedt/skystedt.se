@@ -46,6 +46,11 @@
     // other rules
     "jsdoc/valid-types": "off",
     "jsdoc/require-param-description": "off",
-    "jsdoc/require-returns-description": "off"
+    "jsdoc/require-returns-description": "off",
+    "jsdoc/check-indentation": "warn",
+    "jsdoc/check-syntax": "warn",
+    "jsdoc/no-blank-blocks": "warn",
+    "jsdoc/no-blank-block-descriptions": "warn",
+    "jsdoc/sort-tags": "warn"
   }
 }
