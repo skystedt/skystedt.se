@@ -15,15 +15,7 @@ export default class Communication {
   #updateCallback;
 
   #connectionAttempt = 1;
-  /**
-   * @type {{
-   *   ws: WebSocket,
-   *   token: string,
-   *   expiresAt: Date,
-   *   intervalId: ReturnType<typeof setInterval>,
-   *   reconnect: boolean
-   * }?}
-   */
+  /** @type {{ ws: WebSocket, token: string, expiresAt: Date, intervalId: ReturnType<typeof setInterval>, reconnect: boolean }?} */
   #connection = null;
 
   /**
@@ -55,14 +47,7 @@ export default class Communication {
     }
   }
 
-  /**
-   * @returns {Promise<{
-   *   token: string,
-   *   expiresAt: Date,
-   *   websocketUrl: string,
-   *   updateInterval: number
-   * }?>}
-   */
+  /** @returns {Promise<{ token: string, expiresAt: Date, websocketUrl: string, updateInterval: number }?>} */
   async #negotiate() {
     const response = await fetch(`/api/position/negotiate`);
     if (!response.ok) {
