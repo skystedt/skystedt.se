@@ -5,13 +5,11 @@ import airbnb from 'eslint-config-airbnb-base';
 import prettier from 'eslint-config-prettier';
 import compat from 'eslint-plugin-compat';
 import jsdoc from 'eslint-plugin-jsdoc';
+import pluginPromise from 'eslint-plugin-promise';
 import globals from 'globals';
 
 /** @typedef { import("eslint").Linter.FlatConfig } FlatConfig */
 /** @typedef { import("eslint").Linter.RulesRecord } Rules */
-
-// TODO: eslint 9?/flat? config not supported
-//const promise = flatCompat.extends('plugin:promise/recommended')[0];
 
 /** @returns {Promise<{airbnb: Rules, import: Rules}>} */
 const loadAirbnbRules = async () => {
@@ -22,23 +20,24 @@ const loadAirbnbRules = async () => {
 
   for (const rulesFile of airbnb.extends) {
     // Resolve the rules file and import it
-    const filePath = import.meta.resolve(rulesFile, 'eslint-config-airbnb-base');
+    var filePath = import.meta.resolve(rulesFile, 'eslint-config-airbnb-base');
     const file = await import(`file://${filePath}`);
 
-    // Split rules into airbnb and import, and also rename import rules to import-x
+    // Split rules into airbnb and import
     for (const [key, value] of Object.entries(/** @type {Rules} */ (file.default.rules))) {
-      if (key.startsWith('import/')) {
-        rules.import[key.replace('import/', 'import-x/')] = value;
-      } else {
-        rules.airbnb[key] = value;
-      }
+      const type = key.startsWith('import/') ? 'import' : 'airbnb';
+      rules[type][key] = value;
     }
   }
 
   return rules;
 };
 
-const { airbnb: airbnbRules, import: importRules } = await loadAirbnbRules();
+let { airbnb: airbnbRules, import: importRules } = await loadAirbnbRules();
+// Rename import rules to import-x
+importRules = Object.fromEntries(
+  Object.entries(importRules).map(([key, value]) => [key.replace('import/', 'import-x/'), value])
+);
 
 /** @type {FlatConfig[]} */
 export default [
@@ -74,7 +73,7 @@ export default [
       'jsdoc/sort-tags': 'warn'
     }
   },
-  //promise,
+  { ...pluginPromise.configs['flat/recommended'] },
   {
     ...compat.configs['flat/recommended'],
     settings: {
