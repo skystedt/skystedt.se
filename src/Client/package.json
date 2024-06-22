@@ -18,7 +18,7 @@
     "yarn": "4.x",
     "node": "22.x"
   },
-  "packageManager": "yarn@4.3.0",
+  "packageManager": "yarn@4.3.1",
   "devDependencies": {
     "@babel/core": "7.24.7",
     "@babel/eslint-parser": "7.24.7",
@@ -86,6 +86,11 @@
     "unfetch": "5.0.0"
   },
   "resolutions": {
+    "eslint-config-airbnb-base": "peer:#eslint@^9;eslint-plugin-import:eslint-plugin-import-x",
+    "eslint-import-resolver-custom-alias": "peer:#eslint-plugin-import:eslint-plugin-import-x",
+    "eslint-import-resolver-exports": "peer:#eslint-plugin-import:eslint-plugin-import-x",
+    "eslint-plugin-compat": "peer:#eslint@^9",
+    "eslint-plugin-import-x/@typescript-eslint/utils": "rc-v8",
     "@pixi/utils@npm:7.4.2": "patch:@pixi/utils@npm%3A7.4.2#~/.yarn/patches/@pixi-utils-npm-7.4.2-0fd06125d9.patch"
   }
 }
