@@ -6,7 +6,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "preinstall": "yarn dedupe caniuse-lite --strategy highest --mode=skip-build",
     "build": "webpack --progress --config webpack.development.mjs",
     "production": "webpack --progress --config webpack.production.mjs",
     "start": "webpack serve --config webpack.development.mjs --open",
