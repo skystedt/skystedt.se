@@ -1,0 +1,24 @@
+name: Reusable - Azure Static Web Apps - Close
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    
+env:
+  SRC_DIR: "src"
+  PUBLISH_DIR: "publish"
+  API_DIR: "Api"
+  CLIENT_DIR: "Client"
+  DOTNET_CONFIGURATION: "Release"
+  
+jobs:
+  deploy:
+    name: Deploy
+    needs: [build_api, build_client]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Config
+        uses: actions/download-artifact@v4
+        with:
+          name: config
+          path: ${{ github.workspace }}/artifacts/config
