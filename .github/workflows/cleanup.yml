@@ -1,4 +1,4 @@
-﻿name: Cleanup
+name: Reusable - Cleanup
 
 on:
   workflow_call:
