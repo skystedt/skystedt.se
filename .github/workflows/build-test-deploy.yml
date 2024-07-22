@@ -60,6 +60,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}/package.json
+          check-latest: true
           
       - name: Corepack Enable
         run: corepack enable
