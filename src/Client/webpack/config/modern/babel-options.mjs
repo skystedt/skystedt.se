@@ -12,7 +12,8 @@ export const babelPresetEnvOptions = {
     'es.error.cause', // needed for older ios/safari, newer option that can be used with Error, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
     'es.array.push', // needed for modern browsers, length not properly set for arrays larger than 0x100000000, https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/es.array.push.js
     // needed for older ios/safari, different error is thrown, https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/es.array.push.js
-    'es.array.reduce' // chrome 79
+    'es.array.reduce', // chrome 79
+    'es.json.stringify' // ios 11
   ]
 };
 
@@ -21,14 +22,24 @@ export const pixiBabelPresetEnvOptions = {
   browserslistEnv: 'modern',
   debug: false,
   exclude: [
-    'es.array.push',
-    'es.array.reduce',
-    'es.array.unshift',
+    'es.array-buffer.constructor',
     'es.array-buffer.detached',
+    'es.array-buffer.slice',
     'es.array-buffer.transfer',
     'es.array-buffer.transfer-to-fixed-length',
+    'es.array.push',
+    'es.array.reduce',
+    'es.array.reverse',
+    'es.array.sort',
+    'es.array.unshift',
     'es.error.cause',
+    'es.global-this',
+    'es.json.stringify',
+    'es.regexp.constructor',
+    'es.regexp.dot-all',
+    'es.regexp.exec',
     'es.string.replace',
+    'es.string.trim',
     'es.typed-array.at',
     'es.typed-array.fill',
     'es.typed-array.find-last',
@@ -49,6 +60,7 @@ export const pixiBabelPresetEnvOptions = {
     'esnext.array-buffer.detached',
     'esnext.array-buffer.transfer',
     'esnext.array-buffer.transfer-to-fixed-length',
+    'esnext.global-this',
     'esnext.typed-array.at',
     'esnext.typed-array.find-last',
     'esnext.typed-array.find-last-index',
@@ -56,12 +68,14 @@ export const pixiBabelPresetEnvOptions = {
     'esnext.typed-array.to-sorted',
     'esnext.typed-array.with',
     'web.dom-collections.iterator',
+    'web.dom-exception.constructor',
     'web.dom-exception.stack',
+    'web.dom-exception.to-string-tag',
     'web.url',
-    'web.url.to-json',
     'web.url-search-params',
     'web.url-search-params.delete',
     'web.url-search-params.has',
-    'web.url-search-params.size'
+    'web.url-search-params.size',
+    'web.url.to-json'
   ]
 };
