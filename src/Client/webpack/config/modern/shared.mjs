@@ -20,7 +20,6 @@ import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mj
 import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
 import { browserslistBrowsers, dir, mergeBabelPresetEnvOptions, printProgress } from '../../utils.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
-import { babelPresetEnvOptions, pixiBabelPresetEnvOptions } from './babel-options.mjs';
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
 import staticWebApp from '../../../staticwebapp.config.template.json' with { type: 'json' };
@@ -29,9 +28,32 @@ const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin
   /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
 );
 
+/** @typedef { import("@babel/preset-env").Options | { browserslistEnv: string }} BabelPresetEnvOptions */
 /** @typedef { import("postcss-load-config").Config } PostcssConfig */
 
 const buildInfo = new BuildInfo();
+
+/** @type {BabelPresetEnvOptions} */
+const babelPresetEnvOptions = {
+  browserslistEnv: 'modern',
+  // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set debug to true to find what files/polyfills is causing it
+  // http://zloirock.github.io/core-js/compat/
+  debug: false,
+  // we don't want polyfills in modern, but instead of disabling them, we exclude the ones that would be added (to check that we don't use unwanted functionality)
+  exclude: [
+    'es.error.cause', // mostly unsupported on older browsers, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause
+    'es.array.push', // length not properly set for arrays larger than 0x100000000, https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/es.array.push.js
+
+    // small number of older browsers
+    'es.array.includes',
+    'es.array.reduce',
+    'es.json.stringify',
+    'es.parse-int',
+    'es.promise',
+    'es.weak-map',
+    'web.dom-collections.iterator'
+  ]
+};
 
 /** @type {PostcssConfig} */
 const postcssOptions = {
@@ -137,11 +159,21 @@ export default {
       },
       {
         test: /\.m?js$/i,
-        include: path.resolve(dir.node_modules, '@pixi'), // pixi.js v7+ doesn't ship polyfills
+        include: path.resolve(dir.node_modules, '@pixi'),
         use: {
+          // use babel to transform pixi but don't include polyfills (we don't want polyfills in modern)
           loader: 'babel-loader',
           options: {
-            presets: [['@babel/preset-env', await mergeBabelPresetEnvOptions(pixiBabelPresetEnvOptions)]]
+            presets: [
+              [
+                '@babel/preset-env',
+                await mergeBabelPresetEnvOptions({
+                  browserslistEnv: 'modern',
+                  useBuiltIns: false,
+                  corejs: undefined
+                })
+              ]
+            ]
           }
         }
       },

@@ -20,7 +20,7 @@
   ],
   "settings": {
     "polyfills": ["Promise", "fetch", "navigator.sendBeacon", "Array.from"], // used by eslint-plugin-compat
-    "browserslistOpts": { "env": "all-exclude-opera-mini" }, // used by eslint-plugin-compat
+    "browserslistOpts": { "env": "eslint-plugin-compat" }, // used by eslint-plugin-compat
     "import/resolver": {
       "eslint-import-resolver-exports": {},
       "eslint-import-resolver-custom-alias": {
