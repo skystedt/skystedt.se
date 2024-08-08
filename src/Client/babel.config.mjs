@@ -19,8 +19,8 @@ export default (api) => {
         /** @type {BabelPresetEnvOptions} */
         ({
           useBuiltIns: 'usage',
-          // https://github.com/zloirock/core-js#babelpreset-env
-          // "Recommended to specify used minor core-js version"
+          // https://babeljs.io/docs/babel-preset-env#corejs
+          // "It is recommended to specify the minor version"
           corejs: coreJs.version,
           bugfixes: true
         })

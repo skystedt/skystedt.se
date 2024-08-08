@@ -1,14 +1,14 @@
 # https://github.com/browserslist/browserslist
-# https://browserslist.dev/?q=bGFzdCAyIHZlcnNpb25zIGFuZCBub3QgZGVhZCBhbmQgPiAwLjAxJSBvciA%2BIDAuMSU
+# https://browserslist.dev/?q=bGFzdCAyIHZlcnNpb25zIGFuZCBub3QgZGVhZCBvciA%2BIDAuMDEl
 
 [all]
-last 2 versions and not dead and > 0.01% or > 0.1%
+last 2 versions and not dead or > 0.01%
 
 [modern]
-last 2 versions and not dead and > 0.01% or > 0.1% and supports es6-module
+last 2 versions and not dead or > 0.01% and supports es6-module
 
 [legacy]
-last 2 versions and not dead and > 0.01% or > 0.1% and not supports es6-module
+last 2 versions and not dead or > 0.01% and not supports es6-module
 
-[all-exclude-opera-mini]
-last 2 versions and not dead and > 0.01% or > 0.1% and not op_mini all
+[eslint-plugin-compat]
+last 2 versions and not dead or > 0.01% and not IE <= 9 and not Firefox <= 56 and not op_mini all
