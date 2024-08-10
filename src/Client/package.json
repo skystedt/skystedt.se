@@ -56,7 +56,7 @@
     "postcss": "8.4.41",
     "postcss-load-config": "6.0.1",
     "postcss-loader": "8.1.1",
-    "postcss-merge-rules": "7.0.2",
+    "postcss-merge-rules": "7.0.3",
     "postcss-preset-env": "10.0.0",
     "prettier": "3.3.3",
     "stylelint": "16.8.1",
