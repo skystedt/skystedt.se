@@ -3878,7 +3878,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:4.23.3":
+"browserslist@npm:4.23.3, browserslist@npm:^4.23.3":
   version: 4.23.3
   resolution: "browserslist@npm:4.23.3"
   dependencies:
@@ -8474,17 +8474,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-merge-rules@npm:7.0.2":
-  version: 7.0.2
-  resolution: "postcss-merge-rules@npm:7.0.2"
+"postcss-merge-rules@npm:7.0.3":
+  version: 7.0.3
+  resolution: "postcss-merge-rules@npm:7.0.3"
   dependencies:
-    browserslist: "npm:^4.23.1"
+    browserslist: "npm:^4.23.3"
     caniuse-api: "npm:^3.0.0"
     cssnano-utils: "npm:^5.0.0"
-    postcss-selector-parser: "npm:^6.1.0"
+    postcss-selector-parser: "npm:^6.1.1"
   peerDependencies:
     postcss: ^8.4.31
-  checksum: 10c0/fbad20382ca45f1b3b5ff704c075f899cc9ba8418ae6effbdeb9e7c1f9b5c24996d1941ad36cd0936d60cbf127a72f235b2cbb0c44d9239a8a61042406d95b4a
+  checksum: 10c0/3cd20484ab6d15c62eded408248d5eeaba52a573935943f933865680e070a0e75b3a7447802c575bc86e1fae667cf51d9d5766537835d9b8c090337b5adf928e
   languageName: node
   linkType: hard
 
@@ -9700,7 +9700,7 @@ __metadata:
     postcss: "npm:8.4.41"
     postcss-load-config: "npm:6.0.1"
     postcss-loader: "npm:8.1.1"
-    postcss-merge-rules: "npm:7.0.2"
+    postcss-merge-rules: "npm:7.0.3"
     postcss-preset-env: "npm:10.0.0"
     prettier: "npm:3.3.3"
     stylelint: "npm:16.8.1"
