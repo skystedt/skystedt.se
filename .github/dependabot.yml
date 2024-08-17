@@ -24,19 +24,7 @@ updates:
       api:
         patterns:
           - "*"
-
-  - package-ecosystem: "nuget"
-    directory: "/src/Api.Tests"
-    schedule:
-      interval: "weekly"
-      day: "saturday"
-      time: "10:00"
-      timezone: "Europe/Stockholm"
-    groups:
-      api-tests:
-        patterns:
-          - "*"
-
+          
   - package-ecosystem: "npm"
     directory: "/src/Client"
     schedule:
