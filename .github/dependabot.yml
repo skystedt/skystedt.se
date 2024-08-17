@@ -14,7 +14,8 @@ updates:
           - "*"
       
   - package-ecosystem: "nuget"
-    directory: "/src"
+    directories:
+      - "/src/"
     schedule:
       interval: "weekly"
       day: "saturday"
@@ -26,7 +27,8 @@ updates:
           - "*"
 
   - package-ecosystem: "nuget"
-    directory: "/src/Api.Tests"
+    directories:
+      - "/src/Api.Tests"
     schedule:
       interval: "weekly"
       day: "saturday"
@@ -38,7 +40,8 @@ updates:
           - "*"
 
   - package-ecosystem: "npm"
-    directory: "/src/Client"
+    directories:
+      - "/src/Client"
     schedule:
       interval: "weekly"
       day: "saturday"
