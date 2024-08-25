@@ -71,7 +71,7 @@ export default class PeerPatchResolver implements Resolver {
     locators: Locator[],
     opts: ResolveOptions
   ): Promise<{ locators: Locator[]; sorted: boolean }> {
-    return opts.resolver.getSatisfying(descriptor, dependencies, locators, opts);
+    return { locators, sorted: true };
   }
 
   async resolve(locator: Locator, opts: ResolveOptions): Promise<Package> {
