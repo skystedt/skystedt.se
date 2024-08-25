@@ -11,8 +11,9 @@
     "production": "webpack --progress --config webpack.production.mjs",
     "start": "webpack serve --config webpack.development.mjs --open",
     "update-yarn": "yarn set version stable",
+    "update-plugin-peer-patch": "yarn plugin import ../Plugins/yarn-plugin-peer-patch/bundles/@yarnpkg/plugin-peer-patch.js",
     "ncu": "yarn dlx npm-check-updates",
-    "transitive-update": "yarn dlx rimraf yarn.lock && yarn install"
+    "update-transitive": "yarn dlx rimraf yarn.lock && yarn install"
   },
   "engines": {
     "yarn": "4.x",
