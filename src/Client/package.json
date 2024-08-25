@@ -70,9 +70,6 @@
     "webpack-dev-server": "5.0.4",
     "webpack-subresource-integrity": "5.1.0"
   },
-  "optionalDependencies": {
-    "tslib": "*"
-  },
   "dependencies": {
     "@microsoft/applicationinsights-web": "3.3.1",
     "@pixi/app": "7.4.2",
@@ -86,6 +83,14 @@
     "unfetch": "5.0.0"
   },
   "resolutions": {
-    "@pixi/utils@npm:7.4.2": "patch:@pixi/utils@npm%3A7.4.2#~/.yarn/patches/@pixi-utils-npm-7.4.2-0fd06125d9.patch"
+    "@pixi/utils@npm:7.4.2": "patch:@pixi/utils@npm%3A7.4.2#~/.yarn/patches/@pixi-utils-npm-7.4.2-0fd06125d9.patch",
+    "@microsoft/applicationinsights-web": "peer-patch:#tslib:-",
+    "@microsoft/applicationinsights-analytics-js": "peer-patch:#tslib:-",
+    "@microsoft/applicationinsights-cfgsync-js": "peer-patch:#tslib:-",
+    "@microsoft/applicationinsights-channel-js": "peer-patch:#tslib:-",
+    "@microsoft/applicationinsights-common": "peer-patch:#tslib:-",
+    "@microsoft/applicationinsights-core-js": "peer-patch:#tslib:-",
+    "@microsoft/applicationinsights-dependencies-js": "peer-patch:#tslib:-",
+    "@microsoft/applicationinsights-properties-js": "peer-patch:#tslib:-"
   }
 }
