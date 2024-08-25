@@ -1,0 +1,16 @@
+# /src
+
+# embedded slashes explained
+# https://stackoverflow.com/a/54776954
+
+# node_modules
+node_modules
+
+# Build results
+[Pp]ublish/
+
+# Yarn
+**/.pnp.*
+**/.yarn/*
+!**/.yarn/patches
+!**/.yarn/plugins
