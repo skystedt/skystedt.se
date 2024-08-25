@@ -39,3 +39,16 @@ updates:
           - "@pixi/*"
       client-development:
         dependency-type: "development"
+
+  - package-ecosystem: "npm"
+    directories:
+      - "/src/Plugins/*"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "10:00"
+      timezone: "Europe/Stockholm"
+    groups:
+      plugins:
+        patterns:
+          - "*"
