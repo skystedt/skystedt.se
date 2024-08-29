@@ -13,7 +13,8 @@
     "update-yarn": "corepack up",
     "update-plugin-peer-patch": "yarn plugin import ../Plugins/yarn-plugin-peer-patch/bundles/@yarnpkg/plugin-peer-patch.js",
     "ncu": "yarn dlx npm-check-updates",
-    "update-transitive": "yarn dlx rimraf yarn.lock && yarn install"
+    "update-transitive": "yarn dlx rimraf yarn.lock && yarn install",
+    "eslint-inspector": "yarn dlx @eslint/config-inspector"
   },
   "engines": {
     "yarn": "4.x",
@@ -35,18 +36,19 @@
     "css-loader": "7.1.2",
     "css-minimizer-webpack-plugin": "7.0.0",
     "enhanced-resolve": "5.17.1",
-    "eslint": "8.57.0",
+    "eslint": "9.9.1",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "9.1.0",
     "eslint-import-resolver-custom-alias": "1.3.2",
     "eslint-import-resolver-exports": "1.0.0-beta.5",
     "eslint-plugin-compat": "6.0.0",
-    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-import-x": "4.1.1",
     "eslint-plugin-jsdoc": "50.2.2",
     "eslint-plugin-prettier": "5.2.1",
     "eslint-plugin-promise": "7.1.0",
     "eslint-webpack-plugin": "4.2.0",
     "glob": "11.0.0",
+    "globals": "15.9.0",
     "html-inline-css-webpack-plugin": "1.11.2",
     "html-webpack-plugin": "5.6.0",
     "ignore-loader": "0.1.2",
@@ -64,6 +66,7 @@
     "stylelint-config-standard": "36.0.1",
     "stylelint-webpack-plugin": "5.0.1",
     "terser-webpack-plugin": "5.3.10",
+    "typescript": "5.5.4",
     "update-browserslist-db": "1.1.0",
     "webpack": "5.94.0",
     "webpack-cli": "5.1.4",
@@ -84,6 +87,9 @@
   },
   "resolutions": {
     "@pixi/utils@npm:7.4.2": "patch:@pixi/utils@npm%3A7.4.2#~/.yarn/patches/@pixi-utils-npm-7.4.2-0fd06125d9.patch",
+    "eslint-config-airbnb-base": "peer-patch:#eslint@^9;eslint-plugin-import:eslint-plugin-import-x",
+    "eslint-import-resolver-custom-alias": "peer-patch:#eslint-plugin-import:eslint-plugin-import-x",
+    "eslint-import-resolver-exports": "peer-patch:#eslint-plugin-import:eslint-plugin-import-x",
     "@microsoft/applicationinsights-web": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-analytics-js": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-cfgsync-js": "peer-patch:#tslib:-",
@@ -91,6 +97,8 @@
     "@microsoft/applicationinsights-common": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-core-js": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-dependencies-js": "peer-patch:#tslib:-",
-    "@microsoft/applicationinsights-properties-js": "peer-patch:#tslib:-"
+    "@microsoft/applicationinsights-properties-js": "peer-patch:#tslib:-",
+    "eslint-plugin-import-x": "peer-patch:#typescript",
+    "@typescript-eslint/utils": "peer-patch:#typescript"
   }
 }

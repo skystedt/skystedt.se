@@ -26,7 +26,6 @@ export default class Stars extends Container {
    */
   load(gameSize, numberOfStars) {
     for (let i = 0; i < numberOfStars; i += 1) {
-      // eslint-disable-next-line no-use-before-define
       this.addChild(new Star(gameSize));
     }
   }
