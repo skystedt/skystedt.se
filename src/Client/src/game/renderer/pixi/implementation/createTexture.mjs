@@ -1,6 +1,6 @@
-import * as PIXI from '@pixi/core';
+import * as PIXI from 'pixi.js';
 
 /** @type { import("../../contract").createTexture } */
-const createTexture = (canvas) => new PIXI.Texture(new PIXI.BaseTexture(new PIXI.CanvasResource(canvas)));
+const createTexture = (canvas) => new PIXI.Texture({ source: new PIXI.CanvasSource({ resource: canvas }) });
 
 export default createTexture;

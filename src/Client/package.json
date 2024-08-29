@@ -75,18 +75,12 @@
   },
   "dependencies": {
     "@microsoft/applicationinsights-web": "3.3.1",
-    "@pixi/app": "7.4.2",
-    "@pixi/core": "7.4.2",
-    "@pixi/display": "7.4.2",
-    "@pixi/graphics": "7.4.2",
-    "@pixi/sprite": "7.4.2",
-    "@pixi/unsafe-eval": "7.4.2",
     "core-js": "3.38.1",
     "navigator.sendbeacon": "0.0.20",
+    "pixi.js": "8.1.5",
     "unfetch": "5.0.0"
   },
   "resolutions": {
-    "@pixi/utils@npm:7.4.2": "patch:@pixi/utils@npm%3A7.4.2#~/.yarn/patches/@pixi-utils-npm-7.4.2-0fd06125d9.patch",
     "eslint-config-airbnb-base": "peer-patch:#eslint@^9;eslint-plugin-import:eslint-plugin-import-x",
     "eslint-import-resolver-custom-alias": "peer-patch:#eslint-plugin-import:eslint-plugin-import-x",
     "eslint-import-resolver-exports": "peer-patch:#eslint-plugin-import:eslint-plugin-import-x",

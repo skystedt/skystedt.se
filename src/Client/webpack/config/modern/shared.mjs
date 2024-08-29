@@ -159,7 +159,7 @@ export default {
       },
       {
         test: /\.m?js$/i,
-        include: path.resolve(dir.node_modules, '@pixi'),
+        include: dir.pixi,
         use: {
           // use babel to transform pixi but don't include polyfills (we don't want polyfills in modern)
           loader: 'babel-loader',

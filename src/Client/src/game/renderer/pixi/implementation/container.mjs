@@ -1,19 +1,17 @@
-import * as PIXI_D from '@pixi/display';
-import * as PIXI_G from '@pixi/graphics';
-import * as PIXI_S from '@pixi/sprite';
+import * as PIXI from 'pixi.js';
 
 /** @typedef {import("../../contract").Container} Contract */
 
-export default class Container extends PIXI_D.Container {
+export default class Container extends PIXI.Container {
   /** @type {Contract["addChild"] } */
   // @ts-ignore
   addChild(child) {
-    super.addChild(/** @type { PIXI_S.Sprite | PIXI_G.Graphics } */ (child));
+    super.addChild(/** @type { PIXI.Sprite | PIXI.Graphics } */ (child));
   }
 
   /** @type {Contract["removeChild"] } */
   // @ts-ignore
   removeChild(child) {
-    super.removeChild(/** @type { PIXI_S.Sprite | PIXI_G.Graphics } */ (child));
+    super.removeChild(/** @type { PIXI.Sprite | PIXI.Graphics } */ (child));
   }
 }

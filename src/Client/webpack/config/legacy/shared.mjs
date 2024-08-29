@@ -64,23 +64,6 @@ export default {
         }
       },
       {
-        test: /\.m?js$/i,
-        include: path.resolve(dir.node_modules, '@pixi'), // pixi.js v7+ doesn't ship polyfills
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                await mergeBabelPresetEnvOptions({
-                  browserslistEnv: 'legacy'
-                })
-              ]
-            ]
-          }
-        }
-      },
-      {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
         type: 'asset/inline'
       },
