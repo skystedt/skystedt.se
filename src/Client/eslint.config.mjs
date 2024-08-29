@@ -21,7 +21,8 @@ const loadAirbnbRules = async () => {
   airbnb.extends.forEach((rulesFile) => {
     // Resolve the rules file and import it
     const filePath = import.meta.resolve(rulesFile, 'eslint-config-airbnb-base');
-    const fileImport = import(`file://${filePath}`);
+    const pathPrefix = process.platform === 'win32' ? 'file://' : '';
+    const fileImport = import(`${pathPrefix}${filePath}`);
     const promise = fileImport.then((file) => file.default.rules);
     promises.push(promise);
   });

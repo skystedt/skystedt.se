@@ -4159,9 +4159,9 @@ __metadata:
   linkType: hard
 
 "caniuse-lite@npm:^1.0.0, caniuse-lite@npm:^1.0.30001587, caniuse-lite@npm:^1.0.30001599, caniuse-lite@npm:^1.0.30001629, caniuse-lite@npm:^1.0.30001639, caniuse-lite@npm:^1.0.30001646":
-  version: 1.0.30001651
-  resolution: "caniuse-lite@npm:1.0.30001651"
-  checksum: 10c0/7821278952a6dbd17358e5d08083d258f092e2a530f5bc1840657cb140fbbc5ec44293bc888258c44a18a9570cde149ed05819ac8320b9710cf22f699891e6ad
+  version: 1.0.30001653
+  resolution: "caniuse-lite@npm:1.0.30001653"
+  checksum: 10c0/7aedf037541c93744148f599daea93d46d1f93ab4347997189efa2d1f003af8eadd7e1e05347ef09261ac1dc635ce375b8c6c00796245fffb4120a124824a14f
   languageName: node
   linkType: hard
 
@@ -5342,9 +5342,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-import-x@npm:4.1.0":
-  version: 4.1.0
-  resolution: "eslint-plugin-import-x@npm:4.1.0"
+"eslint-plugin-import-x@npm:4.1.1":
+  version: 4.1.1
+  resolution: "eslint-plugin-import-x@npm:4.1.1"
   dependencies:
     "@typescript-eslint/typescript-estree": "npm:^8.1.0"
     "@typescript-eslint/utils": "npm:^8.1.0"
@@ -5359,13 +5359,13 @@ __metadata:
     tslib: "npm:^2.6.3"
   peerDependencies:
     eslint: ^8.57.0 || ^9.0.0
-  checksum: 10c0/0afb415bda227d5fda8b77b9826fdcf813894833cfff5a2daa7ece85eeebaa95cc666878c09573d334fb416a9b8c9e78cc2e417cb645640786bc50201199af1c
+  checksum: 10c0/cb44a04cf830752534e71929857aa8dca3128d02cbdef367df79e998f333c229b81a645b5f2d62409d0e51ebc1875ad52618d72db1622e4112bd727a739af417
   languageName: node
   linkType: hard
 
-"eslint-plugin-import-x@peer-patch:npm%3A4.1.0#typescript":
-  version: 4.1.0
-  resolution: "eslint-plugin-import-x@peer-patch:npm%3A4.1.0#typescript"
+"eslint-plugin-import-x@peer-patch:npm%3A4.1.1#typescript":
+  version: 4.1.1
+  resolution: "eslint-plugin-import-x@peer-patch:npm%3A4.1.1#typescript"
   dependencies:
     "@typescript-eslint/typescript-estree": "npm:^8.1.0"
     "@typescript-eslint/utils": "npm:^8.1.0"
@@ -5381,7 +5381,7 @@ __metadata:
   peerDependencies:
     eslint: ^8.57.0 || ^9.0.0
     typescript: "*"
-  checksum: 10c0/0afb415bda227d5fda8b77b9826fdcf813894833cfff5a2daa7ece85eeebaa95cc666878c09573d334fb416a9b8c9e78cc2e417cb645640786bc50201199af1c
+  checksum: 10c0/cb44a04cf830752534e71929857aa8dca3128d02cbdef367df79e998f333c229b81a645b5f2d62409d0e51ebc1875ad52618d72db1622e4112bd727a739af417
   languageName: node
   linkType: hard
 
@@ -9380,7 +9380,7 @@ __metadata:
     eslint-import-resolver-custom-alias: "npm:1.3.2"
     eslint-import-resolver-exports: "npm:1.0.0-beta.5"
     eslint-plugin-compat: "npm:6.0.0"
-    eslint-plugin-import-x: "npm:4.1.0"
+    eslint-plugin-import-x: "npm:4.1.1"
     eslint-plugin-jsdoc: "npm:50.2.2"
     eslint-plugin-prettier: "npm:5.2.1"
     eslint-plugin-promise: "npm:7.1.0"
