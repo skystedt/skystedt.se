@@ -11,4 +11,4 @@ last 2 versions and not dead or > 0.01% and supports es6-module
 last 2 versions and not dead or > 0.01% and not supports es6-module
 
 [eslint-plugin-compat]
-last 2 versions and not dead or > 0.01% and not IE <= 9 and not Firefox <= 56 and not op_mini all
+last 2 versions and not dead or > 0.01% and not IE <= 10 and not Firefox <= 56 and not op_mini all
