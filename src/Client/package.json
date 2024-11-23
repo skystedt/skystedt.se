@@ -20,7 +20,7 @@
     "yarn": "4.x",
     "node": "20.x || 22.x"
   },
-  "packageManager": "yarn@4.5.0+sha512.837566d24eec14ec0f5f1411adb544e892b3454255e61fdef8fd05f3429480102806bac7446bc9daff3896b01ae4b62d00096c7e989f1596f2af10b927532f39",
+  "packageManager": "yarn@4.5.2+sha512.570504f67349ef26d2d86a768dc5ec976ead977aa086b0bb4237e97d5db7ae5c620f9f0e0edf3ea5047205063faff102bf2a2d778664a94eaaa1085ad483fe2e",
   "devDependencies": {
     "@babel/core": "7.25.8",
     "@babel/eslint-parser": "7.25.8",
