@@ -51,6 +51,11 @@ const babelPresetEnvOptions = {
     'es.parse-int',
     'es.promise',
     'es.weak-map',
+    'esnext.iterator.constructor',
+    'esnext.iterator.filter',
+    'esnext.iterator.find',
+    'esnext.iterator.for-each',
+    'esnext.iterator.reduce',
     'web.dom-collections.iterator'
   ]
 };
