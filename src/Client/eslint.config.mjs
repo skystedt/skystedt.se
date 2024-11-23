@@ -121,7 +121,7 @@ export default [
     name: 'plugin/compat/recommended',
     files: ['src/**/*.mjs'],
     settings: {
-      polyfills: ['Promise', 'fetch', 'navigator.sendBeacon', 'Array.from'],
+      polyfills: ['Promise', 'fetch', 'navigator.sendBeacon', 'Array.from', 'Map'],
       browserslistOpts: { env: 'eslint-plugin-compat' }
     }
   },
