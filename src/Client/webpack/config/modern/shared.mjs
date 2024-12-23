@@ -46,6 +46,7 @@ const babelPresetEnvOptions = {
 
     // small number of older browsers
     'es.array.includes',
+    'es.array.iterator',
     'es.array.reduce',
     'es.json.stringify',
     'es.parse-int',
