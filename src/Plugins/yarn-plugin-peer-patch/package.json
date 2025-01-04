@@ -7,12 +7,12 @@
   },
   "packageManager": "yarn@4.4.0",
   "dependencies": {
-    "@yarnpkg/cli": "4.5.3",
-    "@yarnpkg/core": "4.1.6",
+    "@yarnpkg/cli": "4.6.0",
+    "@yarnpkg/core": "4.2.0",
     "prettier": "3.4.2"
   },
   "devDependencies": {
-    "@types/node": "22.10.2",
+    "@types/node": "22.10.5",
     "@yarnpkg/builder": "4.2.0",
     "typescript": "5.7.2"
   }
