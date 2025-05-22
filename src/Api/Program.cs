@@ -8,10 +8,6 @@ var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults(builder =>
     {
         builder.AddResponseExceptions();
-    },
-    options =>
-    {
-        options.EnableUserCodeException = true;
     })
     .ConfigureAppConfiguration(config =>
     {
