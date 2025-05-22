@@ -86,7 +86,7 @@
     "unfetch": "5.0.0"
   },
   "resolutions": {
-    "@pixi/utils@npm:7.4.2": "patch:@pixi/utils@npm%3A7.4.2#~/.yarn/patches/@pixi-utils-npm-7.4.2-0fd06125d9.patch",
+    "@pixi/utils@npm:7.4.3": "patch:@pixi/utils@npm%3A7.4.3#~/.yarn/patches/@pixi-utils-npm-7.4.3-cb6e0da58f.patch",
     "eslint-config-airbnb-base": "peer-patch:#eslint@^9;eslint-plugin-import:eslint-plugin-import-x",
     "eslint-import-resolver-custom-alias": "peer-patch:#eslint-plugin-import:eslint-plugin-import-x",
     "eslint-import-resolver-exports": "peer-patch:#eslint-plugin-import:eslint-plugin-import-x",
