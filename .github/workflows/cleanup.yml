@@ -3,6 +3,9 @@ name: Reusable - Cleanup
 on:
   workflow_call:
         
+permissions:
+  {}
+
 jobs:
   cleanup:
     name: Cleanup
