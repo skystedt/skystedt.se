@@ -3,6 +3,9 @@ name: Reusable - Build, Test and Deploy
 on:
   workflow_call:
 
+permissions:
+  pull-requests: write
+
 env:
   SRC_DIR: "src"
   PUBLISH_DIR: "publish"
