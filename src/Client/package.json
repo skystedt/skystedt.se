@@ -75,12 +75,12 @@
   },
   "dependencies": {
     "@microsoft/applicationinsights-web": "3.3.8",
-    "@pixi/app": "7.4.2",
-    "@pixi/core": "7.4.2",
-    "@pixi/display": "7.4.2",
-    "@pixi/graphics": "7.4.2",
-    "@pixi/sprite": "7.4.2",
-    "@pixi/unsafe-eval": "7.4.2",
+    "@pixi/app": "7.4.3",
+    "@pixi/core": "7.4.3",
+    "@pixi/display": "7.4.3",
+    "@pixi/graphics": "7.4.3",
+    "@pixi/sprite": "7.4.3",
+    "@pixi/unsafe-eval": "7.4.3",
     "core-js": "3.39.0",
     "navigator.sendbeacon": "0.0.20",
     "unfetch": "5.0.0"
