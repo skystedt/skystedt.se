@@ -1,4 +1,4 @@
-﻿name: Push main
+name: Push main
 
 concurrency: 
   group: push-main-${{ github.ref }}
@@ -12,6 +12,7 @@ on:
 permissions:
   actions: read
   contents: read
+  pull-requests: write
 
 jobs:
   build_test_and_deploy:
