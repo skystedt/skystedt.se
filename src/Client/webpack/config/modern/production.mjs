@@ -6,8 +6,7 @@ import webpack from 'webpack';
 import settings from '../../../settings.mjs';
 import { dir } from '../../utils.mjs';
 
-/** @typedef { import("eslint").Linter.FlatConfig } FlatConfig */
-/** @typedef { import("eslint-webpack-plugin").Options & { baseConfig: FlatConfig[] } } ESLintPluginOptions */
+/** @typedef { import("eslint-webpack-plugin").Options } ESLintPluginOptions */
 
 /** @type {webpack.Configuration} */
 export default {
@@ -25,7 +24,6 @@ export default {
     }),
     new ESLintPlugin(
       /** @type {ESLintPluginOptions} */ ({
-        configType: 'flat',
         extensions: ['.mjs'],
         failOnError: true,
         failOnWarning: true,

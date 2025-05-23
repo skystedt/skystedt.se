@@ -2,17 +2,17 @@
 import babelParser from '@babel/eslint-parser/experimental-worker'; // experimental-worker is needed to run asynchronously, which is needed when using esm configuration
 import comments from '@eslint-community/eslint-plugin-eslint-comments/configs';
 import airbnb from 'eslint-config-airbnb-base';
-import prettier from 'eslint-config-prettier';
+import prettier from 'eslint-config-prettier/flat';
 import compat from 'eslint-plugin-compat';
 import importX from 'eslint-plugin-import-x';
 import jsdoc from 'eslint-plugin-jsdoc';
 import pluginPromise from 'eslint-plugin-promise';
 import globals from 'globals';
 
-/** @typedef { import("eslint").Linter.FlatConfig } FlatConfig */
+/** @typedef { import("eslint").Linter.Config } Config */
 /** @typedef { import("eslint").Linter.RulesRecord } Rules */
 
-/** @typedef { typeof pluginPromise & { configs: { [config: string]: FlatConfig } } } PromiseConfig */
+/** @typedef { typeof pluginPromise & { configs: { [config: string]: Config } } } PromiseConfig */
 
 /** @returns {Promise<Rules>} */
 const loadAirbnbRules = async () => {
@@ -55,7 +55,7 @@ const splitAirbnbRules = (rules) => {
 const allAirBnbRules = await loadAirbnbRules();
 const { airbnbRules, importRules } = splitAirbnbRules(allAirBnbRules);
 
-/** @type {FlatConfig[]} */
+/** @type {Config[]} */
 export default [
   {
     name: 'settings/global',
@@ -94,7 +94,7 @@ export default [
     }
   },
   {
-    .../** @type {FlatConfig} */ (comments.recommended),
+    .../** @type {Config} */ (comments.recommended),
     name: 'plugin/comments/recommended'
   },
   {
@@ -126,7 +126,7 @@ export default [
     }
   },
   {
-    .../** @type {FlatConfig} */ (importX.flatConfigs.recommended),
+    .../** @type {Config} */ (importX.flatConfigs.recommended),
     name: 'plugin/import-x/recommended',
     settings: {
       'import-x/resolver': {

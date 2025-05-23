@@ -11,6 +11,6 @@
   "eslint.codeActionsOnSave.rules": ["curly", "no-var", "prefer-const"],
   "css.validate": false,
   "stylelint.validate": ["css"],
-  "cSpell.words": ["Skystedt", "pixi"],
+  "cSpell.words": ["corejs", "pixi", "Skystedt"],
   "cSpell.ignorePaths": [".vscode", "node_modules", "package.json", ".eslintrc.json"]
 }
