@@ -39,7 +39,7 @@ jobs:
         run: dotnet test --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
 
       - name: Dotnet Publish
-        run: dotnet publish ${{ env.API_DIR }} --output ${{ env.PUBLISH_DIR }}/${{ env.API_DIR }} --configuration ${{ env.DOTNET_CONFIGURATION }}
+        run: dotnet publish ${{ env.API_DIR }} --output ${{ env.PUBLISH_DIR }}/${{ env.API_DIR }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
         
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
