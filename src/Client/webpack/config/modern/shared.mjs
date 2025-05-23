@@ -1,4 +1,4 @@
-// cSpell:ignore staticwebapp, subresource, caniuse
+// cSpell:ignore staticwebapp, corejs, subresource, caniuse
 import CopyPlugin from 'copy-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import _HtmlInlineCssWebpackPlugin from 'html-inline-css-webpack-plugin';
@@ -12,6 +12,7 @@ import webpack from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import BuildInfo from '../../build-info.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
+import DataUriFaviconHtmlWebpackPlugin from '../../plugins/data-uri-favicon-html-webpack-plugin.mjs';
 import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
 import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
 import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.mjs';
@@ -212,7 +213,9 @@ export default {
     new webpack.ProgressPlugin(printProgress('modern')),
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
-      scriptLoading: 'module'
+      favicon: path.resolve(dir.src, 'favicon.ico'),
+      scriptLoading: 'module',
+      minify: 'auto'
     }),
     new ScriptsHtmlWebpackPlugin({
       add: [
@@ -225,6 +228,7 @@ export default {
         { path: 'legacy/*.js', type: 'nomodule', defer: true, integrity: false }
       ]
     }),
+    new DataUriFaviconHtmlWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].[contenthash].css'
     }),
