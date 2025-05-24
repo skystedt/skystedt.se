@@ -13,7 +13,6 @@ import BuildInfo from '../../build-info.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import DataUriFaviconHtmlWebpackPlugin from '../../plugins/data-uri-favicon-html-webpack-plugin.mjs';
 import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
-import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
 import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.mjs';
 import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
@@ -31,7 +30,7 @@ const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin
 /** @typedef { import("@babel/preset-env").Options | { browserslistEnv: string }} BabelPresetEnvOptions */
 /** @typedef { import("postcss-load-config").Config } PostcssConfig */
 
-const buildInfo = new BuildInfo();
+export const buildInfo = new BuildInfo();
 
 /** @type {BabelPresetEnvOptions} */
 const babelPresetEnvOptions = {
@@ -253,7 +252,6 @@ export default {
     new CreateFilePlugin(dir.publish, 'staticwebapp.config.json', staticWebAppConfig),
     new CreateFilePlugin(dir.dist, 'build/version.json', () => buildInfo.version()),
     new CreateFilePlugin(dir.dist, 'build/browsers.json', () => buildInfo.browsers()),
-    new CreateFilePlugin(dir.dist, 'build/sizes.json', () => buildInfo.sizes()),
-    new PostCompilationPrintPlugin(() => buildInfo.resolved)
+    new CreateFilePlugin(dir.dist, 'build/sizes.json', () => buildInfo.sizes())
   ]
 };
