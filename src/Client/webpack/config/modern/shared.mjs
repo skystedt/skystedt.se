@@ -1,5 +1,4 @@
 // cSpell:ignore staticwebapp, corejs, subresource, caniuse
-import CopyPlugin from 'copy-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import _HtmlInlineCssWebpackPlugin from 'html-inline-css-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
@@ -251,7 +250,6 @@ export default {
     }),
     new ThrowOnNestedPackagePlugin(dir.node_modules, nestedPackagesCaniuseLite),
     new ThrowOnAssetEmittedPlugin('polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
-    new CopyPlugin({ patterns: [path.resolve(dir.src, 'favicon.ico')] }),
     new CreateFilePlugin(dir.publish, 'staticwebapp.config.json', staticWebAppConfig),
     new CreateFilePlugin(dir.dist, 'build/version.json', () => buildInfo.version()),
     new CreateFilePlugin(dir.dist, 'build/browsers.json', () => buildInfo.browsers()),
