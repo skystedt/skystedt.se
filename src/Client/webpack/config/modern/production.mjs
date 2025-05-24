@@ -4,7 +4,9 @@ import path from 'node:path';
 import StylelintPlugin from 'stylelint-webpack-plugin';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
+import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
 import { dir } from '../../utils.mjs';
+import { buildInfo } from './shared.mjs';
 
 /** @typedef { import("eslint-webpack-plugin").Options } ESLintPluginOptions */
 
@@ -39,6 +41,7 @@ export default {
       extensions: '.css',
       failOnError: true,
       failOnWarning: true
-    })
+    }),
+    new PostCompilationPrintPlugin(() => buildInfo.resolved)
   ]
 };

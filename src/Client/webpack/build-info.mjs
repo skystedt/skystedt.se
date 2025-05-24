@@ -76,7 +76,7 @@ export default class BuildInfo {
         const matches = fileTypes.some((fileType) => minimatch(filePath, fileType));
         if (matches) {
           const stat = await fs.stat(path.resolve(dir.dist, file));
-          const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' });
+          const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' }) ?? '?';
           result[file] = size;
         }
       })
