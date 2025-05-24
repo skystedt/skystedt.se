@@ -99,7 +99,6 @@
     "@microsoft/applicationinsights-common": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-core-js": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-dependencies-js": "peer-patch:#tslib:-",
-    "@microsoft/applicationinsights-properties-js": "peer-patch:#tslib:-",
-    "eslint-plugin-import-x": "peer-patch:#typescript"
+    "@microsoft/applicationinsights-properties-js": "peer-patch:#tslib:-"
   }
 }
