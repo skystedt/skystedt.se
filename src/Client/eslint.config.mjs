@@ -191,7 +191,7 @@ export default [
       'jsdoc/valid-types': 'off',
       'jsdoc/require-param-description': 'off',
       'jsdoc/require-returns-description': 'off',
-      'jsdoc/check-indentation': 'warn',
+      'jsdoc/check-indentation': ['warn', { excludeTags: ['typedef'] }],
       'jsdoc/check-syntax': 'warn',
       'jsdoc/no-blank-blocks': 'warn',
       'jsdoc/no-blank-block-descriptions': 'warn',
