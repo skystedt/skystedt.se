@@ -11,9 +11,10 @@ import webpack from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import BuildInfo from '../../build-info.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
-import DataUriFaviconHtmlWebpackPlugin from '../../plugins/data-uri-favicon-html-webpack-plugin.mjs';
-import ExtendedCspHtmlWebpackPlugin from '../../plugins/extended-csp-html-webpack-plugin.mjs';
-import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.mjs';
+import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpack-plugin.mjs';
+import DataUriFaviconHtmlWebpackPlugin from '../../plugins/html/data-uri-favicon-html-webpack-plugin.mjs';
+import MoveHookHtmlWebpackPlugin from '../../plugins/html/move-hook-html-webpack-plugin.mjs';
+import ScriptsHtmlWebpackPlugin from '../../plugins/html/scripts-html-webpack-plugin.mjs';
 import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
@@ -88,15 +89,17 @@ const nestedPackagesCaniuseLite = [
   ['postcss-preset-env', 'browserslist', 'caniuse-lite']
 ];
 
-/** @type {string} */
+/** @typedef {{ [directive: string]: string | string[] }} CspPolicy */
+/** @type {CspPolicy}} */
 let cspPolicy;
-const cspProcessCallback = (/** @type {string} */ builtPolicy) => {
-  cspPolicy = builtPolicy;
+const cspCallback = (/** @type {CspPolicy}} */ policy) => {
+  cspPolicy = policy;
 };
 const staticWebAppConfig = () => {
   const rootHeaders = staticWebApp.routes.find((route) => route.route === '/')?.headers;
   if (rootHeaders) {
-    rootHeaders['Content-Security-Policy'] = String(cspPolicy);
+    const builtPolicy = CspHashesHtmlWebpackPlugin.buildPolicy(cspPolicy);
+    rootHeaders['Content-Security-Policy'] = builtPolicy;
   }
   return staticWebApp;
 };
@@ -214,6 +217,7 @@ export default {
       scriptLoading: 'module',
       minify: 'auto'
     }),
+    new MoveHookHtmlWebpackPlugin(), // Required for CSP
     new ScriptsHtmlWebpackPlugin({
       add: [
         { path: 'legacy/insights.*.js', directory: dir.dist },
@@ -234,17 +238,13 @@ export default {
       enabled: 'auto',
       hashFuncNames: ['sha384']
     }),
-    new ExtendedCspHtmlWebpackPlugin(csp, {
-      hashingMethod: 'sha384',
-      hashEnabled: {
-        'script-src': false,
-        'style-src': true
+    new CspHashesHtmlWebpackPlugin(csp, {
+      hashAlgorithm: 'sha384',
+      metaTag: false,
+      ignore: {
+        externalPatterns: ['legacy/*.js']
       },
-      nonceEnabled: {
-        'script-src': false,
-        'style-src': false
-      },
-      processFn: cspProcessCallback
+      callback: cspCallback
     }),
     new ThrowOnNestedPackagePlugin(dir.node_modules, nestedPackagesCaniuseLite),
     new ThrowOnAssetEmittedPlugin('polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
