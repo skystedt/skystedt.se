@@ -14,6 +14,7 @@ import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpack-plugin.mjs';
 import DataUriFaviconHtmlWebpackPlugin from '../../plugins/html/data-uri-favicon-html-webpack-plugin.mjs';
 import MoveHookHtmlWebpackPlugin from '../../plugins/html/move-hook-html-webpack-plugin.mjs';
+import PreloadHtmlWebpackPlugin from '../../plugins/html/preload-html-webpack-plugin.mjs';
 import ScriptsHtmlWebpackPlugin from '../../plugins/html/scripts-html-webpack-plugin.mjs';
 import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
@@ -234,6 +235,12 @@ export default {
       filename: '[name].[contenthash].css'
     }),
     new HtmlInlineCssWebpackPlugin(),
+    new PreloadHtmlWebpackPlugin([
+      {
+        pattern: '*.mjs',
+        type: 'modulepreload'
+      }
+    ]),
     new SubresourceIntegrityPlugin({
       enabled: 'auto',
       hashFuncNames: ['sha384']
