@@ -17,7 +17,7 @@ import ScriptsHtmlWebpackPlugin from '../../plugins/scripts-html-webpack-plugin.
 import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
-import { browserslistBrowsers, dir, mergeBabelPresetEnvOptions, printProgress } from '../../utils.mjs';
+import { browserslistBrowsers, dir, mergeBabelPresetEnvOptions } from '../../utils.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
@@ -208,7 +208,6 @@ export default {
     ]
   },
   plugins: [
-    new webpack.ProgressPlugin(printProgress('modern')),
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
       favicon: path.resolve(dir.src, 'favicon.ico'),
