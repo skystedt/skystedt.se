@@ -5,7 +5,7 @@ import StylelintPlugin from 'stylelint-webpack-plugin';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
 import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
-import { dir } from '../../utils.mjs';
+import { dir, printProgress } from '../../utils.mjs';
 import { buildInfo } from './shared.mjs';
 
 /** @typedef { import("eslint-webpack-plugin").Options } ESLintPluginOptions */
@@ -21,6 +21,7 @@ export default {
     minimize: true
   },
   plugins: [
+    new webpack.ProgressPlugin(printProgress('modern')),
     new webpack.DefinePlugin({
       INSTRUMENTATION_KEY: `"${settings.production.INSTRUMENTATION_KEY}"`
     }),

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
-import { dir } from '../../utils.mjs';
+import { dir, printProgress } from '../../utils.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
@@ -15,6 +15,7 @@ export default {
     minimize: true
   },
   plugins: [
+    new webpack.ProgressPlugin(printProgress('legacy')),
     new webpack.DefinePlugin({
       INSTRUMENTATION_KEY: `"${settings.production.INSTRUMENTATION_KEY}"`
     })

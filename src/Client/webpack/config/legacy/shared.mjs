@@ -2,7 +2,7 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-import { dir, mergeBabelPresetEnvOptions, printProgress } from '../../utils.mjs';
+import { dir, mergeBabelPresetEnvOptions } from '../../utils.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 
 /** @type {webpack.Configuration} */
@@ -90,5 +90,5 @@ export default {
       }
     ]
   },
-  plugins: [new webpack.ProgressPlugin(printProgress('legacy'))]
+  plugins: []
 };
