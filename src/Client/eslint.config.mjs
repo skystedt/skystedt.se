@@ -1,6 +1,5 @@
 // cSpell:ignore nonconstructor
-// @ts-expect-error TS2307
-import babelParser from '@babel/eslint-parser/experimental-worker'; // experimental-worker is needed to run asynchronously, which is needed when using esm configuration
+import babelParser from '@babel/eslint-parser';
 import comments from '@eslint-community/eslint-plugin-eslint-comments/configs';
 import stylistic from '@stylistic/eslint-plugin';
 import airbnb from 'eslint-config-airbnb-base';
@@ -103,11 +102,6 @@ export default [
     languageOptions: {
       globals: {
         ...globals.node
-      },
-      parserOptions: {
-        babelOptions: {
-          plugins: ['@babel/plugin-syntax-import-attributes'] // required for "import with json" in the configuration file
-        }
       }
     }
   },

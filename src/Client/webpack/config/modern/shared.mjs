@@ -4,11 +4,10 @@ import _HtmlInlineCssWebpackPlugin from 'html-inline-css-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'node:path';
-import postcssMergeRules from 'postcss-merge-rules';
-import postcssPresetEnv from 'postcss-preset-env';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
+import { polyfillCorejs, polyfillCorejsExcluded } from '../../../babel.config.mjs';
 import BuildInfo from '../../build-info.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpack-plugin.mjs';
@@ -18,8 +17,8 @@ import PreloadHtmlWebpackPlugin from '../../plugins/html/preload-html-webpack-pl
 import ScriptsHtmlWebpackPlugin from '../../plugins/html/scripts-html-webpack-plugin.mjs';
 import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
-import postcssRemoveCarriageReturn from '../../postcss/postcss-remove-carriage-return.mjs';
-import { browserslistBrowsers, dir, mergeBabelPresetEnvOptions } from '../../utils.mjs';
+import { postcssOptions } from '../../postcss/config.mjs';
+import { dir } from '../../utils.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
@@ -29,66 +28,7 @@ const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin
   /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
 );
 
-/** @typedef { import("@babel/preset-env").Options | { browserslistEnv: string }} BabelPresetEnvOptions */
-/** @typedef { import("postcss-load-config").Config } PostcssConfig */
-
 export const buildInfo = new BuildInfo();
-
-/** @type {BabelPresetEnvOptions} */
-const babelPresetEnvOptions = {
-  browserslistEnv: 'modern',
-  // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set debug to true to find what files/polyfills is causing it
-  // http://zloirock.github.io/core-js/compat/
-  debug: false,
-  // we don't want polyfills in modern, but instead of disabling them, we exclude the ones that would be added (to check that we don't use unwanted functionality)
-  exclude: [
-    'es.error.cause', // mostly unsupported on older browsers, https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause
-    'es.array.push', // length not properly set for arrays larger than 0x100000000, https://github.com/zloirock/core-js/blob/master/packages/core-js/modules/es.array.push.js
-
-    // small number of older browsers
-    'es.array.includes',
-    'es.array.iterator',
-    'es.array.reduce',
-    'es.iterator.constructor',
-    'es.iterator.filter',
-    'es.iterator.find',
-    'es.iterator.for-each',
-    'es.iterator.reduce',
-    'es.json.stringify',
-    'es.parse-int',
-    'es.promise',
-    'es.string.includes',
-    'es.weak-map',
-    'esnext.iterator.constructor',
-    'esnext.iterator.filter',
-    'esnext.iterator.find',
-    'esnext.iterator.for-each',
-    'esnext.iterator.reduce',
-    'web.dom-collections.iterator'
-  ]
-};
-
-/** @type {PostcssConfig} */
-const postcssOptions = {
-  plugins: [
-    postcssRemoveCarriageReturn(),
-    postcssMergeRules(),
-    postcssPresetEnv({
-      browsers: browserslistBrowsers('all'),
-      features: {
-        'nesting-rules': true
-      }
-    })
-  ]
-};
-
-const nestedPackagesCaniuseLite = [
-  ['browserslist', 'caniuse-lite'],
-  ['webpack', 'browserslist', 'caniuse-lite'],
-  ['@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite'],
-  ['@babel/preset-env', 'browserslist', 'caniuse-lite'],
-  ['postcss-preset-env', 'browserslist', 'caniuse-lite']
-];
 
 /** @typedef {{ [directive: string]: string | string[] }} CspPolicy */
 /** @type {CspPolicy}} */
@@ -168,7 +108,15 @@ export default {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: [['@babel/preset-env', await mergeBabelPresetEnvOptions(babelPresetEnvOptions)]]
+            browserslistEnv: 'modern',
+            plugins: [
+              polyfillCorejs({
+                exclude: polyfillCorejsExcluded,
+                // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set debug to true to find what files/polyfills is causing it
+                // http://zloirock.github.io/core-js/compat/
+                debug: false
+              })
+            ]
           }
         }
       },
@@ -179,15 +127,11 @@ export default {
           // use babel to transform pixi but don't include polyfills (we don't want polyfills in modern)
           loader: 'babel-loader',
           options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                await mergeBabelPresetEnvOptions({
-                  browserslistEnv: 'modern',
-                  useBuiltIns: false,
-                  corejs: undefined
-                })
-              ]
+            browserslistEnv: 'modern',
+            plugins: [
+              polyfillCorejs({
+                shouldInjectPolyfill: () => false
+              })
             ]
           }
         }
@@ -253,7 +197,13 @@ export default {
       },
       callback: cspCallback
     }),
-    new ThrowOnNestedPackagePlugin(dir.node_modules, nestedPackagesCaniuseLite),
+    new ThrowOnNestedPackagePlugin(dir.node_modules, [
+      ['browserslist', 'caniuse-lite'],
+      ['webpack', 'browserslist', 'caniuse-lite'],
+      ['@babel/helper-compilation-targets', 'browserslist', 'caniuse-lite'],
+      ['@babel/preset-env', 'browserslist', 'caniuse-lite'],
+      ['postcss-preset-env', 'browserslist', 'caniuse-lite']
+    ]),
     new ThrowOnAssetEmittedPlugin('polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
     new CreateFilePlugin(dir.publish, 'staticwebapp.config.json', staticWebAppConfig),
     new CreateFilePlugin(dir.dist, 'build/version.json', () => buildInfo.version()),
