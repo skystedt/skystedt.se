@@ -2,7 +2,7 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-import { dir, mergeBabelPresetEnvOptions } from '../../utils.mjs';
+import { dir } from '../../utils.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 
 /** @type {webpack.Configuration} */
@@ -52,14 +52,7 @@ export default {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                await mergeBabelPresetEnvOptions({
-                  browserslistEnv: 'legacy'
-                })
-              ]
-            ]
+            browserslistEnv: 'legacy'
           }
         }
       },
@@ -69,14 +62,7 @@ export default {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                await mergeBabelPresetEnvOptions({
-                  browserslistEnv: 'legacy'
-                })
-              ]
-            ]
+            browserslistEnv: 'legacy'
           }
         }
       },

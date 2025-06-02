@@ -404,7 +404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-syntax-import-attributes@npm:7.27.1, @babel/plugin-syntax-import-attributes@npm:^7.27.1":
+"@babel/plugin-syntax-import-attributes@npm:^7.27.1":
   version: 7.27.1
   resolution: "@babel/plugin-syntax-import-attributes@npm:7.27.1"
   dependencies:
@@ -3500,6 +3500,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"babel-plugin-polyfill-corejs3@npm:0.12.0":
+  version: 0.12.0
+  resolution: "babel-plugin-polyfill-corejs3@npm:0.12.0"
+  dependencies:
+    "@babel/helper-define-polyfill-provider": "npm:^0.6.4"
+    core-js-compat: "npm:^3.41.0"
+  peerDependencies:
+    "@babel/core": ^7.4.0 || ^8.0.0-0 <8.0.0
+  checksum: 10c0/0b076936436a8631dc64bb931312fa4f116bb85dbbe3d2c303c86fba0c17c767bef9957c9f3e10832291d42d329d9222810f6339ea6cd83d06a8739a1452bc4a
+  languageName: node
+  linkType: hard
+
 "babel-plugin-polyfill-corejs3@npm:^0.11.0":
   version: 0.11.1
   resolution: "babel-plugin-polyfill-corejs3@npm:0.11.1"
@@ -3999,7 +4011,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js-compat@npm:^3.40.0":
+"core-js-compat@npm:^3.40.0, core-js-compat@npm:^3.41.0":
   version: 3.42.0
   resolution: "core-js-compat@npm:3.42.0"
   dependencies:
@@ -8693,7 +8705,6 @@ __metadata:
     "@babel/core": "npm:7.27.4"
     "@babel/eslint-parser": "npm:7.27.1"
     "@babel/helper-compilation-targets": "npm:7.27.2"
-    "@babel/plugin-syntax-import-attributes": "npm:7.27.1"
     "@babel/preset-env": "npm:7.27.2"
     "@eslint-community/eslint-plugin-eslint-comments": "npm:4.5.0"
     "@microsoft/applicationinsights-web": "npm:3.3.8"
@@ -8705,6 +8716,7 @@ __metadata:
     "@pixi/unsafe-eval": "npm:7.4.3"
     "@stylistic/eslint-plugin": "npm:^4.4.0"
     babel-loader: "npm:10.0.0"
+    babel-plugin-polyfill-corejs3: "npm:0.12.0"
     browserslist: "npm:4.25.0"
     bytes: "npm:3.1.2"
     core-js: "npm:3.42.0"

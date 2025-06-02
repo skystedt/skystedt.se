@@ -1,13 +1,8 @@
 // cSpell:ignore picocolors
-import { loadPartialConfigAsync as loadBabelConfigAsync } from '@babel/core';
 import browserslist from 'browserslist';
 import path from 'node:path';
 import pc from 'picocolors';
 import webpack from 'webpack';
-
-/** @typedef { import("@babel/core").PartialConfig } BabelPartialConfig */
-/** @typedef { import("@babel/core").ConfigItem } BabelConfigItem */
-/** @typedef { import("@babel/preset-env").Options } BabelPresetEnvOptions */
 
 const cwd = process.cwd();
 export const dir = {
@@ -49,28 +44,3 @@ export const mergeConfigurationRules = (configuration) => ({
   devServer: { $set: configuration.devServer },
   plugins: { $push: configuration.plugins || [] }
 });
-
-/**
- * @param {BabelPresetEnvOptions | { browserslistEnv: string}} additionalOptions
- * @returns {Promise<BabelPresetEnvOptions>}
- */
-export const mergeBabelPresetEnvOptions = async (additionalOptions) => {
-  const presetName = '@babel/preset-env';
-
-  const { options } = /** @type {Readonly<BabelPartialConfig>} */ (await loadBabelConfigAsync());
-
-  const preset = Array.isArray(options.presets)
-    ? /** @type {BabelConfigItem | undefined} */ (
-        options.presets.find((preset) => /** @type {BabelConfigItem} */ (preset).file?.request === presetName)
-      )
-    : null;
-
-  const configOptions = /** @type {BabelPresetEnvOptions} */ (preset?.options || {});
-
-  const mergedOptions = {
-    ...configOptions,
-    ...additionalOptions
-  };
-
-  return mergedOptions;
-};
