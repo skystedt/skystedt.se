@@ -12,7 +12,7 @@
     "prettier": "3.5.3"
   },
   "devDependencies": {
-    "@types/node": "22.15.30",
+    "@types/node": "24.0.1",
     "@yarnpkg/builder": "4.2.2",
     "typescript": "5.8.3"
   }
