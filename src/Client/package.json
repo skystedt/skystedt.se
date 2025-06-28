@@ -76,7 +76,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "dependencies": {
-    "@microsoft/applicationinsights-web": "3.3.8",
+    "@microsoft/applicationinsights-web": "3.3.9",
     "@pixi/app": "7.4.3",
     "@pixi/core": "7.4.3",
     "@pixi/display": "7.4.3",
