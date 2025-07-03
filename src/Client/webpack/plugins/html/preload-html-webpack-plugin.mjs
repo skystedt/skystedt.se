@@ -72,7 +72,7 @@ export default class PreloadHtmlWebpackPlugin {
   /**
    * @param {string} file
    * @param {Type} type
-   * @param {{}} [attributes]
+   * @param {{} | undefined} attributes
    * @returns {HtmlWebpackPlugin.HtmlTagObject}
    */
   #createPreloadTag(file, type, attributes) {

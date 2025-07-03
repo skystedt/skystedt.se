@@ -8,8 +8,6 @@ import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plu
 import { dir, printProgress } from '../../utils.mjs';
 import { buildInfo } from './shared.mjs';
 
-/** @typedef { import("eslint-webpack-plugin").Options } ESLintPluginOptions */
-
 /** @type {webpack.Configuration} */
 export default {
   mode: 'production',
@@ -26,7 +24,7 @@ export default {
       INSTRUMENTATION_KEY: `"${settings.production.INSTRUMENTATION_KEY}"`
     }),
     new ESLintPlugin(
-      /** @type {ESLintPluginOptions} */ ({
+      /** @type {ESLintPlugin.Options} */ ({
         extensions: ['.mjs'],
         failOnError: true,
         failOnWarning: true,
