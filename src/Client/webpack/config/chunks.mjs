@@ -62,18 +62,23 @@ export const cacheGroups = {
     name: 'polyfills'
   },
   vendors: {
-    test: (/** @type {webpack.NormalModule} */ module) =>
-      module.resource && // ensure module is webpack.NormalModule
-      minimatch(module.resource, path.resolve(dir.node_modules, '**'), { windowsPathsNoEscape: true }),
+    test: (/** @type {webpack.Module} */ module) =>
+      !!(/** @type {webpack.NormalModule} */ (module).resource) && // ensure module is webpack.NormalModule
+      minimatch(/** @type {webpack.NormalModule} */ (module).resource, path.resolve(dir.node_modules, '**'), {
+        windowsPathsNoEscape: true
+      }),
     type: wildcardMatch('javascript/*'),
-    name: (/** @type {webpack.NormalModule} */ module) =>
-      mapVendorModuleToChunk(module.resourceResolveData?.descriptionFileData.name)
+    name: (/** @type {webpack.Module} */ module) =>
+      mapVendorModuleToChunk(
+        /** @type {string | undefined} */ (
+          /** @type {webpack.NormalModule} */ (module).resourceResolveData?.descriptionFileData?.name
+        )
+      )
   },
   ignored: {
-    test: (/** @type {webpack.NormalModule} */ module) =>
-      module.identifier && module.identifier().startsWith('ignored|'),
+    test: (/** @type {webpack.Module} */ module) => module.identifier && module.identifier().startsWith('ignored|'),
     type: wildcardMatch('javascript/*'),
-    name: (/** @type {webpack.NormalModule} */ module) => {
+    name: (/** @type {webpack.Module} */ module) => {
       console.warn(`Using ignored module: ${module.identifier()}`);
       const [, modulePath] = module.identifier().split('|');
       const moduleName = path.relative(dir.node_modules, modulePath);
@@ -83,16 +88,16 @@ export const cacheGroups = {
 };
 
 /**
- * @param {string} moduleName
+ * @param {string | undefined} moduleName
  * @returns {string}
  */
 function mapVendorModuleToChunk(moduleName) {
   // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunksname
   // "You can also use on demand named chunks, but you must be careful that the selected modules are only used under this chunk."
   switch (true) {
-    case moduleName.startsWith('@pixi/'):
+    case moduleName?.startsWith('@pixi/'):
       return 'pixi';
-    case moduleName.startsWith('@microsoft/applicationinsights-'):
+    case moduleName?.startsWith('@microsoft/applicationinsights-'):
       return 'insights';
     default:
       // check specific module name below
