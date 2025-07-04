@@ -4,6 +4,7 @@ import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { dir } from '../../utils.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
+import { licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
@@ -24,7 +25,18 @@ export default {
       minSizeReduction: 0,
       cacheGroups
     },
-    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false, // don't extract comments to a separate LICENSE file, license-webpack-plugin handles licenses
+        terserOptions: {
+          format: {
+            comments: false, // don't include comments in the output
+            preamble: licensePreamble
+          }
+        }
+      }),
+      new CssMinimizerPlugin()
+    ],
     realContentHash: true,
     removeAvailableModules: true,
     sideEffects: true
@@ -76,5 +88,5 @@ export default {
       }
     ]
   },
-  plugins: []
+  plugins: [new LicenseWebpackPlugin(licenseOptions)]
 };

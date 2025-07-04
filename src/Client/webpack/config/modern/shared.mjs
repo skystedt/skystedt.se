@@ -20,6 +20,7 @@ import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mj
 import { postcssOptions } from '../../postcss/config.mjs';
 import { dir } from '../../utils.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
+import { LicenseWebpackPlugin, licenseOptions, licensePreamble } from '../licenses.mjs';
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
 import staticWebApp from '../../../staticwebapp.config.template.json' with { type: 'json' };
@@ -72,8 +73,13 @@ export default {
     },
     minimizer: [
       new TerserPlugin({
+        extractComments: false, // don't extract comments to a separate LICENSE file, license-webpack-plugin handles licenses
         terserOptions: {
-          module: true
+          module: true,
+          format: {
+            comments: false, // don't include comments in the output
+            preamble: licensePreamble
+          }
         }
       }),
       new CssMinimizerPlugin()
@@ -156,6 +162,7 @@ export default {
     ]
   },
   plugins: [
+    new LicenseWebpackPlugin(licenseOptions),
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
       favicon: path.resolve(dir.src, 'favicon.ico'),
