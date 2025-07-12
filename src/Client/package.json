@@ -86,7 +86,7 @@
     "@pixi/graphics": "7.4.3",
     "@pixi/sprite": "7.4.3",
     "@pixi/unsafe-eval": "7.4.3",
-    "core-js": "3.43.0",
+    "core-js": "3.44.0",
     "navigator.sendbeacon": "0.0.20",
     "unfetch": "5.0.0"
   },
