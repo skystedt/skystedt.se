@@ -19,7 +19,7 @@ export const LicenseWebpackPlugin = /** @type {LicenseWebpackPlugin} */ (/** @ty
 
 const filename = 'THIRD-PARTY-LICENSES.txt';
 
-const acceptableLicenses = ['MIT', 'ISC'];
+const acceptableLicenses = ['MIT', 'Apache-2.0', 'ISC'];
 
 const typeOverrides = {
   'unfetch-polyfill': unfetch.license
