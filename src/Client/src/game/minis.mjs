@@ -18,7 +18,7 @@ const MiniState = {
   FadeOut: 3
 };
 
-/** @typedef {{ sprite: Sprite, state: MiniState, wait: number }} Item */
+/** @typedef {{ sprite: Sprite, state: number, wait: number }} Item */
 
 export default class Minis extends Container {
   #texture = /** @type {Texture} */ (Uninitialized);
