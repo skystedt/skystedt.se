@@ -5,11 +5,13 @@ import './game.css';
 import Input from './input.mjs';
 import Minis from './minis.mjs';
 import { Uninitialized } from './primitives.mjs';
+import RenderingContext from './renderer/renderingContext.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Stars from './stars.mjs';
 import View from './view.mjs';
 
 /** @typedef { number } DOMHighResTimeStamp */
+/** @typedef { ReturnType<RenderingContext.information> } RenderingInformation */
 /** @typedef { import("./renderer/contract").Application } Application */
 
 const LOGIC_FPS = 100;
@@ -21,6 +23,7 @@ const STARS = 100;
 
 export default class Game {
   #parent;
+  #renderingInformation = /** @type {RenderingInformation} */ (Uninitialized);
   #currentFps = /** @type {() => number} */ (Uninitialized);
   #view = /** @type {View} */ (Uninitialized);
   #input = /** @type {Input} */ (Uninitialized);
@@ -46,6 +49,7 @@ export default class Game {
     const app = await Factory.initializeApplication();
 
     this.#parent.appendChild(app.canvas);
+    this.#renderingInformation = RenderingContext.information(app.canvas);
 
     await this.load(app);
     this.#startFrameLoop();
@@ -129,6 +133,11 @@ export default class Game {
 
     this.#logFpsMetric(fps, 0);
 
+    // eslint-disable-next-line no-console
+    console.debug(
+      `Context: ${this.#renderingInformation.context}, Information: ${this.#renderingInformation.information}`
+    );
+
     if (fps >= LOGIC_FPS) {
       // eslint-disable-next-line no-console
       console.debug(`FPS: ${fps}`);
@@ -146,7 +155,7 @@ export default class Game {
     const { insights } = /** @type {any} */ (window);
 
     if (insights) {
-      insights.trackMetric({ name: 'fps', average: fps });
+      insights.trackMetric({ name: 'fps', average: fps }, this.#renderingInformation);
     } else if (logTry < MAX_LOG_METRIC_RETRIES) {
       setTimeout(this.#logFpsMetric.bind(this), 1000, fps, logTry + 1);
     }
