@@ -1,10 +1,9 @@
-import * as PIXI_C from '@pixi/core';
-import * as PIXI_S from '@pixi/sprite';
+import * as PIXI from 'pixi.js';
 
 /** @typedef {import("../../contract").Factory} Factory */
 
-export default class Sprite extends PIXI_S.Sprite {
+export default class Sprite extends PIXI.Sprite {
   /** @type {Factory["createSprite"]} */
   static createSprite = (source) =>
-    /** @type {Sprite} */ (PIXI_S.Sprite.from(/** @type {PIXI_C.Texture} */ (/** @type {unknown} */ (source))));
+    /** @type {Sprite} */ (PIXI.Sprite.from(/** @type {PIXI.Texture} */ (/** @type {unknown} */ (source))));
 }
