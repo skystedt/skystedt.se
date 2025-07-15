@@ -17,12 +17,13 @@ const wildcardMatch = (...patterns) => {
 
 const pixiSideEffects = [
   path.resolve(dir.src, 'renderers', 'pixi', 'renderer.mjs'),
-  path.resolve(dir.src, 'renderers', 'pixi', 'implementation', 'init.mjs')
+  path.resolve(dir.src, 'renderers', 'pixi', 'implementation', 'init.mjs'),
+  path.resolve(dir.pixi, 'lib', 'unsafe-eval')
 ];
 
 /** @type {SideEffects} */
 export const sideEffects = {
-  include: dir.src,
+  include: [dir.src, dir.pixi],
   exclude: [path.resolve(dir.src, 'polyfills.mjs'), ...pixiSideEffects]
 };
 
@@ -96,14 +97,8 @@ export const cacheGroups = {
 function mapVendorModuleToChunk(moduleName) {
   // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunksname
   // "You can also use on demand named chunks, but you must be careful that the selected modules are only used under this chunk."
-  switch (true) {
-    case moduleName?.startsWith('@pixi/'):
-      return 'pixi';
-    case moduleName?.startsWith('@microsoft/applicationinsights-'):
-      return 'insights';
-    default:
-      // check specific module name below
-      break;
+  if (moduleName?.startsWith('@microsoft/applicationinsights-')) {
+    return 'insights';
   }
   // cSpell:disable
   switch (moduleName) {
@@ -114,9 +109,11 @@ function mapVendorModuleToChunk(moduleName) {
     case 'events':
     case 'mini-css-extract-plugin':
       return 'development';
+    case 'pixi.js':
+    case '@pixi/colord':
     case 'earcut':
     case 'eventemitter3':
-    case 'ismobilejs':
+    case 'parse-svg-path':
       return 'pixi';
     case 'core-js':
       return 'polyfills';

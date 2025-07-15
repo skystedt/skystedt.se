@@ -1,4 +1,4 @@
-import * as PIXI from '@pixi/sprite';
+import * as PIXI from 'pixi.js';
 
 /** @typedef {import("../../contract").Sprite} Contract */
 

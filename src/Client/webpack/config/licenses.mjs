@@ -28,7 +28,7 @@ const typeOverrides = {
 const fileOverrides = /** @type { [sourcePackage: string, targetPackage: string, file: string][] }} */ ([
   ['unfetch-polyfill', '.', 'LICENSE.md'],
   ['@microsoft/applicationinsights-cfgsync-js', '@microsoft/applicationinsights-web', 'LICENSE'],
-  ['@pixi/colord', '@pixi/color', 'LICENSE']
+  ['@pixi/colord', 'pixi.js', 'LICENSE']
 ]);
 
 export const licensePreamble = `/*! License information is available at ${filename} */`;

@@ -5,7 +5,6 @@ import Sprite from './sprite.mjs';
 import Texture from './texture.mjs';
 
 /** @typedef {import("../../contract").Factory} Contract */
-/** @typedef {import("@pixi/core").Texture} PIXI_Texture */
 
 export default class Factory {
   /** @type {Contract["initializeApplication"]} */
@@ -18,7 +17,7 @@ export default class Factory {
   static createTexture = (canvas) => new Texture(canvas);
 
   /** @type {Contract["createSprite"]} */
-  static createSprite = (texture) => new Sprite(/** @type {PIXI_Texture} */ (texture));
+  static createSprite = (texture) => new Sprite(texture);
 
   /** @type {Contract["createGraphics"]} */
   static createGraphics = () => new Graphics();
