@@ -1,5 +1,4 @@
-import * as PIXI from '@pixi/app';
-import { BaseTexture, SCALE_MODES } from '@pixi/core';
+import * as PIXI from 'pixi.js';
 import Display from './display.mjs';
 
 /** @typedef {import("../../contract").Application} Contract */
@@ -8,16 +7,21 @@ import Display from './display.mjs';
 export default class Application extends PIXI.Application {
   /** @type {Factory["initializeApplication"]} */
   static async initializeApplication() {
-    BaseTexture.defaultOptions.scaleMode = SCALE_MODES.NEAREST;
+    PIXI.TextureSource.defaultOptions.scaleMode = 'nearest';
 
     const app = new Application();
 
-    return Promise.resolve(app);
+    await app.init({
+      preference: 'webgpu',
+      skipExtensionImports: true
+    });
+
+    return app;
   }
 
   /** @type {Contract["canvas"]} */
   get canvas() {
-    return /** @type {HTMLCanvasElement} */ (this.view);
+    return /** @type {HTMLCanvasElement} */ (super.canvas);
   }
 
   /** @type {Contract["display"]} */

@@ -9,7 +9,8 @@ export const dir = {
   src: path.resolve(cwd, 'src'),
   publish: path.resolve(cwd, '..', 'publish'),
   dist: path.resolve(cwd, '..', 'publish', 'Client'),
-  node_modules: path.resolve(cwd, 'node_modules')
+  node_modules: path.resolve(cwd, 'node_modules'),
+  pixi: path.resolve(cwd, 'node_modules', 'pixi.js')
 };
 
 export const printProgress =

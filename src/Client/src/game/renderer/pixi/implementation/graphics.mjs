@@ -1,4 +1,4 @@
-import * as PIXI from '@pixi/graphics';
+import * as PIXI from 'pixi.js';
 
 export default class Graphics extends PIXI.Graphics {
   /**
@@ -9,8 +9,7 @@ export default class Graphics extends PIXI.Graphics {
    * @param {number} height
    */
   fillRect(color, x, y, width, height) {
-    this.beginFill(color);
-    this.drawRect(x, y, width, height);
-    this.endFill();
+    this.rect(x, y, width, height);
+    this.fill(color);
   }
 }
