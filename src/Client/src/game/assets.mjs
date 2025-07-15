@@ -1,4 +1,4 @@
-import { createTexture } from '$renderer';
+import { Factory } from '$renderer';
 
 /** @typedef { import("./renderer/contract").Texture } Texture */
 
@@ -23,7 +23,7 @@ export default class Assets {
     const context = canvas.getContext('2d');
     context?.drawImage(image, 0, 0);
 
-    const texture = createTexture(canvas);
+    const texture = Factory.createTexture(canvas);
     return texture;
   }
 }

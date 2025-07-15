@@ -1,8 +1,9 @@
 import * as Contract from '../contract';
-import * as Implementation from './pixi.mjs';
+import * as Implementation from './renderer.mjs';
 
 // File is used to validate that the implementation correctly implements the contract
 
+const Factory: Contract.Factory = Implementation.Factory;
 declare class Application extends Implementation.Application implements Contract.Application {}
 declare class Display extends Implementation.Display implements Contract.Display {}
 declare class Container extends Implementation.Container implements Contract.Container {}

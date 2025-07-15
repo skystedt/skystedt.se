@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "rootDir": ".",
     "paths": {
-      "$renderer": ["./src/game/renderer/pixi/pixi.mjs"]
+      "$renderer": ["./src/game/renderer/pixi/renderer.mjs"]
     }
   },
   "typeAcquisition": {

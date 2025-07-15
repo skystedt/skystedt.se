@@ -1,4 +1,4 @@
-import { Container, createSprite } from '$renderer';
+import { Factory } from '$renderer';
 import Assets from './assets.mjs';
 import ShipStraightImage from './assets/ship.png';
 import ShipLeftImage from './assets/ship_left.png';
@@ -6,6 +6,7 @@ import ShipRightImage from './assets/ship_right.png';
 import { GamePosition, Size, Uninitialized } from './primitives.mjs';
 
 /** @typedef { import("./renderer/contract").Display } Display */
+/** @typedef { import("./renderer/contract").Container } Container */
 /** @typedef { import("./renderer/contract").Sprite } Sprite */
 
 const TURN_STRAIGHT_DELAY = 10;
@@ -18,7 +19,7 @@ export const ShipDirection = {
 };
 
 export default class Ship {
-  #container = /** @type {Container} */ (Uninitialized);
+  /** @type {Container} */ #container;
   #spriteStraight = /** @type {Sprite} */ (Uninitialized);
   #spriteLeft = /** @type {Sprite} */ (Uninitialized);
   #spriteRight = /** @type {Sprite} */ (Uninitialized);
@@ -29,8 +30,8 @@ export default class Ship {
    * @param {Display} display
    */
   constructor(display) {
-    this.#container = new Container();
-    display.addChild(this.#container);
+    this.#container = Factory.createContainer();
+    display.addContainer(this.#container);
   }
 
   /** @param {Size} gameSize */
@@ -39,13 +40,13 @@ export default class Ship {
     const shipLeftTexture = await Assets.loadImage(ShipLeftImage);
     const shipRightTexture = await Assets.loadImage(ShipRightImage);
 
-    this.#spriteStraight = createSprite(shipStraightTexture);
-    this.#spriteLeft = createSprite(shipLeftTexture);
-    this.#spriteRight = createSprite(shipRightTexture);
+    this.#spriteStraight = Factory.createSprite(shipStraightTexture);
+    this.#spriteLeft = Factory.createSprite(shipLeftTexture);
+    this.#spriteRight = Factory.createSprite(shipRightTexture);
 
-    this.#container.addChild(this.#spriteStraight);
-    this.#container.addChild(this.#spriteLeft);
-    this.#container.addChild(this.#spriteRight);
+    this.#container.addElement(this.#spriteStraight);
+    this.#container.addElement(this.#spriteLeft);
+    this.#container.addElement(this.#spriteRight);
 
     this.#startPosition = new GamePosition(
       (gameSize.width - this.size.width) / 2,

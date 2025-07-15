@@ -1,9 +1,10 @@
-import { Container, createSprite } from '$renderer';
+import { Factory } from '$renderer';
 import Assets from './assets.mjs';
 import MiniImage from './assets/mini.png';
 import { Uninitialized } from './primitives.mjs';
 
 /** @typedef { import("./renderer/contract").Display } Display */
+/** @typedef { import("./renderer/contract").Container } Container */
 /** @typedef { import("./renderer/contract").Texture } Texture */
 /** @typedef { import("./renderer/contract").Sprite } Sprite */
 
@@ -20,7 +21,8 @@ const MiniState = {
 
 /** @typedef {{ sprite: Sprite, state: number, wait: number }} Item */
 
-export default class Minis extends Container {
+export default class Minis {
+  /** @type {Container} */ #container;
   #texture = /** @type {Texture} */ (Uninitialized);
 
   /** @type {Map<string, Item>} */
@@ -28,8 +30,8 @@ export default class Minis extends Container {
 
   /** @param {Display} display */
   constructor(display) {
-    super();
-    display.addChild(this);
+    this.#container = Factory.createContainer();
+    display.addContainer(this.#container);
   }
 
   async load() {
@@ -62,7 +64,7 @@ export default class Minis extends Container {
     const item = this.#map.get(id);
     if (item) {
       const { sprite } = item;
-      this.removeChild(sprite);
+      this.#container.removeElement(sprite);
       sprite.destroy();
       this.#map.delete(id);
     }
@@ -101,9 +103,9 @@ export default class Minis extends Container {
 
   /** @returns {Item} */
   #createItem() {
-    const sprite = createSprite(this.#texture);
+    const sprite = Factory.createSprite(this.#texture);
     sprite.alpha = 0;
-    this.addChild(sprite);
+    this.#container.addElement(sprite);
     return { sprite, state: MiniState.Hidden, wait: 0 };
   }
 }
