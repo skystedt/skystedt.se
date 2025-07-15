@@ -15,13 +15,15 @@ const wildcardMatch = (...patterns) => {
   return (value) => patterns.some((pattern) => minimatch(value, pattern));
 };
 
+const pixiSideEffects = [
+  path.resolve(dir.src, 'game', 'renderer', 'pixi', 'renderer.mjs'),
+  path.resolve(dir.src, 'game', 'renderer', 'pixi', 'implementation', 'init.mjs')
+];
+
 /** @type {SideEffects} */
 export const sideEffects = {
   include: dir.src,
-  exclude: [
-    path.resolve(dir.src, 'polyfills.mjs'),
-    path.resolve(dir.src, 'game', 'pixi.mjs') // needed for @pixi/unsafe-eval
-  ]
+  exclude: [path.resolve(dir.src, 'polyfills.mjs'), ...pixiSideEffects]
 };
 
 /** @type {(assetFilename: string) => boolean} */

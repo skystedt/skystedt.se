@@ -1,8 +1,10 @@
-export type initializeApplication = () => Promise<Application>;
-
-export type createSprite = (source: Texture) => Sprite;
-
-export type createTexture = (canvas: HTMLCanvasElement) => Texture;
+export interface Factory {
+  static initializeApplication: () => Promise<Application>;
+  static createContainer: () => Container;
+  static createTexture: (canvas: HTMLCanvasElement) => Texture;
+  static createSprite: (source: Texture) => Sprite;
+  static createGraphics: () => Graphics;
+}
 
 export interface Application {
   get canvas(): HTMLCanvasElement;
@@ -15,7 +17,7 @@ export interface Display {
   get resolution(): number;
   set resolution(value: number);
   resize(desiredScreenWidth: number, desiredScreenHeight: number): void;
-  addChild(child: Container): void;
+  addContainer(container: Container): void;
 }
 
 export interface Container {
@@ -24,8 +26,9 @@ export interface Container {
   get x(): number;
   get y(): number;
   set position(value: { x: number; y: number });
-  addChild(child: Sprite | Graphics): void;
-  removeChild(child: Sprite | Graphics): void;
+  get elements(): (Sprite | Graphics)[];
+  addElement(element: Sprite | Graphics): void;
+  removeElement(element: Sprite | Graphics): void;
 }
 
 export interface Sprite {

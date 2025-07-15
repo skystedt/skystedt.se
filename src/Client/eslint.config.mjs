@@ -153,7 +153,7 @@ export default [
         'eslint-import-resolver-exports': {},
         'eslint-import-resolver-custom-alias': {
           alias: {
-            $renderer: './src/game/renderer/pixi/pixi.mjs'
+            $renderer: './src/game/renderer/pixi/renderer.mjs'
           }
         }
       }

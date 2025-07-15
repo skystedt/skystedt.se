@@ -1,8 +1,18 @@
-import { Container, Graphics } from '$renderer';
+import { Factory } from '$renderer';
 import { Size, Uninitialized } from './primitives.mjs';
 
 /** @typedef { import("./renderer/contract").Display } Display */
+/** @typedef { import("./renderer/contract").Container } Container */
+/** @typedef { import("./renderer/contract").Graphics } Graphics */
 
+/**
+ * @typedef {{
+ *   graphics: Graphics,
+ *   color: number,
+ *   speed: number,
+ *   blinking: number
+ * }} Star
+ */
 const BLINK_PROBABILITY = 0.0001;
 const BLINK_DURATION = 30;
 // prettier-ignore
@@ -13,11 +23,15 @@ const SPEED_PROBABILITIES = [
   { speed: 0.50, p: 0.59 }
 ];
 
-export default class Stars extends Container {
+export default class Stars {
+  /** @type {Container} */ #container;
+  /** @type {Star[]} */ #stars = [];
+  #gameSize = /** @type {Size} */ (Uninitialized);
+
   /** @param {Display} display */
   constructor(display) {
-    super();
-    display.addChild(this);
+    this.#container = Factory.createContainer();
+    display.addContainer(this.#container);
   }
 
   /**
@@ -25,41 +39,57 @@ export default class Stars extends Container {
    * @param {number} numberOfStars
    */
   load(gameSize, numberOfStars) {
+    this.#gameSize = gameSize;
     for (let i = 0; i < numberOfStars; i += 1) {
-      this.addChild(new Star(gameSize));
+      const star = this.#newStar();
+      this.#stars.push(star);
+      this.#container.addElement(star.graphics);
     }
   }
 
   tick() {
-    this.children.forEach((star) => {
-      /** @type {Star} */ (star).move();
+    this.#stars.forEach((star) => {
+      this.#move(star);
     });
   }
-}
 
-export class Star extends Graphics {
-  #gameSize;
-  #speed = /** @type {number} */ (Uninitialized);
-  #blinking = /** @type {number} */ (Uninitialized);
-  #originalColor = /** @type {number} */ (Uninitialized);
+  /** @param {Star} star */
+  #move(star) {
+    star.graphics.y += star.speed;
 
-  /**
-   * @param {Size} gameSize
-   */
-  constructor(gameSize) {
-    super();
-    this.#gameSize = gameSize;
+    if (star.graphics.y >= this.#gameSize.height) {
+      this.#resetStar(star, true);
+    }
 
-    this.#newStar(false);
+    if (star.blinking === 1) {
+      star.blinking -= 1;
+      this.#setGraphicsColor(star.graphics, star.color);
+    } else if (star.blinking > 1) {
+      star.blinking -= 1;
+    } else if (Math.random() < BLINK_PROBABILITY) {
+      star.blinking = BLINK_DURATION;
+      this.#setGraphicsColor(star.graphics, 0x000000);
+    }
   }
 
-  /** @param {boolean} outside */
-  #newStar(outside) {
-    this.#originalColor = this.#randomLightColor();
-    this.#setColor(this.#originalColor);
-    this.x = Math.floor(Math.random() * this.#gameSize.width);
-    this.y = Math.floor(Math.random() * (outside ? -10 : this.#gameSize.height)) - 1;
-    this.#speed = this.#randomSpeed();
+  /** @returns {Star} */
+  #newStar() {
+    const graphics = Factory.createGraphics();
+    const star = { graphics, color: 0, speed: 0, blinking: 0 };
+    this.#resetStar(star, false);
+    return star;
+  }
+
+  /**
+   * @param {Star} star
+   * @param {boolean} outside
+   */
+  #resetStar(star, outside) {
+    star.color = this.#randomLightColor();
+    this.#setGraphicsColor(star.graphics, star.color);
+    star.graphics.x = Math.floor(Math.random() * this.#gameSize.width);
+    star.graphics.y = Math.floor(Math.random() * (outside ? -10 : this.#gameSize.height)) - 1;
+    star.speed = this.#randomSpeed();
   }
 
   #randomLightColor() {
@@ -85,25 +115,12 @@ export class Star extends Graphics {
     return speed ?? 1;
   }
 
-  /** @param {number} value */
-  #setColor(value) {
-    this.clear();
-    this.fillRect(value, 0, 0, 1, 1);
-  }
-
-  move() {
-    this.y += this.#speed;
-    if (this.y >= this.#gameSize.height) {
-      this.#newStar(true);
-    }
-    if (this.#blinking === 1) {
-      this.#blinking -= 1;
-      this.#setColor(this.#originalColor);
-    } else if (this.#blinking > 1) {
-      this.#blinking -= 1;
-    } else if (Math.random() < BLINK_PROBABILITY) {
-      this.#blinking = BLINK_DURATION;
-      this.#setColor(0x000000);
-    }
+  /**
+   * @param {Graphics} graphics
+   * @param {number} color
+   */
+  #setGraphicsColor(graphics, color) {
+    graphics.clear();
+    graphics.fillRect(color, 0, 0, 1, 1);
   }
 }

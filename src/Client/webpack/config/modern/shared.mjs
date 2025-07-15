@@ -97,7 +97,7 @@ export default {
   },
   resolve: {
     alias: {
-      $renderer: path.resolve(dir.src, 'game/renderer', 'pixi/pixi.mjs')
+      $renderer: path.resolve(dir.src, 'game/renderer', 'pixi/renderer.mjs')
     }
   },
   module: {

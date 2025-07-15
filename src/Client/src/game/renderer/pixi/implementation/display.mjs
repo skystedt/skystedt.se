@@ -29,13 +29,13 @@ export default class Display {
     this.#viewport.resolution = value;
   }
 
-  /** @type {Contract["resize"] } */
+  /** @type {Contract["resize"]} */
   resize(desiredScreenWidth, desiredScreenHeight) {
     this.#viewport.resize(desiredScreenWidth, desiredScreenHeight);
   }
 
-  /** @type {Contract["addChild"] } */
-  addChild(child) {
-    this.#stage.addChild(/** @type { PIXI_D.Container } */ (child));
+  /** @type {Contract["addContainer"]} */
+  addContainer(container) {
+    this.#stage.addChild(/** @type {PIXI_D.Container} */ (/** @type {unknown} */ (container)));
   }
 }

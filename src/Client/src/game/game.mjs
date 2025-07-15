@@ -1,4 +1,4 @@
-import { initializeApplication } from '$renderer';
+import { Factory } from '$renderer';
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import Communication, { MessageType } from './communication.mjs';
 import './game.css';
@@ -43,7 +43,7 @@ export default class Game {
   }
 
   async init() {
-    const app = await initializeApplication();
+    const app = await Factory.initializeApplication();
 
     this.#parent.appendChild(app.canvas);
 
