@@ -3,6 +3,7 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import _HtmlInlineCssWebpackPlugin from 'html-inline-css-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import { minimatch } from 'minimatch';
 import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
@@ -59,7 +60,7 @@ export default {
     trustedTypes: 'webpack',
     crossOriginLoading: 'anonymous',
     clean: {
-      keep: 'legacy'
+      keep: (filename) => minimatch(path.normalize(filename), 'legacy/*')
     }
   },
   optimization: {
