@@ -120,7 +120,6 @@ export default {
               polyfillCorejs({
                 exclude: polyfillCorejsExcluded,
                 // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set debug to true to find what files/polyfills is causing it
-                // http://zloirock.github.io/core-js/compat/
                 debug: false
               })
             ]
@@ -129,7 +128,7 @@ export default {
       },
       {
         test: /\.m?js$/i,
-        include: path.resolve(dir.node_modules, '@pixi'),
+        include: dir.pixi,
         use: {
           // use babel to transform pixi but don't include polyfills (we don't want polyfills in modern)
           loader: 'babel-loader',

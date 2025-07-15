@@ -8,7 +8,8 @@ export const dir = {
   publish: path.resolve(cwd, '..', 'publish'),
   dist: path.resolve(cwd, '..', 'publish', 'Client'),
   dist_legacy: path.resolve(cwd, '..', 'publish', 'Client', 'legacy'),
-  node_modules: path.resolve(cwd, 'node_modules')
+  node_modules: path.resolve(cwd, 'node_modules'),
+  pixi: path.resolve(cwd, 'node_modules', 'pixi.js')
 };
 
 /**

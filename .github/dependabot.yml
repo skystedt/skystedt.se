@@ -42,8 +42,5 @@ updates:
       timezone: "Europe/Stockholm"
     open-pull-requests-limit: 10
     groups:
-      pixi:
-        patterns:
-          - "@pixi/*"
       client-development:
         dependency-type: "development"

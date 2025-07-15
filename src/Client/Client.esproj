@@ -8,7 +8,6 @@
   <ItemGroup>
     <None Include="**" Exclude="node_modules\**;**\.*\**;*.esproj;*.lock" Link="configuration\%(RelativeDir)%(Filename)%(Extension)" />
     <None Include=".vscode\**" Link="configuration\%(RelativeDir)%(Filename)%(Extension)" />
-    <None Include=".yarn\patches\**" Link="configuration\%(RelativeDir)%(Filename)%(Extension)" />
     <None Remove="jsconfig.json" />
     <None Include="src\**" />
   </ItemGroup>

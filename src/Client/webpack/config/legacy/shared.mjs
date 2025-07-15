@@ -1,5 +1,4 @@
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import RendererImplementation from '../../../src/renderers/rendererImplementation.mjs';
@@ -48,7 +47,7 @@ export default {
   },
   resolve: {
     alias: {
-      $renderer: rendererPath(RendererImplementation.PixiWithHtmlFallback)
+      $renderer: rendererPath(RendererImplementation.Html)
     }
   },
   module: {
@@ -63,16 +62,6 @@ export default {
       {
         test: /\.m?js$/i,
         include: dir.src,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            browserslistEnv: 'legacy'
-          }
-        }
-      },
-      {
-        test: /\.m?js$/i,
-        include: path.resolve(dir.node_modules, '@pixi'), // pixi.js v7+ doesn't ship polyfills
         use: {
           loader: 'babel-loader',
           options: {
