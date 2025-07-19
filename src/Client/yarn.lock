@@ -2678,19 +2678,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stylistic/eslint-plugin@npm:^5.1.0":
-  version: 5.1.0
-  resolution: "@stylistic/eslint-plugin@npm:5.1.0"
+"@stylistic/eslint-plugin@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "@stylistic/eslint-plugin@npm:5.2.0"
   dependencies:
     "@eslint-community/eslint-utils": "npm:^4.7.0"
-    "@typescript-eslint/types": "npm:^8.34.1"
+    "@typescript-eslint/types": "npm:^8.37.0"
     eslint-visitor-keys: "npm:^4.2.1"
     espree: "npm:^10.4.0"
     estraverse: "npm:^5.3.0"
-    picomatch: "npm:^4.0.2"
+    picomatch: "npm:^4.0.3"
   peerDependencies:
     eslint: ">=9.0.0"
-  checksum: 10c0/a56555c14859e4a9c7abf9667d047b6289d93be0e0bdf4eee118bdbe96bb164d7453ef397cd7623a139147dc643382493df6eb2c5431142edb1f17db73fa9058
+  checksum: 10c0/3be1714219c07a926d6c24284597f5816f491495a2e9cc3c6d5f8e13a93fbec396d7f42cbd8097debef10bceb006788edbdb1bd46facc733e5bc3ea69e035a9c
   languageName: node
   linkType: hard
 
@@ -3012,6 +3012,13 @@ __metadata:
   version: 8.35.1
   resolution: "@typescript-eslint/types@npm:8.35.1"
   checksum: 10c0/136dd1c7a39685baa398406423a97a4b6a66e6aed7cbd6ae698a89b0fde92c76f1415294bec612791d67d7917fda280caa65b9d761e2744e8143506d1f417fb2
+  languageName: node
+  linkType: hard
+
+"@typescript-eslint/types@npm:^8.37.0":
+  version: 8.37.0
+  resolution: "@typescript-eslint/types@npm:8.37.0"
+  checksum: 10c0/0caa649ba242d384e935eef9badbb352a3e640c3842104a6a562af69e0f680ec8e6c0c55c069d4d714f05208f6d07811417ca6179745128a60c45fa92794e6dd
   languageName: node
   linkType: hard
 
@@ -3723,7 +3730,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"browserslist@npm:4.25.1, browserslist@npm:^4.25.0":
+"browserslist@npm:4.25.1, browserslist@npm:^4.25.0, browserslist@npm:^4.25.1":
   version: 4.25.1
   resolution: "browserslist@npm:4.25.1"
   dependencies:
@@ -4874,14 +4881,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:10.1.5":
-  version: 10.1.5
-  resolution: "eslint-config-prettier@npm:10.1.5"
+"eslint-config-prettier@npm:10.1.8":
+  version: 10.1.8
+  resolution: "eslint-config-prettier@npm:10.1.8"
   peerDependencies:
     eslint: ">=7.0.0"
   bin:
     eslint-config-prettier: bin/cli.js
-  checksum: 10c0/5486255428e4577e8064b40f27db299faf7312b8e43d7b4bc913a6426e6c0f5950cd519cad81ae24e9aecb4002c502bc665c02e3b52efde57af2debcf27dd6e0
+  checksum: 10c0/e1bcfadc9eccd526c240056b1e59c5cd26544fe59feb85f38f4f1f116caed96aea0b3b87868e68b3099e55caaac3f2e5b9f58110f85db893e83a332751192682
   languageName: node
   linkType: hard
 
@@ -5005,9 +5012,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:51.3.4":
-  version: 51.3.4
-  resolution: "eslint-plugin-jsdoc@npm:51.3.4"
+"eslint-plugin-jsdoc@npm:51.4.1":
+  version: 51.4.1
+  resolution: "eslint-plugin-jsdoc@npm:51.4.1"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.52.0"
     are-docs-informative: "npm:^0.0.2"
@@ -5021,7 +5028,7 @@ __metadata:
     spdx-expression-parse: "npm:^4.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10c0/59e5aa972bdd1bd4e2ca2796ed4455dff1069044abc028621e107aa4b0cbb62ce09554c8e7c2ff3a44a1cbd551e54b6970adc420ba3a89adc6236b94310a81ff
+  checksum: 10c0/2dc8063f810984bca1ec2cbe4fa4cfa6948a4e6340bfc817c30d603fd7a85bc11375c0a45d6a1825fa28f1bf1c454f98aed74041b16bc6b5c7077ea58c05ff0a
   languageName: node
   linkType: hard
 
@@ -5044,9 +5051,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-prettier@npm:5.5.1":
-  version: 5.5.1
-  resolution: "eslint-plugin-prettier@npm:5.5.1"
+"eslint-plugin-prettier@npm:5.5.3":
+  version: 5.5.3
+  resolution: "eslint-plugin-prettier@npm:5.5.3"
   dependencies:
     prettier-linter-helpers: "npm:^1.0.0"
     synckit: "npm:^0.11.7"
@@ -5060,7 +5067,7 @@ __metadata:
       optional: true
     eslint-config-prettier:
       optional: true
-  checksum: 10c0/6ed93faa7d885af2a987d732f7e716e7aaba55e2da2b091e1b16bacf68425bffe91d784803597bd3f3e6201499fabb89ae28a51ac3986659a46e55e729ed2d55
+  checksum: 10c0/7524e381b400fec67dd2bd1a71779c220a5410f0063cd220d144431f291ec800bee1985709ef0dd38d666d01e0e53bec93824063912784d4021db8473fafe73e
   languageName: node
   linkType: hard
 
@@ -7413,6 +7420,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"picomatch@npm:^4.0.3":
+  version: 4.0.3
+  resolution: "picomatch@npm:4.0.3"
+  checksum: 10c0/9582c951e95eebee5434f59e426cddd228a7b97a0161a375aed4be244bd3fe8e3a31b846808ea14ef2c8a2527a6eeab7b3946a67d5979e81694654f939473ae2
+  languageName: node
+  linkType: hard
+
 "pkg-dir@npm:^4.2.0":
   version: 4.2.0
   resolution: "pkg-dir@npm:4.2.0"
@@ -7759,7 +7773,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-merge-rules@npm:7.0.5, postcss-merge-rules@npm:^7.0.5":
+"postcss-merge-rules@npm:7.0.6":
+  version: 7.0.6
+  resolution: "postcss-merge-rules@npm:7.0.6"
+  dependencies:
+    browserslist: "npm:^4.25.1"
+    caniuse-api: "npm:^3.0.0"
+    cssnano-utils: "npm:^5.0.1"
+    postcss-selector-parser: "npm:^7.1.0"
+  peerDependencies:
+    postcss: ^8.4.32
+  checksum: 10c0/1708d2e862825f79077aff1f7d82ff815c015929f0fb5bb3fb58dbc83f9bc79ef9aa40ef585afbe2dcb2563ea3516f21332be926e746189649459eb9399cc95e
+  languageName: node
+  linkType: hard
+
+"postcss-merge-rules@npm:^7.0.5":
   version: 7.0.5
   resolution: "postcss-merge-rules@npm:7.0.5"
   dependencies:
@@ -8862,7 +8890,7 @@ __metadata:
     "@pixi/graphics": "npm:7.4.3"
     "@pixi/sprite": "npm:7.4.3"
     "@pixi/unsafe-eval": "npm:7.4.3"
-    "@stylistic/eslint-plugin": "npm:^5.1.0"
+    "@stylistic/eslint-plugin": "npm:^5.2.0"
     babel-loader: "npm:10.0.0"
     babel-plugin-polyfill-corejs3: "npm:0.13.0"
     browserslist: "npm:4.25.1"
@@ -8875,14 +8903,14 @@ __metadata:
     enhanced-resolve: "npm:5.18.2"
     eslint: "npm:9.31.0"
     eslint-config-airbnb-base: "npm:15.0.0"
-    eslint-config-prettier: "npm:10.1.5"
+    eslint-config-prettier: "npm:10.1.8"
     eslint-import-resolver-custom-alias: "npm:1.3.2"
     eslint-import-resolver-exports: "npm:1.0.0-beta.5"
     eslint-plugin-compat: "npm:6.0.2"
     eslint-plugin-import-x: "npm:4.16.1"
-    eslint-plugin-jsdoc: "npm:51.3.4"
+    eslint-plugin-jsdoc: "npm:51.4.1"
     eslint-plugin-n: "npm:17.21.0"
-    eslint-plugin-prettier: "npm:5.5.1"
+    eslint-plugin-prettier: "npm:5.5.3"
     eslint-plugin-promise: "npm:7.2.1"
     eslint-webpack-plugin: "npm:5.0.2"
     glob: "npm:11.0.3"
@@ -8900,18 +8928,18 @@ __metadata:
     postcss: "npm:8.5.6"
     postcss-load-config: "npm:6.0.1"
     postcss-loader: "npm:8.1.1"
-    postcss-merge-rules: "npm:7.0.5"
+    postcss-merge-rules: "npm:7.0.6"
     postcss-preset-env: "npm:10.2.4"
     prettier: "npm:3.6.2"
     spdx-satisfies: "npm:6.0.0"
-    stylelint: "npm:16.21.1"
+    stylelint: "npm:16.22.0"
     stylelint-config-standard: "npm:38.0.0"
     stylelint-webpack-plugin: "npm:5.0.1"
     terser-webpack-plugin: "npm:5.3.14"
     typescript: "npm:5.8.3"
     unfetch: "npm:5.0.0"
     update-browserslist-db: "npm:1.1.3"
-    webpack: "npm:5.100.1"
+    webpack: "npm:5.100.2"
     webpack-cli: "npm:6.0.1"
     webpack-dev-server: "npm:5.2.2"
     webpack-subresource-integrity: "npm:5.1.0"
@@ -9239,9 +9267,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint@npm:16.21.1":
-  version: 16.21.1
-  resolution: "stylelint@npm:16.21.1"
+"stylelint@npm:16.22.0":
+  version: 16.22.0
+  resolution: "stylelint@npm:16.22.0"
   dependencies:
     "@csstools/css-parser-algorithms": "npm:^3.0.5"
     "@csstools/css-tokenizer": "npm:^3.0.4"
@@ -9283,7 +9311,7 @@ __metadata:
     write-file-atomic: "npm:^5.0.1"
   bin:
     stylelint: bin/stylelint.mjs
-  checksum: 10c0/32750d764411213d96e24f6a6e12af85f365ad4674214843068b39e02873adae927680c58e3ae14bc9d624899abe330819a53020bf3bd812821c3966678a3663
+  checksum: 10c0/706ba1f2f8d1c4c55347c2abbab661cf36cd6889af8afd200877cababf7f758e780d0e8a22ed1833542f487aeba08c30964b88dd6764c63953f7f232f5f4f114
   languageName: node
   linkType: hard
 
@@ -9893,9 +9921,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.100.1":
-  version: 5.100.1
-  resolution: "webpack@npm:5.100.1"
+"webpack@npm:5.100.2":
+  version: 5.100.2
+  resolution: "webpack@npm:5.100.2"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.8"
@@ -9927,7 +9955,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10c0/6dd8e286a5e361650c543dc6c4922b82276b0ed57ae545014bf4f6486d857d1c388dc8ec798f1dc3b77a765936357286910879fab65e6ff53e4cba1cc13db538
+  checksum: 10c0/0add75d44c482634c6879a3fc87fa2af6a6c7c8eacda5d5f60ed778a2ce13d33fd6178a2b4750368706a49e769af6d828934c28914b4faa2e21be790f92b4110
   languageName: node
   linkType: hard
 
