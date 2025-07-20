@@ -2,33 +2,30 @@ export interface Factory {
   static initializeApplication: () => Promise<Application>;
   static createContainer: () => Container;
   static createTexture: (canvas: HTMLCanvasElement) => Texture;
-  static createSprite: (source: Texture) => Sprite;
+  static createSprite: (texture: Texture) => Sprite;
   static createGraphics: () => Graphics;
 }
 
 export interface Application {
-  get canvas(): HTMLCanvasElement;
-  get display(): Display;
+  get element(): HTMLElement;
+  get width(): number;
+  get height(): number;
+  get offsetLeft(): number;
+  get offsetTop(): number;
+  get scale(): number;
   get ticker(): { get FPS(): number };
-}
-
-export interface Display {
-  set position(value: { x: number; y: number });
-  get resolution(): number;
-  set resolution(value: number);
-  resize(desiredScreenWidth: number, desiredScreenHeight: number): void;
+  resize(width: number, height: number, scale: number): void;
+  offset(left: number, top: number): void;
   addContainer(container: Container): void;
 }
 
 export interface Container {
-  get width(): number;
-  get height(): number;
   get x(): number;
   get y(): number;
-  set position(value: { x: number; y: number });
-  get elements(): (Sprite | Graphics)[];
-  addElement(element: Sprite | Graphics): void;
-  removeElement(element: Sprite | Graphics): void;
+  get items(): (Sprite | Graphics)[];
+  move(x: number, y: number): void;
+  addItem(item: Sprite | Graphics): void;
+  removeItem(item: Sprite | Graphics): void;
 }
 
 export interface Sprite {
@@ -36,8 +33,11 @@ export interface Sprite {
   set visible(value: boolean);
   get width(): number;
   get height(): number;
-  set position(value: { x: number; y: number });
+  get x(): number;
+  get y(): number;
+  get alpha(): number;
   set alpha(value: number);
+  move(x: number, y: number): void;
   destroy(): void;
 }
 
@@ -45,9 +45,8 @@ export interface Texture {}
 
 export interface Graphics {
   get x(): number;
-  set x(value: number);
   get y(): number;
-  set y(value: number);
+  move(x: number, y: number): void;
   clear();
   fillRect(color: number, x: number, y: number, width: number, height: number);
 }

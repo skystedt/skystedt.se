@@ -5,7 +5,7 @@ import ShipLeftImage from './assets/ship_left.png';
 import ShipRightImage from './assets/ship_right.png';
 import { GamePosition, Size, Uninitialized } from './primitives.mjs';
 
-/** @typedef { import("./renderer/contract").Display } Display */
+/** @typedef { import("./renderer/contract").Application } Application */
 /** @typedef { import("./renderer/contract").Container } Container */
 /** @typedef { import("./renderer/contract").Sprite } Sprite */
 
@@ -26,16 +26,14 @@ export default class Ship {
   #startPosition = /** @type {GamePosition} */ (Uninitialized);
   #straightDelay = 0;
 
-  /**
-   * @param {Display} display
-   */
-  constructor(display) {
+  /** @param {Application} application */
+  constructor(application) {
     this.#container = Factory.createContainer();
-    display.addContainer(this.#container);
+    application.addContainer(this.#container);
   }
 
-  /** @param {Size} gameSize */
-  async load(gameSize) {
+  /** @param {GamePosition} position */
+  async load(position) {
     const shipStraightTexture = await Assets.loadImage(ShipStraightImage);
     const shipLeftTexture = await Assets.loadImage(ShipLeftImage);
     const shipRightTexture = await Assets.loadImage(ShipRightImage);
@@ -44,19 +42,19 @@ export default class Ship {
     this.#spriteLeft = Factory.createSprite(shipLeftTexture);
     this.#spriteRight = Factory.createSprite(shipRightTexture);
 
-    this.#container.addElement(this.#spriteStraight);
-    this.#container.addElement(this.#spriteLeft);
-    this.#container.addElement(this.#spriteRight);
-
     this.#startPosition = new GamePosition(
-      (gameSize.width - this.size.width) / 2,
-      (gameSize.height - this.size.height) / 2
+      position.x - this.#spriteStraight.width / 2,
+      position.y - this.#spriteStraight.height / 2
     );
     this.reset();
+
+    this.#container.addItem(this.#spriteStraight);
+    this.#container.addItem(this.#spriteLeft);
+    this.#container.addItem(this.#spriteRight);
   }
 
   get size() {
-    return new Size(this.#container.width, this.#container.height);
+    return new Size(this.#spriteStraight.width, this.#spriteStraight.height);
   }
 
   get position() {
@@ -65,7 +63,7 @@ export default class Ship {
 
   /** @param {GamePosition} position */
   set position(position) {
-    this.#container.position = { x: position.x, y: position.y };
+    this.#container.move(position.x, position.y);
   }
 
   get centerPosition() {

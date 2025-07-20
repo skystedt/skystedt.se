@@ -246,9 +246,9 @@ export default class Input {
     const directionX = position.x - absolutePosition.x;
     const directionY = position.y - absolutePosition.y;
     const max = Math.max(Math.abs(directionX), Math.abs(directionY));
-    // the condition for larger than resolution is to prevent "flip-flopping" movements (jumping back and forth)
-    const dx = Math.abs(directionX) > this.#view.resolution ? directionX / max : 0;
-    const dy = Math.abs(directionY) > this.#view.resolution ? directionY / max : 0;
+    // the condition for larger than scale is to prevent "flip-flopping" movements (jumping back and forth)
+    const dx = Math.abs(directionX) > this.#view.scale ? directionX / max : 0;
+    const dy = Math.abs(directionY) > this.#view.scale ? directionY / max : 0;
     return new Movement(dx, dy);
   }
 

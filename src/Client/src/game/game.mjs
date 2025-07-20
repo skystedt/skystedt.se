@@ -4,7 +4,7 @@ import Communication, { MessageType } from './communication.mjs';
 import './game.css';
 import Input from './input.mjs';
 import Minis from './minis.mjs';
-import { Uninitialized } from './primitives.mjs';
+import { GamePosition, Uninitialized } from './primitives.mjs';
 import RenderingContext from './renderer/renderingContext.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Stars from './stars.mjs';
@@ -48,8 +48,8 @@ export default class Game {
   async init() {
     const app = await Factory.initializeApplication();
 
-    this.#parent.appendChild(app.canvas);
-    this.#renderingInformation = RenderingContext.information(app.canvas);
+    this.#parent.appendChild(app.element);
+    this.#renderingInformation = RenderingContext.information(app.element);
 
     await this.load(app);
     this.#startFrameLoop();
@@ -59,19 +59,21 @@ export default class Game {
   /** @param {Application} app */
   async load(app) {
     this.#currentFps = () => app.ticker.FPS;
-    this.#view = new View(app.display, app.canvas, true);
+    this.#view = new View(app, app.element, true);
     this.#input = new Input(this.#view);
     this.#communication = new Communication(
       this.#communicationReceived.bind(this),
       this.#communicationSendUpdate.bind(this)
     );
 
-    // order determines z order, last will be on top
-    this.#stars = new Stars(app.display);
-    this.#minis = new Minis(app.display);
-    this.#ship = new Ship(app.display);
+    const middle = new GamePosition(this.#view.gameSize.width / 2, this.#view.gameSize.height / 2);
 
-    await this.#ship.load(this.#view.gameSize);
+    // order determines z order, last will be on top
+    this.#stars = new Stars(app);
+    this.#minis = new Minis(app);
+    this.#ship = new Ship(app);
+
+    await this.#ship.load(middle);
     await this.#minis.load();
     this.#stars.load(this.#view.gameSize, STARS);
   }

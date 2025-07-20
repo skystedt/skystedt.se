@@ -7,26 +7,30 @@ import * as PIXI_S from '@pixi/sprite';
 /** @typedef {import("../../contract").Graphics} Graphics */
 
 export default class Container extends PIXI_D.Container {
-  /** @type { (Sprite | Graphics)[] } */ #elements = [];
+  /** @type { (Sprite | Graphics)[] } */ #items = [];
 
-  /** @type {Contract["elements"]} */
-  get elements() {
-    return this.#elements;
+  /** @type {Contract["items"]} */
+  get items() {
+    return this.#items;
   }
 
-  /** @type {Contract["addElement"]} */
-  addElement(element) {
-    this.#elements.push(element);
-    this.addChild(/** @type { PIXI_S.Sprite | PIXI_G.Graphics } */ (/** @type {unknown} */ (element)));
+  /** @type {Contract["move"]} */
+  move(x, y) {
+    this.position.set(x, y);
   }
 
-  /** @type {Contract["removeElement"]} */
-  // @ts-ignore
-  removeElement(element) {
-    const index = this.#elements.indexOf(element);
+  /** @type {Contract["addItem"]} */
+  addItem(item) {
+    this.#items.push(item);
+    this.addChild(/** @type { PIXI_S.Sprite | PIXI_G.Graphics } */ (/** @type {unknown} */ (item)));
+  }
+
+  /** @type {Contract["removeItem"]} */
+  removeItem(item) {
+    const index = this.#items.indexOf(item);
     if (index !== -1) {
-      this.#elements.splice(index, 1);
+      this.#items.splice(index, 1);
     }
-    this.removeChild(/** @type { PIXI_S.Sprite | PIXI_G.Graphics } */ (/** @type {unknown} */ (element)));
+    this.removeChild(/** @type { PIXI_S.Sprite | PIXI_G.Graphics } */ (/** @type {unknown} */ (item)));
   }
 }
