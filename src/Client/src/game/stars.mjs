@@ -1,7 +1,7 @@
 import { Factory } from '$renderer';
 import { Size, Uninitialized } from './primitives.mjs';
 
-/** @typedef { import("./renderer/contract").Display } Display */
+/** @typedef { import("./renderer/contract").Application } Application */
 /** @typedef { import("./renderer/contract").Container } Container */
 /** @typedef { import("./renderer/contract").Graphics } Graphics */
 
@@ -28,10 +28,10 @@ export default class Stars {
   /** @type {Star[]} */ #stars = [];
   #gameSize = /** @type {Size} */ (Uninitialized);
 
-  /** @param {Display} display */
-  constructor(display) {
+  /** @param {Application} application */
+  constructor(application) {
     this.#container = Factory.createContainer();
-    display.addContainer(this.#container);
+    application.addContainer(this.#container);
   }
 
   /**
@@ -43,7 +43,7 @@ export default class Stars {
     for (let i = 0; i < numberOfStars; i += 1) {
       const star = this.#newStar();
       this.#stars.push(star);
-      this.#container.addElement(star.graphics);
+      this.#container.addItem(star.graphics);
     }
   }
 
@@ -55,7 +55,7 @@ export default class Stars {
 
   /** @param {Star} star */
   #move(star) {
-    star.graphics.y += star.speed;
+    star.graphics.move(star.graphics.x, star.graphics.y + star.speed);
 
     if (star.graphics.y >= this.#gameSize.height) {
       this.#resetStar(star, true);
@@ -87,8 +87,9 @@ export default class Stars {
   #resetStar(star, outside) {
     star.color = this.#randomLightColor();
     this.#setGraphicsColor(star.graphics, star.color);
-    star.graphics.x = Math.floor(Math.random() * this.#gameSize.width);
-    star.graphics.y = Math.floor(Math.random() * (outside ? -10 : this.#gameSize.height)) - 1;
+    const x = Math.floor(Math.random() * this.#gameSize.width);
+    const y = Math.floor(Math.random() * (outside ? -10 : this.#gameSize.height)) - 1;
+    star.graphics.move(x, y);
     star.speed = this.#randomSpeed();
   }
 

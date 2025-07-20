@@ -1,36 +1,43 @@
 export default class RenderingContext {
   /**
-   * @param {HTMLCanvasElement} canvas
+   * @param {HTMLElement} element
    * @returns {{ context: string, information: string }}
    */
-  static information(canvas) {
+  /* eslint-disable no-cond-assign */
+  static information(element) {
+    if (!(element instanceof HTMLCanvasElement)) {
+      return {
+        context: 'html',
+        information: ''
+      };
+    }
+
     /** @type {GPUCanvasContext | WebGLRenderingContext | CanvasRenderingContext2D | null} */ let context;
     let contextId;
     let contextInformation;
 
-    /* eslint-disable no-cond-assign */
-    if ((context = canvas.getContext((contextId = 'webgpu')))) {
+    if ((context = element.getContext((contextId = 'webgpu')))) {
       contextInformation = this.#webgpuContext(context);
-    } else if ((context = canvas.getContext((contextId = 'webgl2')))) {
+    } else if ((context = element.getContext((contextId = 'webgl2')))) {
       contextInformation = this.#webglInformation(context);
-    } else if ((context = canvas.getContext((contextId = 'webgl')))) {
+    } else if ((context = element.getContext((contextId = 'webgl')))) {
       contextInformation = this.#webglInformation(context);
     } else if (
-      (context = /** @type {WebGLRenderingContext} */ (canvas.getContext((contextId = 'experimental-webgl'))))
+      (context = /** @type {WebGLRenderingContext} */ (element.getContext((contextId = 'experimental-webgl'))))
     ) {
       contextInformation = this.#webglInformation(context);
-    } else if ((context = canvas.getContext((contextId = '2d')))) {
+    } else if ((context = element.getContext((contextId = '2d')))) {
       contextInformation = '';
     } else {
       contextId = 'unknown';
       contextInformation = '';
     }
-    /* eslint-enable no-cond-assign */
     return {
       context: contextId,
       information: contextInformation
     };
   }
+  /* eslint-enable no-cond-assign */
 
   /**
    * @param {GPUCanvasContext} context

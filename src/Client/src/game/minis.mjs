@@ -3,7 +3,7 @@ import Assets from './assets.mjs';
 import MiniImage from './assets/mini.png';
 import { Uninitialized } from './primitives.mjs';
 
-/** @typedef { import("./renderer/contract").Display } Display */
+/** @typedef { import("./renderer/contract").Application } Application */
 /** @typedef { import("./renderer/contract").Container } Container */
 /** @typedef { import("./renderer/contract").Texture } Texture */
 /** @typedef { import("./renderer/contract").Sprite } Sprite */
@@ -28,10 +28,10 @@ export default class Minis {
   /** @type {Map<string, Item>} */
   #map = new Map();
 
-  /** @param {Display} display */
-  constructor(display) {
+  /** @param {Application} application */
+  constructor(application) {
     this.#container = Factory.createContainer();
-    display.addContainer(this.#container);
+    application.addContainer(this.#container);
   }
 
   async load() {
@@ -53,7 +53,7 @@ export default class Minis {
     const item = this.#map.get(id);
     if (item) {
       const { sprite } = item;
-      sprite.position = { x: x - sprite.width / 2, y: y - sprite.height / 2 };
+      sprite.move(x - sprite.width / 2, y - sprite.height / 2);
       sprite.alpha = 0;
       item.state = MiniState.FadeIn;
     }
@@ -64,7 +64,7 @@ export default class Minis {
     const item = this.#map.get(id);
     if (item) {
       const { sprite } = item;
-      this.#container.removeElement(sprite);
+      this.#container.removeItem(sprite);
       sprite.destroy();
       this.#map.delete(id);
     }
@@ -105,7 +105,7 @@ export default class Minis {
   #createItem() {
     const sprite = Factory.createSprite(this.#texture);
     sprite.alpha = 0;
-    this.#container.addElement(sprite);
+    this.#container.addItem(sprite);
     return { sprite, state: MiniState.Hidden, wait: 0 };
   }
 }

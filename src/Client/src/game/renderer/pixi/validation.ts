@@ -5,7 +5,6 @@ import * as Implementation from './renderer.mjs';
 
 const Factory: Contract.Factory = Implementation.Factory;
 declare class Application extends Implementation.Application implements Contract.Application {}
-declare class Display extends Implementation.Display implements Contract.Display {}
 declare class Container extends Implementation.Container implements Contract.Container {}
 declare class Sprite extends Implementation.Sprite implements Contract.Sprite {}
 declare class Texture extends Implementation.Texture implements Contract.Texture {}
