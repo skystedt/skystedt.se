@@ -1,16 +1,7 @@
 // cSpell:ignore picocolors
 import browserslist from 'browserslist';
-import path from 'node:path';
 import pc from 'picocolors';
 import webpack from 'webpack';
-
-const cwd = process.cwd();
-export const dir = {
-  src: path.resolve(cwd, 'src'),
-  publish: path.resolve(cwd, '..', 'publish'),
-  dist: path.resolve(cwd, '..', 'publish', 'Client'),
-  node_modules: path.resolve(cwd, 'node_modules')
-};
 
 export const printProgress =
   (/** @type {string} */ environment) =>

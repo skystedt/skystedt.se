@@ -4,8 +4,9 @@ import { glob } from 'glob';
 import { minimatch } from 'minimatch';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { dir } from './dir.mjs';
 import BrowserslistUpdatePlugin from './plugins/browserslist-update-plugin.mjs';
-import { browserslistBrowsers, dir } from './utils.mjs';
+import { browserslistBrowsers } from './utils.mjs';
 
 const babelTargets = /** @type {_babelTargets} */ (/** @type {any} */ (_babelTargets).default);
 

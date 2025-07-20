@@ -1,7 +1,7 @@
 import path from 'node:path';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
-import { dir } from '../../utils.mjs';
+import { dir } from '../../dir.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
