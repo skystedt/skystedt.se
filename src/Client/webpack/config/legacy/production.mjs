@@ -1,7 +1,8 @@
 import path from 'node:path';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
-import { dir, printProgress } from '../../utils.mjs';
+import { dir } from '../../dir.mjs';
+import { printProgress } from '../../utils.mjs';
 
 /** @type {webpack.Configuration} */
 export default {

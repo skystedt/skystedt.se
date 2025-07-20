@@ -2,7 +2,7 @@
 import { LicenseWebpackPlugin as _LicenseWebpackPlugin } from 'license-webpack-plugin';
 import path from 'node:path';
 import spdxSatisfies from 'spdx-satisfies';
-import { dir } from '../utils.mjs';
+import { dir } from '../dir.mjs';
 
 // eslint-disable-next-line import-x/order
 import unfetch from 'unfetch/package.json' with { type: 'json' };

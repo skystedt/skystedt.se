@@ -1,7 +1,7 @@
 import { minimatch } from 'minimatch';
 import path from 'node:path';
 import webpack from 'webpack';
-import { dir } from '../utils.mjs';
+import { dir } from '../dir.mjs';
 
 /** @typedef { Pick<webpack.RuleSetRule, 'include' | 'exclude'> } SideEffects */
 /** @typedef { Exclude<NonNullable<webpack.Configuration["optimization"]>["splitChunks"], boolean | undefined>["cacheGroups"] } CacheGroups */

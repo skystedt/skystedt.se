@@ -3,10 +3,10 @@ import path from 'node:path';
 import StylelintPlugin from 'stylelint-webpack-plugin';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
+import { dir } from '../../dir.mjs';
 import BrowserslistUpdatePlugin from '../../plugins/browserslist-update-plugin.mjs';
 import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpack-plugin.mjs';
 import PostProcessHtmlWebpackPlugin from '../../plugins/html/post-process-html-webpack-plugin.mjs';
-import { dir } from '../../utils.mjs';
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
 
