@@ -9,4 +9,4 @@ export const dir = {
 };
 
 export const rendererPath = (/** @type {string} */ renderer) =>
-  path.resolve(dir.src, 'game', 'renderer', renderer, 'renderer.mjs');
+  path.resolve(dir.src, 'renderers', renderer, 'renderer.mjs');
