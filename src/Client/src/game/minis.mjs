@@ -3,10 +3,10 @@ import Assets from './assets.mjs';
 import MiniImage from './assets/mini.png';
 import { Uninitialized } from './primitives.mjs';
 
-/** @typedef { import("./renderer/contract").Application } Application */
-/** @typedef { import("./renderer/contract").Container } Container */
-/** @typedef { import("./renderer/contract").Texture } Texture */
-/** @typedef { import("./renderer/contract").Sprite } Sprite */
+/** @typedef { import("../renderers/contract").Application } Application */
+/** @typedef { import("../renderers/contract").Container } Container */
+/** @typedef { import("../renderers/contract").Texture } Texture */
+/** @typedef { import("../renderers/contract").Sprite } Sprite */
 
 const ALPHA_DELTA = 0.025;
 const SHOWN_DURATION = 20;

@@ -1,9 +1,9 @@
 import { Factory } from '$renderer';
 import { Size, Uninitialized } from './primitives.mjs';
 
-/** @typedef { import("./renderer/contract").Application } Application */
-/** @typedef { import("./renderer/contract").Container } Container */
-/** @typedef { import("./renderer/contract").Graphics } Graphics */
+/** @typedef { import("../renderers/contract").Application } Application */
+/** @typedef { import("../renderers/contract").Container } Container */
+/** @typedef { import("../renderers/contract").Graphics } Graphics */
 
 /**
  * @typedef {{

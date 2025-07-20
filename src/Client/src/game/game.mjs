@@ -1,18 +1,18 @@
 import { Factory } from '$renderer';
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+import RenderingContext from '../renderers/renderingContext.mjs';
 import Communication, { MessageType } from './communication.mjs';
 import './game.css';
 import Input from './input.mjs';
 import Minis from './minis.mjs';
 import { GamePosition, Uninitialized } from './primitives.mjs';
-import RenderingContext from './renderer/renderingContext.mjs';
 import Ship, { ShipDirection } from './ship.mjs';
 import Stars from './stars.mjs';
 import View from './view.mjs';
 
 /** @typedef { number } DOMHighResTimeStamp */
 /** @typedef { ReturnType<RenderingContext.information> } RenderingInformation */
-/** @typedef { import("./renderer/contract").Application } Application */
+/** @typedef { import("../renderers/contract").Application } Application */
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;

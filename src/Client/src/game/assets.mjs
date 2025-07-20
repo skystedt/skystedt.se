@@ -1,6 +1,6 @@
 import { Factory } from '$renderer';
 
-/** @typedef { import("./renderer/contract").Texture } Texture */
+/** @typedef { import("../renderers/contract").Texture } Texture */
 
 export default class Assets {
   /**

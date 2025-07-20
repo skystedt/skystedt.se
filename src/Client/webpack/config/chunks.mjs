@@ -16,8 +16,8 @@ const wildcardMatch = (...patterns) => {
 };
 
 const pixiSideEffects = [
-  path.resolve(dir.src, 'game', 'renderer', 'pixi', 'renderer.mjs'),
-  path.resolve(dir.src, 'game', 'renderer', 'pixi', 'implementation', 'init.mjs')
+  path.resolve(dir.src, 'renderers', 'pixi', 'renderer.mjs'),
+  path.resolve(dir.src, 'renderers', 'pixi', 'implementation', 'init.mjs')
 ];
 
 /** @type {SideEffects} */
