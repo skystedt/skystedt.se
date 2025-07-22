@@ -1,4 +1,6 @@
-body {
+body,
+canvas,
+img {
   /* Sharper zoom */
   image-rendering: crisp-edges;
   image-rendering: pixelated;
