@@ -154,7 +154,7 @@ export default [
         'eslint-import-resolver-exports': {},
         'eslint-import-resolver-custom-alias': {
           alias: {
-            $renderer: rendererPath(Renderer.HTML)
+            $renderer: rendererPath(Renderer.Pixi)
           }
         }
       }
