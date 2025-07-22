@@ -2,7 +2,7 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-import { dir, rendererPath } from '../../dir.mjs';
+import { dir, Renderer, rendererPath } from '../../dir.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 import { licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
 
@@ -46,7 +46,7 @@ export default {
   },
   resolve: {
     alias: {
-      $renderer: rendererPath('pixi')
+      $renderer: rendererPath(Renderer.Pixi)
     }
   },
   module: {

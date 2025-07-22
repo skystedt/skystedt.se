@@ -8,5 +8,14 @@ export const dir = {
   node_modules: path.resolve(cwd, 'node_modules')
 };
 
-export const rendererPath = (/** @type {string} */ renderer) =>
-  path.resolve(dir.src, 'renderers', renderer, 'renderer.mjs');
+/** @enum {string} */
+export const Renderer = {
+  Pixi: 'pixi',
+  HTML: 'html'
+};
+
+/**
+ * @param {Renderer} renderer
+ * @returns {string}
+ */
+export const rendererPath = (renderer) => path.resolve(dir.src, 'renderers', renderer, 'renderer.mjs');

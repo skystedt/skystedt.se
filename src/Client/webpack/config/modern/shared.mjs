@@ -10,7 +10,7 @@ import webpack from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { polyfillCorejs, polyfillCorejsExcluded } from '../../../babel.config.mjs';
 import BuildInfo from '../../build-info.mjs';
-import { dir, rendererPath } from '../../dir.mjs';
+import { dir, Renderer, rendererPath } from '../../dir.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpack-plugin.mjs';
 import DataUriFaviconHtmlWebpackPlugin from '../../plugins/html/data-uri-favicon-html-webpack-plugin.mjs';
@@ -21,7 +21,7 @@ import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plug
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import { postcssOptions } from '../../postcss/config.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
-import { LicenseWebpackPlugin, licenseOptions, licensePreamble } from '../licenses.mjs';
+import { licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
 import staticWebApp from '../../../staticwebapp.config.template.json' with { type: 'json' };
@@ -97,7 +97,7 @@ export default {
   },
   resolve: {
     alias: {
-      $renderer: rendererPath('pixi')
+      $renderer: rendererPath(Renderer.Pixi)
     }
   },
   module: {
