@@ -1,25 +1,26 @@
-import * as PIXI_A from '@pixi/app';
-import { BaseTexture, SCALE_MODES } from '@pixi/core';
-import * as PIXI_D from '@pixi/display';
+import * as PIXI from 'pixi.js';
 
 /** @typedef {import("../../contract").Application} Contract */
 /** @typedef {import("../../contract").Factory} Factory */
 
-export default class Application extends PIXI_A.Application {
+export default class Application extends PIXI.Application {
   /** @type {Factory["initializeApplication"]} */
   static async initializeApplication() {
-    BaseTexture.defaultOptions.scaleMode = SCALE_MODES.NEAREST;
+    PIXI.TextureSource.defaultOptions.scaleMode = 'nearest';
 
     const app = new Application();
-    // Patch the resize method to use the class prototype's override
-    app.resize = Application.prototype.resize;
 
-    return Promise.resolve(app);
+    await app.init({
+      preference: 'webgpu',
+      skipExtensionImports: true
+    });
+
+    return app;
   }
 
   /** @type {Contract["element"]} */
   get element() {
-    return /** @type {HTMLCanvasElement} */ (super.view);
+    return this.canvas;
   }
 
   /** @type {Contract["width"]} */
@@ -50,8 +51,7 @@ export default class Application extends PIXI_A.Application {
   /** @type {Contract["resize"]} */
   // @ts-ignore
   resize(width, height, scale) {
-    this.renderer.resolution = scale;
-    this.renderer.resize(width, height);
+    this.renderer.resize(width, height, scale);
   }
 
   /** @type {Contract["offset"]} */
@@ -61,6 +61,6 @@ export default class Application extends PIXI_A.Application {
 
   /** @type {Contract["addContainer"]} */
   addContainer(container) {
-    this.stage.addChild(/** @type {PIXI_D.Container} */ (/** @type {unknown} */ (container)));
+    this.stage.addChild(/** @type {PIXI.Container} */ (/** @type {unknown} */ (container)));
   }
 }
