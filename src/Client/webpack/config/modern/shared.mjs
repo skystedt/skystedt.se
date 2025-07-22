@@ -97,7 +97,7 @@ export default {
   },
   resolve: {
     alias: {
-      $renderer: rendererPath(Renderer.Pixi)
+      $renderer: rendererPath(Renderer.HTML)
     }
   },
   module: {
