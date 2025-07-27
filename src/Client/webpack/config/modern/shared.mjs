@@ -19,6 +19,7 @@ import PreloadHtmlWebpackPlugin from '../../plugins/html/preload-html-webpack-pl
 import ScriptsHtmlWebpackPlugin from '../../plugins/html/scripts-html-webpack-plugin.mjs';
 import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
+import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { postcssOptions } from '../../postcss/config.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 import { licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
@@ -212,6 +213,7 @@ export default {
       ['@babel/preset-env', 'browserslist', 'caniuse-lite'],
       ['postcss-preset-env', 'browserslist', 'caniuse-lite']
     ]),
+    new ThrowOnUnnamedChunkPlugin(),
     new ThrowOnAssetEmittedPlugin('polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
     new CreateFilePlugin(dir.publish, 'staticwebapp.config.json', staticWebAppConfig),
     new CreateFilePlugin(dir.dist, 'build/version.json', () => buildInfo.version()),
