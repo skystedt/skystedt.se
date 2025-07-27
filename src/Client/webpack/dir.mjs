@@ -5,6 +5,7 @@ export const dir = {
   src: path.resolve(cwd, 'src'),
   publish: path.resolve(cwd, '..', 'publish'),
   dist: path.resolve(cwd, '..', 'publish', 'Client'),
+  dist_legacy: path.resolve(cwd, '..', 'publish', 'Client', 'legacy'),
   node_modules: path.resolve(cwd, 'node_modules')
 };
 

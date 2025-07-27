@@ -1,7 +1,5 @@
 import _babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
 import bytes from 'bytes';
-import { glob } from 'glob';
-import { minimatch } from 'minimatch';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { dir } from './dir.mjs';
@@ -67,18 +65,18 @@ export default class BuildInfo {
 
   /** @returns {Promise<Sizes>} */
   async sizes() {
-    const fileTypes = ['*.html', '*.mjs', '*.js'];
+    const fileTypes = ['.html', '.mjs', '.js'];
+
+    const relativePaths = await fs.readdir(dir.dist, { recursive: true });
 
     const result = /** @type {Sizes} */ ({});
-    const files = await glob('**/*', { cwd: dir.dist });
     await Promise.all(
-      files.map(async (file) => {
-        const filePath = path.basename(file);
-        const matches = fileTypes.some((fileType) => minimatch(filePath, fileType));
-        if (matches) {
-          const stat = await fs.stat(path.resolve(dir.dist, file));
+      relativePaths.map(async (relativePath) => {
+        if (fileTypes.includes(path.extname(relativePath))) {
+          const fullPath = path.join(dir.dist, relativePath);
+          const stat = await fs.stat(fullPath);
           const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' }) ?? '?';
-          result[file] = size;
+          result[relativePath] = size;
         }
       })
     );

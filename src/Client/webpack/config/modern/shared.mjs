@@ -15,8 +15,7 @@ import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpack-plugin.mjs';
 import DataUriFaviconHtmlWebpackPlugin from '../../plugins/html/data-uri-favicon-html-webpack-plugin.mjs';
 import MoveHookHtmlWebpackPlugin from '../../plugins/html/move-hook-html-webpack-plugin.mjs';
-import PreloadHtmlWebpackPlugin from '../../plugins/html/preload-html-webpack-plugin.mjs';
-import ScriptsHtmlWebpackPlugin from '../../plugins/html/scripts-html-webpack-plugin.mjs';
+import TagsHtmlWebpackPlugin from '../../plugins/html/tags-html-webpack-plugin.mjs';
 import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
@@ -34,14 +33,13 @@ const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin
 export const buildInfo = new BuildInfo();
 
 /** @typedef {{ [directive: string]: string | string[] }} CspPolicy */
-/** @type {CspPolicy}} */
-let cspPolicy;
-const cspCallback = (/** @type {CspPolicy}} */ policy) => {
+let /** @type {CspPolicy | undefined} */ cspPolicy;
+const cspCallback = (/** @type {CspPolicy} */ policy) => {
   cspPolicy = policy;
 };
 const staticWebAppConfig = () => {
   const rootHeaders = staticWebApp.routes.find((route) => route.route === '/')?.headers;
-  if (rootHeaders) {
+  if (cspPolicy && rootHeaders) {
     const builtPolicy = CspHashesHtmlWebpackPlugin.buildPolicy(cspPolicy);
     rootHeaders['Content-Security-Policy'] = builtPolicy;
   }
@@ -172,15 +170,42 @@ export default {
       minify: 'auto'
     }),
     new MoveHookHtmlWebpackPlugin(), // Required for CSP
-    new ScriptsHtmlWebpackPlugin({
-      add: [
-        { path: 'legacy/insights.*.js', directory: dir.dist },
-        { path: 'legacy/polyfills.*.js', directory: dir.dist },
-        { path: 'legacy/app.*.js', directory: dir.dist }
-      ],
-      attributes: [
-        { path: '**/insights.*.*js', async: true },
-        { path: 'legacy/*.js', type: 'nomodule', defer: true, integrity: false }
+    new TagsHtmlWebpackPlugin({
+      files: {
+        includeCompiledAssets: true,
+        extraFileDirectories: [path.resolve(dir.dist_legacy)]
+      },
+      tags: [
+        {
+          path: 'game.*.mjs',
+          tag: 'link',
+          attributes: { rel: 'modulepreload' }
+        },
+        {
+          path: 'pixi.*.mjs',
+          tag: 'link',
+          attributes: { rel: 'preload', as: 'script', crossorigin: 'anonymous' } // Don't use webpackPreload/Prefetch, since we don't want webpack to also load it if we add it to the html
+        },
+        {
+          path: 'insights.*.*js',
+          tag: 'script',
+          attributes: { async: true }
+        },
+        {
+          path: 'legacy/insights.*.js',
+          tag: 'script',
+          attributes: { nomodule: true, async: true, defer: true, integrity: undefined }
+        },
+        {
+          path: 'legacy/polyfills.*.js',
+          tag: 'script',
+          attributes: { nomodule: true, defer: true, integrity: undefined }
+        },
+        {
+          path: 'legacy/app.*.js',
+          tag: 'script',
+          attributes: { nomodule: true, defer: true, integrity: undefined }
+        }
       ]
     }),
     new DataUriFaviconHtmlWebpackPlugin(),
@@ -188,19 +213,13 @@ export default {
       filename: '[name].[contenthash].css'
     }),
     new HtmlInlineCssWebpackPlugin(),
-    new PreloadHtmlWebpackPlugin([
-      {
-        pattern: '*.mjs',
-        type: 'modulepreload'
-      }
-    ]),
     new SubresourceIntegrityPlugin({
       enabled: 'auto',
       hashFuncNames: ['sha384']
     }),
     new CspHashesHtmlWebpackPlugin(csp, {
       hashAlgorithm: 'sha384',
-      metaTag: false,
+      metaTag: false, // uses callback to capture CSP and writes it to staticwebapp.config.json
       ignore: {
         externalPatterns: ['legacy/*.js']
       },
