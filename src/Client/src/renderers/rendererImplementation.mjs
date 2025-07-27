@@ -1,7 +1,8 @@
 /** @enum {string} */
 const RendererImplementation = {
   Pixi: 'pixi',
-  Html: 'html'
+  Html: 'html',
+  PixiWithHtmlFallback: 'pixi-with-html-fallback'
 };
 
 export default RendererImplementation;
