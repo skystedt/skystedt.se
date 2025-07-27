@@ -15,6 +15,17 @@ const wildcardMatch = (...patterns) => {
   return (value) => patterns.some((pattern) => minimatch(value, pattern));
 };
 
+/**
+ * @param {string} targetFolder
+ * @param {webpack.Module} module
+ * @returns {boolean}
+ */
+const cacheGroupFolderTest = (targetFolder, module) =>
+  !!(/** @type {webpack.NormalModule} */ (module).resource) && // ensure module is webpack.NormalModule
+  minimatch(/** @type {webpack.NormalModule} */ (module).resource, path.resolve(targetFolder, '**'), {
+    windowsPathsNoEscape: true
+  });
+
 const pixiSideEffects = [
   path.resolve(dir.src, 'renderers', 'pixi', 'renderer.mjs'),
   path.resolve(dir.src, 'renderers', 'pixi', 'implementation', 'init.mjs')
@@ -53,6 +64,20 @@ export const cacheGroups = {
     type: wildcardMatch('javascript/*', 'asset/inline'),
     name: 'game'
   },
+  renderers: {
+    // Have all renderers except for Pixi be in the game chunk
+    test: (/** @type {webpack.Module} */ module) =>
+      cacheGroupFolderTest(path.resolve(dir.src, 'renderers'), module) &&
+      !cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
+    type: wildcardMatch('javascript/*'),
+    name: 'game'
+  },
+  pixi: {
+    test: (/** @type {webpack.Module} */ module) =>
+      cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
+    type: wildcardMatch('javascript/*'),
+    name: 'pixi'
+  },
   insights: {
     test: path.resolve(dir.src, 'insights'),
     type: wildcardMatch('javascript/*'),
@@ -64,11 +89,7 @@ export const cacheGroups = {
     name: 'polyfills'
   },
   vendors: {
-    test: (/** @type {webpack.Module} */ module) =>
-      !!(/** @type {webpack.NormalModule} */ (module).resource) && // ensure module is webpack.NormalModule
-      minimatch(/** @type {webpack.NormalModule} */ (module).resource, path.resolve(dir.node_modules, '**'), {
-        windowsPathsNoEscape: true
-      }),
+    test: (/** @type {webpack.Module} */ module) => cacheGroupFolderTest(dir.node_modules, module),
     type: wildcardMatch('javascript/*'),
     name: (/** @type {webpack.Module} */ module) =>
       mapVendorModuleToChunk(
