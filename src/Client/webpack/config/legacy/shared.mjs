@@ -3,6 +3,7 @@ import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { dir, Renderer, rendererPath } from '../../dir.mjs';
+import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 import { licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
 
@@ -88,5 +89,5 @@ export default {
       }
     ]
   },
-  plugins: [new LicenseWebpackPlugin(licenseOptions)]
+  plugins: [new LicenseWebpackPlugin(licenseOptions), new ThrowOnUnnamedChunkPlugin()]
 };
