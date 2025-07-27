@@ -12,7 +12,7 @@ export default class RenderingContext {
       };
     }
 
-    /** @type {GPUCanvasContext | WebGLRenderingContext | CanvasRenderingContext2D | null} */ let context;
+    let /** @type {GPUCanvasContext | WebGLRenderingContext | CanvasRenderingContext2D | null} */ context;
     let contextId;
     let contextInformation;
 

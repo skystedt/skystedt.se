@@ -2,6 +2,7 @@ import * as PIXI from '@pixi/graphics';
 
 /** @typedef {import("../../contract").Graphics} Contract */
 
+/** @implements {Contract} */
 export default class Graphics extends PIXI.Graphics {
   /** @type {Contract["fillRect"]} */
   fillRect(color, x, y, width, height) {

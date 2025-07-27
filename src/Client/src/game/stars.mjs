@@ -1,6 +1,6 @@
-import { Factory } from '$renderer';
 import { Size, Uninitialized } from './primitives.mjs';
 
+/** @typedef { import("../renderers/contract").Renderer } Renderer */
 /** @typedef { import("../renderers/contract").Application } Application */
 /** @typedef { import("../renderers/contract").Container } Container */
 /** @typedef { import("../renderers/contract").Graphics } Graphics */
@@ -24,13 +24,18 @@ const SPEED_PROBABILITIES = [
 ];
 
 export default class Stars {
-  /** @type {Container} */ #container;
+  #renderer;
+  #container;
   /** @type {Star[]} */ #stars = [];
   #gameSize = /** @type {Size} */ (Uninitialized);
 
-  /** @param {Application} application */
-  constructor(application) {
-    this.#container = Factory.createContainer();
+  /**
+   * @param {Renderer} renderer
+   * @param {Application} application
+   */
+  constructor(renderer, application) {
+    this.#renderer = renderer;
+    this.#container = renderer.createContainer();
     application.addContainer(this.#container);
   }
 
@@ -74,7 +79,7 @@ export default class Stars {
 
   /** @returns {Star} */
   #newStar() {
-    const graphics = Factory.createGraphics();
+    const graphics = this.#renderer.createGraphics();
     const star = { graphics, color: 0, speed: 0, blinking: 0 };
     this.#resetStar(star, false);
     return star;

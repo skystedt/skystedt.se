@@ -2,6 +2,7 @@
 /** @typedef {import("../../contract").Texture} Texture */
 /** @typedef {import("./texture.mjs").default} ImplementationTexture */
 
+/** @implements {Contract} */
 export default class Sprite {
   #element;
   #visible = true;

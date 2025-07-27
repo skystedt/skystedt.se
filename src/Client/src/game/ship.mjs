@@ -1,10 +1,10 @@
-import { Factory } from '$renderer';
 import Assets from './assets.mjs';
 import ShipStraightImage from './assets/ship.png';
 import ShipLeftImage from './assets/ship_left.png';
 import ShipRightImage from './assets/ship_right.png';
 import { GamePosition, Size, Uninitialized } from './primitives.mjs';
 
+/** @typedef { import("../renderers/contract").Renderer } Renderer */
 /** @typedef { import("../renderers/contract").Application } Application */
 /** @typedef { import("../renderers/contract").Container } Container */
 /** @typedef { import("../renderers/contract").Sprite } Sprite */
@@ -19,28 +19,33 @@ export const ShipDirection = {
 };
 
 export default class Ship {
-  /** @type {Container} */ #container;
+  #renderer;
+  #container;
   #spriteStraight = /** @type {Sprite} */ (Uninitialized);
   #spriteLeft = /** @type {Sprite} */ (Uninitialized);
   #spriteRight = /** @type {Sprite} */ (Uninitialized);
   #startPosition = /** @type {GamePosition} */ (Uninitialized);
   #straightDelay = 0;
 
-  /** @param {Application} application */
-  constructor(application) {
-    this.#container = Factory.createContainer();
+  /**
+   * @param {Renderer} renderer
+   * @param {Application} application
+   */
+  constructor(renderer, application) {
+    this.#renderer = renderer;
+    this.#container = renderer.createContainer();
     application.addContainer(this.#container);
   }
 
   /** @param {GamePosition} position */
   async load(position) {
-    const shipStraightTexture = await Assets.loadImage(ShipStraightImage);
-    const shipLeftTexture = await Assets.loadImage(ShipLeftImage);
-    const shipRightTexture = await Assets.loadImage(ShipRightImage);
+    const shipStraightTexture = await Assets.loadImage(this.#renderer, ShipStraightImage);
+    const shipLeftTexture = await Assets.loadImage(this.#renderer, ShipLeftImage);
+    const shipRightTexture = await Assets.loadImage(this.#renderer, ShipRightImage);
 
-    this.#spriteStraight = Factory.createSprite(shipStraightTexture);
-    this.#spriteLeft = Factory.createSprite(shipLeftTexture);
-    this.#spriteRight = Factory.createSprite(shipRightTexture);
+    this.#spriteStraight = this.#renderer.createSprite(shipStraightTexture);
+    this.#spriteLeft = this.#renderer.createSprite(shipLeftTexture);
+    this.#spriteRight = this.#renderer.createSprite(shipRightTexture);
 
     this.#startPosition = new GamePosition(
       position.x - this.#spriteStraight.width / 2,

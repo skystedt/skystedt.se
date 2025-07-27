@@ -1,3 +1,6 @@
+/** @typedef {import("../../contract").Texture} Contract */
+
+/** @implements {Contract} */
 export default class Texture {
   #data;
 

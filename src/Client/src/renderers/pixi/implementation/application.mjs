@@ -1,20 +1,18 @@
 import * as PIXI_A from '@pixi/app';
-import { BaseTexture, SCALE_MODES } from '@pixi/core';
 import * as PIXI_D from '@pixi/display';
 
 /** @typedef {import("../../contract").Application} Contract */
-/** @typedef {import("../../contract").Factory} Factory */
+/** @typedef {import("../../contract").Renderer} Renderer */
 
+/** @implements {Contract} */
 export default class Application extends PIXI_A.Application {
-  /** @type {Factory["initializeApplication"]} */
-  static async initializeApplication() {
-    BaseTexture.defaultOptions.scaleMode = SCALE_MODES.NEAREST;
-
-    const app = new Application();
+  /** @type {Renderer["createApplication"]} */
+  static async createApplication() {
+    const application = new Application();
     // Patch the resize method to use the class prototype's override
-    app.resize = Application.prototype.resize;
+    application.resize = Application.prototype.resize;
 
-    return Promise.resolve(app);
+    return Promise.resolve(application);
   }
 
   /** @type {Contract["element"]} */

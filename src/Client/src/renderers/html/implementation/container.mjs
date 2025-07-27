@@ -4,6 +4,7 @@
 /** @typedef {import("./sprite.mjs").default} ImplementationSprite */
 /** @typedef {import("./graphics.mjs").default} ImplementationGraphics */
 
+/** @implements {Contract} */
 export default class Container {
   #element;
   /** @type { SVGElement? } */ #svg = null;

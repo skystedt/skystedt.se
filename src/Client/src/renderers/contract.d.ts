@@ -1,9 +1,11 @@
-export interface Factory {
-  static initializeApplication: () => Promise<Application>;
-  static createContainer: () => Container;
-  static createTexture: (canvas: HTMLCanvasElement) => Texture;
-  static createSprite: (texture: Texture) => Sprite;
-  static createGraphics: () => Graphics;
+export type initializeRenderer = () => Promise<Renderer>;
+
+export interface Renderer {
+  createApplication: () => Promise<Application>;
+  createContainer: () => Container;
+  createTexture: (canvas: HTMLCanvasElement) => Texture;
+  createSprite: (texture: Texture) => Sprite;
+  createGraphics: () => Graphics;
 }
 
 export interface Application {

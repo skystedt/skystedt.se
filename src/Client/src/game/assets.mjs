@@ -1,13 +1,13 @@
-import { Factory } from '$renderer';
-
+/** @typedef { import("../renderers/contract").Renderer } Renderer */
 /** @typedef { import("../renderers/contract").Texture } Texture */
 
 export default class Assets {
   /**
+   * @param {Renderer} renderer
    * @param {string} url
    * @returns {Promise<Texture>}
    */
-  static async loadImage(url) {
+  static async loadImage(renderer, url) {
     const image = /** @type HTMLImageElement */ (
       await new Promise((resolve, reject) => {
         const element = new Image();
@@ -23,7 +23,7 @@ export default class Assets {
     const context = canvas.getContext('2d');
     context?.drawImage(image, 0, 0);
 
-    const texture = Factory.createTexture(canvas);
+    const texture = renderer.createTexture(canvas);
     return texture;
   }
 }

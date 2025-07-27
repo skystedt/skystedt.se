@@ -6,6 +6,7 @@ import * as PIXI_S from '@pixi/sprite';
 /** @typedef {import("../../contract").Sprite} Sprite */
 /** @typedef {import("../../contract").Graphics} Graphics */
 
+/** @implements {Contract} */
 export default class Container extends PIXI_D.Container {
   /** @type { (Sprite | Graphics)[] } */ #items = [];
 

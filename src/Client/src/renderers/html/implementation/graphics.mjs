@@ -1,5 +1,6 @@
 /** @typedef {import("../../contract").Graphics} Contract */
 
+/** @implements {Contract} */
 export default class Graphics {
   #element;
   #position = { x: 0, y: 0 };
