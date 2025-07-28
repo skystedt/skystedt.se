@@ -5,6 +5,7 @@ import webpack from 'webpack';
 import settings from '../../../settings.mjs';
 import { dir } from '../../dir.mjs';
 import BrowserslistUpdatePlugin from '../../plugins/browserslist-update-plugin.mjs';
+import AddInlineStylesHtmlWebpackPlugin from '../../plugins/html/add-inline-styles-html-webpack-plugin.mjs';
 import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpack-plugin.mjs';
 import PostProcessHtmlWebpackPlugin from '../../plugins/html/post-process-html-webpack-plugin.mjs';
 
@@ -82,6 +83,7 @@ export default {
       },
       callback: cspCallback
     }),
+    new AddInlineStylesHtmlWebpackPlugin('#webpack-dev-server-client-overlay { pointer-events: auto }'),
     new PostProcessHtmlWebpackPlugin({
       insertNewLines: true,
       headIndentation: '    '
