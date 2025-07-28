@@ -13,7 +13,7 @@ export default {
   target: 'browserslist:legacy',
   output: {
     filename: '[name].[contenthash].js',
-    path: path.resolve(dir.dist, 'legacy'),
+    path: dir.dist_legacy,
     publicPath: 'legacy/',
     clean: true
   },
