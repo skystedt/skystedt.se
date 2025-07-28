@@ -1,4 +1,4 @@
-import { Factory } from '$renderer';
+import { initializeRenderer } from '$renderer';
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import RenderingContext from '../renderers/renderingContext.mjs';
 import Communication, { MessageType } from './communication.mjs';
@@ -12,6 +12,7 @@ import View from './view.mjs';
 
 /** @typedef { number } DOMHighResTimeStamp */
 /** @typedef { ReturnType<RenderingContext.information> } RenderingInformation */
+/** @typedef { import("../renderers/contract").Renderer } Renderer */
 /** @typedef { import("../renderers/contract").Application } Application */
 
 const LOGIC_FPS = 100;
@@ -46,20 +47,25 @@ export default class Game {
   }
 
   async init() {
-    const app = await Factory.initializeApplication();
+    const renderer = await initializeRenderer();
 
-    this.#parent.appendChild(app.element);
-    this.#renderingInformation = RenderingContext.information(app.element);
+    const application = await renderer.createApplication();
+    this.#parent.appendChild(application.element);
 
-    await this.load(app);
+    this.#renderingInformation = RenderingContext.information(application.element);
+
+    await this.load(renderer, application);
     this.#startFrameLoop();
     await this.#communication.connect();
   }
 
-  /** @param {Application} app */
-  async load(app) {
-    this.#currentFps = () => app.ticker.FPS;
-    this.#view = new View(app, app.element, true);
+  /**
+   * @param {Renderer} renderer
+   * @param {Application} application
+   */
+  async load(renderer, application) {
+    this.#currentFps = () => application.ticker.FPS;
+    this.#view = new View(application, application.element, true);
     this.#input = new Input(this.#view);
     this.#communication = new Communication(
       this.#communicationReceived.bind(this),
@@ -69,9 +75,9 @@ export default class Game {
     const middle = new GamePosition(this.#view.gameSize.width / 2, this.#view.gameSize.height / 2);
 
     // order determines z order, last will be on top
-    this.#stars = new Stars(app);
-    this.#minis = new Minis(app);
-    this.#ship = new Ship(app);
+    this.#stars = new Stars(renderer, application);
+    this.#minis = new Minis(renderer, application);
+    this.#ship = new Ship(renderer, application);
 
     await this.#ship.load(middle);
     await this.#minis.load();

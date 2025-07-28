@@ -1,8 +1,8 @@
-import { Factory } from '$renderer';
 import Assets from './assets.mjs';
 import MiniImage from './assets/mini.png';
 import { Uninitialized } from './primitives.mjs';
 
+/** @typedef { import("../renderers/contract").Renderer } Renderer */
 /** @typedef { import("../renderers/contract").Application } Application */
 /** @typedef { import("../renderers/contract").Container } Container */
 /** @typedef { import("../renderers/contract").Texture } Texture */
@@ -22,20 +22,25 @@ const MiniState = {
 /** @typedef {{ sprite: Sprite, state: number, wait: number }} Item */
 
 export default class Minis {
-  /** @type {Container} */ #container;
+  #renderer;
+  #container;
   #texture = /** @type {Texture} */ (Uninitialized);
 
   /** @type {Map<string, Item>} */
   #map = new Map();
 
-  /** @param {Application} application */
-  constructor(application) {
-    this.#container = Factory.createContainer();
+  /**
+   * @param {Renderer} renderer
+   * @param {Application} application
+   */
+  constructor(renderer, application) {
+    this.#renderer = renderer;
+    this.#container = renderer.createContainer();
     application.addContainer(this.#container);
   }
 
   async load() {
-    this.#texture = await Assets.loadImage(MiniImage);
+    this.#texture = await Assets.loadImage(this.#renderer, MiniImage);
   }
 
   /** @param {string} id */
@@ -103,7 +108,7 @@ export default class Minis {
 
   /** @returns {Item} */
   #createItem() {
-    const sprite = Factory.createSprite(this.#texture);
+    const sprite = this.#renderer.createSprite(this.#texture);
     sprite.alpha = 0;
     this.#container.addItem(sprite);
     return { sprite, state: MiniState.Hidden, wait: 0 };

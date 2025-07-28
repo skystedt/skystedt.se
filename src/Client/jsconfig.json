@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "rootDir": ".",
     "paths": {
-      "$renderer": ["./src/renderers/pixi/renderer.mjs"]
+      "$renderer": ["./src/renderers/pixi/exports.mjs"]
     }
   },
   "typeAcquisition": {

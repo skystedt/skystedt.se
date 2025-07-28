@@ -1,19 +1,13 @@
 /** @typedef {import("../../contract").Application} Contract */
-/** @typedef {import("../../contract").Factory} Factory */
 /** @typedef {import("./container.mjs").default} ImplementationContainer */
 
+/** @implements {Contract} */
 export default class Application {
   #elementOuter;
   #elementOffset;
   #size = { width: 0, height: 0 };
   #scale = 1;
   #offset = { left: 0, top: 0 };
-
-  /** @type {Factory["initializeApplication"]} */
-  static async initializeApplication() {
-    const app = new Application();
-    return Promise.resolve(app);
-  }
 
   constructor() {
     this.#elementOuter = document.createElement('div');

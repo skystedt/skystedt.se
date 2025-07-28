@@ -10,7 +10,8 @@ import jsdoc from 'eslint-plugin-jsdoc';
 import nodePlugin from 'eslint-plugin-n';
 import pluginPromise from 'eslint-plugin-promise';
 import globals from 'globals';
-import { Renderer, rendererPath } from './webpack/dir.mjs';
+import RendererImplementation from './src/renderers/rendererImplementation.mjs';
+import { rendererPath } from './webpack/dir.mjs';
 
 /** @typedef { import("eslint").Linter.Config } Config */
 /** @typedef { import("eslint").Linter.RulesRecord } Rules */
@@ -154,7 +155,7 @@ export default [
         'eslint-import-resolver-exports': {},
         'eslint-import-resolver-custom-alias': {
           alias: {
-            $renderer: rendererPath(Renderer.Pixi)
+            $renderer: rendererPath(RendererImplementation.Pixi)
           }
         }
       }

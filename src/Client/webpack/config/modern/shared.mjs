@@ -9,8 +9,9 @@ import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { polyfillCorejs, polyfillCorejsExcluded } from '../../../babel.config.mjs';
+import RendererImplementation from '../../../src/renderers/rendererImplementation.mjs';
 import BuildInfo from '../../build-info.mjs';
-import { dir, Renderer, rendererPath } from '../../dir.mjs';
+import { dir, rendererPath } from '../../dir.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
 import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpack-plugin.mjs';
 import DataUriFaviconHtmlWebpackPlugin from '../../plugins/html/data-uri-favicon-html-webpack-plugin.mjs';
@@ -96,7 +97,7 @@ export default {
   },
   resolve: {
     alias: {
-      $renderer: rendererPath(Renderer.Pixi)
+      $renderer: rendererPath(RendererImplementation.Pixi)
     }
   },
   module: {

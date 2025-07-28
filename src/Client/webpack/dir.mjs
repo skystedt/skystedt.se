@@ -1,5 +1,7 @@
 import path from 'node:path';
 
+/** @typedef {import("../src/renderers/rendererImplementation.mjs").default} RendererImplementation */
+
 const cwd = process.cwd();
 export const dir = {
   src: path.resolve(cwd, 'src'),
@@ -9,14 +11,8 @@ export const dir = {
   node_modules: path.resolve(cwd, 'node_modules')
 };
 
-/** @enum {string} */
-export const Renderer = {
-  Pixi: 'pixi',
-  HTML: 'html'
-};
-
 /**
- * @param {Renderer} renderer
+ * @param {RendererImplementation} renderer
  * @returns {string}
  */
-export const rendererPath = (renderer) => path.resolve(dir.src, 'renderers', renderer, 'renderer.mjs');
+export const rendererPath = (renderer) => path.resolve(dir.src, 'renderers', renderer, 'exports.mjs');

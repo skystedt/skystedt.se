@@ -26,10 +26,7 @@ const cacheGroupFolderTest = (targetFolder, module) =>
     windowsPathsNoEscape: true
   });
 
-const pixiSideEffects = [
-  path.resolve(dir.src, 'renderers', 'pixi', 'renderer.mjs'),
-  path.resolve(dir.src, 'renderers', 'pixi', 'implementation', 'init.mjs')
-];
+const pixiSideEffects = [path.resolve(dir.src, 'renderers', 'pixi', 'implementation', 'initialization.mjs')];
 
 /** @type {SideEffects} */
 export const sideEffects = {
