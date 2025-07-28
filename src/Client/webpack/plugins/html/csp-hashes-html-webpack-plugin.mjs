@@ -141,6 +141,7 @@ export default class CspHashesHtmlWebpackPlugin {
     /** @param {Parse5Node} node */
     function parseNode(node) {
       if (node.nodeName === 'script') {
+        // <script src="...">...</script>
         tags.push({
           type: 'script',
           url: node.attrs.find((attr) => attr.name === 'src')?.value || null,
@@ -148,6 +149,7 @@ export default class CspHashesHtmlWebpackPlugin {
         });
       }
       if (node.nodeName === 'style') {
+        // <style>...</style>
         tags.push({
           type: 'style',
           url: null,
@@ -155,8 +157,22 @@ export default class CspHashesHtmlWebpackPlugin {
         });
       }
       if (node.nodeName === 'link' && node.attrs.some((attr) => attr.name === 'rel' && attr.value === 'stylesheet')) {
+        // <link rel="stylesheet" href="...">
         tags.push({
           type: 'style',
+          url: node.attrs.find((attr) => attr.name === 'href')?.value || null,
+          html: null
+        });
+      }
+      if (
+        node.nodeName === 'link' &&
+        node.attrs.some((attr) => attr.name === 'rel' && attr.value === 'preload') &&
+        node.attrs.some((attr) => attr.name === 'as' && attr.value === 'script')
+      ) {
+        // <link rel="preload" as="script" href="...">
+        // Eventhough CSP blocks execution and not loading, preload script are also blocked
+        tags.push({
+          type: 'script',
           url: node.attrs.find((attr) => attr.name === 'href')?.value || null,
           html: null
         });
