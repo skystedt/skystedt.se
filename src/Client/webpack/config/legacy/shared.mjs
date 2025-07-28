@@ -48,7 +48,7 @@ export default {
   },
   resolve: {
     alias: {
-      $renderer: rendererPath(RendererImplementation.Pixi)
+      $renderer: rendererPath(RendererImplementation.PixiWithHtmlFallback)
     }
   },
   module: {
