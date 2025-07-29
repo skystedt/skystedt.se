@@ -1,4 +1,4 @@
-import * as PIXI from '@pixi/graphics';
+import * as PIXI from 'pixi.js';
 
 /** @typedef {import("../../contract").Graphics} Contract */
 
@@ -6,9 +6,8 @@ import * as PIXI from '@pixi/graphics';
 export default class Graphics extends PIXI.Graphics {
   /** @type {Contract["fillRect"]} */
   fillRect(color, x, y, width, height) {
-    this.beginFill(color);
-    this.drawRect(x, y, width, height);
-    this.endFill();
+    this.rect(x, y, width, height);
+    this.fill(color);
   }
 
   /** @type {Contract["move"]} */

@@ -5,7 +5,6 @@ import Sprite from './sprite.mjs';
 import Texture from './texture.mjs';
 
 /** @typedef {import("../../contract").Renderer} Contract */
-/** @typedef {import("@pixi/core").Texture} PIXI_Texture */
 
 /** @implements {Contract} */
 export default class Renderer {
@@ -19,7 +18,7 @@ export default class Renderer {
   createTexture = (canvas) => new Texture(canvas);
 
   /** @type {Contract["createSprite"]} */
-  createSprite = (texture) => new Sprite(/** @type {PIXI_Texture} */ (texture));
+  createSprite = (texture) => new Sprite(texture);
 
   /** @type {Contract["createGraphics"]} */
   createGraphics = () => new Graphics();

@@ -1,4 +1,4 @@
-import * as PIXI from '@pixi/core';
+import * as PIXI from 'pixi.js';
 
 /** @typedef {import("../../contract").Texture} Contract */
 
@@ -6,6 +6,6 @@ import * as PIXI from '@pixi/core';
 export default class Texture extends PIXI.Texture {
   /** @param {HTMLCanvasElement} canvas */
   constructor(canvas) {
-    super(new PIXI.BaseTexture(new PIXI.CanvasResource(canvas)));
+    super(new PIXI.Texture({ source: new PIXI.CanvasSource({ resource: canvas }) }));
   }
 }
