@@ -50,6 +50,7 @@ export default class Game {
     const renderer = await initializeRenderer();
 
     const application = await renderer.createApplication();
+    application.element.classList.add('game');
     this.#parent.appendChild(application.element);
 
     this.#renderingInformation = RenderingContext.information(application.element);

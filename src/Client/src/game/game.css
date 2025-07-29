@@ -1,5 +1,3 @@
-body,
-canvas,
 img {
   /* Sharper zoom */
   image-rendering: crisp-edges;
