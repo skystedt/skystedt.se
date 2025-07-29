@@ -1,4 +1,3 @@
-import Assets from './assets.mjs';
 import ShipStraightImage from './assets/ship.png';
 import ShipLeftImage from './assets/ship_left.png';
 import ShipRightImage from './assets/ship_right.png';
@@ -39,9 +38,11 @@ export default class Ship {
 
   /** @param {GamePosition} position */
   async load(position) {
-    const shipStraightTexture = await Assets.loadImage(this.#renderer, ShipStraightImage);
-    const shipLeftTexture = await Assets.loadImage(this.#renderer, ShipLeftImage);
-    const shipRightTexture = await Assets.loadImage(this.#renderer, ShipRightImage);
+    const [shipStraightTexture, shipLeftTexture, shipRightTexture] = await Promise.all([
+      this.#renderer.createTexture(ShipStraightImage),
+      this.#renderer.createTexture(ShipLeftImage),
+      this.#renderer.createTexture(ShipRightImage)
+    ]);
 
     this.#spriteStraight = this.#renderer.createSprite(shipStraightTexture);
     this.#spriteLeft = this.#renderer.createSprite(shipLeftTexture);

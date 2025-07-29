@@ -3,7 +3,7 @@ export type initializeRenderer = () => Promise<Renderer>;
 export interface Renderer {
   createApplication: () => Promise<Application>;
   createContainer: () => Container;
-  createTexture: (canvas: HTMLCanvasElement) => Texture;
+  createTexture: (src: string) => Promise<Texture>;
   createSprite: (texture: Texture) => Sprite;
   createGraphics: () => Graphics;
 }
@@ -43,7 +43,10 @@ export interface Sprite {
   destroy(): void;
 }
 
-export interface Texture {}
+export interface Texture {
+  get width(): number;
+  get height(): number;
+}
 
 export interface Graphics {
   get x(): number;

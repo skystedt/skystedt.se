@@ -5,16 +5,21 @@
 /** @implements {Contract} */
 export default class Sprite {
   #element;
+  #size;
   #visible = true;
-  #size = { width: 0, height: 0 };
   #position = { x: 0, y: 0 };
   #alpha = 1;
 
   /** @param {Texture} texture */
   constructor(texture) {
+    const { image } = /** @type {ImplementationTexture} */ (texture);
     this.#element = document.createElement('img');
-    this.#element.src = /** @type {ImplementationTexture} */ (texture).data;
+    this.#element.src = image.src;
     this.#element.style.position = 'absolute';
+    this.#size = {
+      width: image.width,
+      height: image.height
+    };
   }
 
   get element() {

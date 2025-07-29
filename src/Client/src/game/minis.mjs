@@ -1,4 +1,3 @@
-import Assets from './assets.mjs';
 import MiniImage from './assets/mini.png';
 import { Uninitialized } from './primitives.mjs';
 
@@ -40,7 +39,7 @@ export default class Minis {
   }
 
   async load() {
-    this.#texture = await Assets.loadImage(this.#renderer, MiniImage);
+    this.#texture = await this.#renderer.createTexture(MiniImage);
   }
 
   /** @param {string} id */
