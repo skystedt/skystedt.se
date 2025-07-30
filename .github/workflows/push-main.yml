@@ -1,6 +1,6 @@
 name: Push main
 
-concurrency: 
+concurrency:
   group: push-main-${{ github.ref }}
   cancel-in-progress: false
 
@@ -17,5 +17,5 @@ permissions:
 jobs:
   build_test_and_deploy:
     name: Build, Test and Deploy
-    uses: ./.github/workflows/build-test-deploy.yml
+    uses: ./.github/workflows/reusable-build-test-deploy.yml
     secrets: inherit

@@ -1,13 +1,13 @@
 ﻿name: Pull Request
 
-concurrency: 
-  group: pull-request-main-${{ github.ref }}
+concurrency:
+  group: pull-request-${{ github.ref }}
   cancel-in-progress: true
 
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    
+
 permissions:
   actions: read
   contents: read
@@ -16,5 +16,6 @@ permissions:
 jobs:
   build_test_and_deploy:
     name: Build, Test and Deploy
-    uses: ./.github/workflows/build-test-deploy.yml
+    if: github.actor != 'dependabot[bot]' # Dependabot PRs are handled separately
+    uses: ./.github/workflows/reusable-build-test-deploy.yml
     secrets: inherit

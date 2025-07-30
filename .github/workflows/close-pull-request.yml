@@ -1,13 +1,13 @@
 ﻿name: Close Pull Request
 
-concurrency: 
+concurrency:
   group: close-pull-request-${{ github.ref }}
   cancel-in-progress: false
 
 on:
   pull_request:
     types: [closed]
-    
+
 permissions:
   actions: read
   pull-requests: read
@@ -15,5 +15,5 @@ permissions:
 jobs:
   cleanup:
     name: Cleanup
-    uses: ./.github/workflows/cleanup.yml
+    uses: ./.github/workflows/reusable-cleanup.yml
     secrets: inherit

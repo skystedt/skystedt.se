@@ -12,7 +12,7 @@ env:
   API_DIR: "Api"
   CLIENT_DIR: "Client"
   DOTNET_CONFIGURATION: "Release"
-  
+
 jobs:
   build_api:
     name: Build API
@@ -23,24 +23,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-  
+
       - name: Dotnet Setup
         uses: actions/setup-dotnet@v4
         with:
           global-json-file: ${{ env.SRC_DIR }}/global.json
-          
+
       - name: Dotnet Restore
         run: dotnet restore
-      
+
       - name: Dotnet Build
         run: dotnet build --configuration ${{ env.DOTNET_CONFIGURATION }} --no-incremental --no-restore
-    
+
       - name: Dotnet Test
         run: dotnet test --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
 
       - name: Dotnet Publish
         run: dotnet publish ${{ env.API_DIR }} --output ${{ env.PUBLISH_DIR }}/${{ env.API_DIR }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
-        
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -59,24 +59,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-  
+
       - name: Node Setup
         uses: actions/setup-node@v4
         with:
           node-version-file: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}/package.json
           check-latest: true
-          
+
       - name: Corepack Enable
         run: corepack enable
 
       - name: Yarn Install
         run: yarn install --immutable
         working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
-        
+
       - name: Yarn Build
         run: yarn run production
         working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
-        
+
       - name: Upload Config
         uses: actions/upload-artifact@v4
         with:
@@ -123,3 +123,4 @@ jobs:
           api_location: ${{ github.workspace }}/artifacts/api
           skip_app_build: true
           skip_api_build: true
+          production_branch: "main"

@@ -1,0 +1,27 @@
+name: Pull Request - Dependabot
+
+concurrency:
+  group: pull-request-dependency-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+jobs:
+  update_transitive_dependencies:
+    name: Update Transitive Dependencies
+    if: github.actor == 'dependabot[bot]' # Only run for Dependabot
+    uses: ./.github/workflows/reusable-dependabot-transitive.yml
+    secrets: inherit
+
+  build_test_and_deploy:
+    name: Build, Test and Deploy
+    needs: update_transitive_dependencies
+    uses: ./.github/workflows/reusable-build-test-deploy.yml
+    secrets: inherit

@@ -13,7 +13,7 @@
     "update-yarn": "corepack up",
     "update-plugin-peer-patch": "yarn plugin import ../Plugins/yarn-plugin-peer-patch/bundles/@yarnpkg/plugin-peer-patch.js",
     "ncu": "yarn dlx npm-check-updates",
-    "update-transitive": "yarn dlx rimraf yarn.lock && yarn install",
+    "update-transitive": "yarn dlx rimraf yarn.lock && yarn install --no-immutable",
     "eslint-inspector": "yarn dlx @eslint/config-inspector"
   },
   "engines": {

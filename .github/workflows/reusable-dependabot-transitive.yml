@@ -1,0 +1,70 @@
+name: Reusable - Dependabot Transitive Dependencies
+
+on:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  dependabot_metadata:
+    name: Dependabot Metadata
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Dependabot Metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      package-ecosystem: ${{ steps.metadata.outputs.package-ecosystem }}
+      dependency-group: ${{ steps.metadata.outputs.dependency-group }}
+      update-type: ${{ steps.metadata.outputs.update-type }}
+      directory: ${{ steps.metadata.outputs.directory }}
+
+  transitive_dependencies:
+    name: Transitive Dependencies
+    runs-on: ubuntu-latest
+    needs: dependabot_metadata
+    if: |
+      needs.dependabot_metadata.outputs.package-ecosystem == 'npm_and_yarn' &&
+      needs.dependabot_metadata.outputs.dependency-group == 'client-development' &&
+      needs.dependabot_metadata.outputs.update-type != 'security'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Set Target Directory
+        run: echo "TARGET_DIR=$(echo '${{ needs.dependabot_metadata.outputs.directory }}' | sed 's|^/||')" >> $GITHUB_ENV # Ensure no leading slash
+
+      - name: Node Setup
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ env.TARGET_DIR }}/package.json
+          check-latest: true
+
+      - name: Corepack Enable
+        run: corepack enable
+
+      - name: Yarn Install
+        run: yarn install --immutable
+        working-directory: ${{ env.TARGET_DIR }}
+
+      - name: Yarn Update Transitive Dependencies
+        run: yarn update-transitive
+        working-directory: ${{ env.TARGET_DIR }}
+
+      - name: Git Commit
+        id: commit
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add "${TARGET_DIR}/yarn.lock"
+          git commit -m "Bump the ${{ needs.dependabot_metadata.outputs.dependency-group }} group in /${TARGET_DIR} with transitive updates"
+          echo "commit_success=$([ $? -eq 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
+
+      - name: Git Push
+        if: steps.commit.outputs.commit_success
+        run: git push
