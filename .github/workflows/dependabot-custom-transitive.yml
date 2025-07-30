@@ -1,0 +1,66 @@
+name: Dependabot Custom Updates - Transitive Dependencies
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  SRC_DIR: "src"
+  CLIENT_DIR: "Client"
+  DEPENDENCY_GROUP: "client-development"
+
+jobs:
+  fetch_metadata:
+    name: Dependabot Metadata
+    runs-on: ubuntu-latest
+    # Only run if the PR is created by Dependabot and the actor for the event is also Dependabot
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.actor == 'dependabot[bot]'
+    steps:
+      - name: Fetch Dependabot Metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      package-ecosystem: ${{ steps.metadata.outputs.package-ecosystem }}
+      dependency-group: ${{ steps.metadata.outputs.dependency-group }}
+      update-type: ${{ steps.metadata.outputs.update-type }}
+
+  npm_update_transitive:
+    name: Update Transitive Dependencies
+    runs-on: ubuntu-latest
+    needs: fetch_metadata
+    if: |
+      needs.fetch_metadata.outputs.package-ecosystem == 'npm' &&
+      needs.fetch_metadata.outputs.dependency-group == '${{ env.DEPENDENCY_GROUP }}' &&
+      needs.fetch_metadata.outputs.update-type != 'security'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Node Setup
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}/package.json
+          check-latest: true
+
+      - name: Corepack Enable
+        run: corepack enable
+
+      - name: Yarn Update Transitive Dependencies
+        run: yarn update-transitive
+        working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
+
+      - name: Git Commit and Push
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Bump the ${{ env.DEPENDENCY_GROUP }} group in /${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }} with transitive updates" || echo "No changes to commit"
+          git push
