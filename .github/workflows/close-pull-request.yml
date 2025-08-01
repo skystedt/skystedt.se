@@ -1,4 +1,4 @@
-﻿name: Close Pull Request
+name: Close Pull Request
 
 concurrency:
   group: close-pull-request-${{ github.ref }}

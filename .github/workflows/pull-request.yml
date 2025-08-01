@@ -1,4 +1,4 @@
-﻿name: Pull Request
+name: Pull Request
 
 concurrency:
   group: pull-request-${{ github.ref }}

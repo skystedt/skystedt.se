@@ -62,7 +62,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add "${TARGET_DIR}/yarn.lock"
-          git commit -m "Bump the ${{ needs.dependabot_metadata.outputs.dependency-group }} group in /${TARGET_DIR} with transitive updates"
+          git commit -m "[dependabot skip] Bump the ${{ needs.dependabot_metadata.outputs.dependency-group }} group in /${TARGET_DIR} with transitive updates"
           echo "commit_success=$([ $? -eq 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
 
       - name: Git Push
