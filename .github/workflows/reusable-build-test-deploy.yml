@@ -95,19 +95,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Config
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: config
           path: ${{ github.workspace }}/artifacts/config
 
       - name: Download Api
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: api
           path: ${{ github.workspace }}/artifacts/api
 
       - name: Download Client
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: client
           path: ${{ github.workspace }}/artifacts/client
