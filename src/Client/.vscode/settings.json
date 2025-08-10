@@ -6,6 +6,9 @@
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "explicit"
   },
+  "eslint.codeActionsOnSave.options": {
+    "overrideConfigFile": ".vscode/vscode-eslint.config.mjs"
+  },
   "eslint.enable": true,
   "eslint.runtime": "node", // Use system installed node instead of node shipped with vscode
   "eslint.codeActionsOnSave.rules": ["curly", "no-var", "prefer-const"],
