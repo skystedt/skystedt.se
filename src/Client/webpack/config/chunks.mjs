@@ -138,6 +138,8 @@ function mapVendorModuleToChunk(moduleName) {
       return 'polyfills';
     case 'navigator.sendbeacon':
       return 'polyfills';
+    case 'element-polyfill':
+      return 'polyfills';
     case '@microsoft/dynamicproto-js':
     case '@nevware21/ts-async':
     case '@nevware21/ts-utils':

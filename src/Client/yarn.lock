@@ -4323,6 +4323,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"element-polyfill@npm:1.1.0":
+  version: 1.1.0
+  resolution: "element-polyfill@npm:1.1.0"
+  checksum: 10c0/f09696701c17fa41ccfa9cf4ef283f557da3ded4a19eae7f9c0b3db3c44cb868a9b6a183ac93627d0e81e10fe8e29e8cd12bc89264729743dd14728faed79c5e
+  languageName: node
+  linkType: hard
+
 "emoji-regex@npm:^8.0.0":
   version: 8.0.0
   resolution: "emoji-regex@npm:8.0.0"
@@ -8452,6 +8459,7 @@ __metadata:
     css-minimizer-webpack-plugin: "npm:7.0.2"
     datauri: "npm:4.1.0"
     diff: "npm:8.0.2"
+    element-polyfill: "npm:1.1.0"
     enhanced-resolve: "npm:5.18.3"
     eslint: "npm:9.33.0"
     eslint-config-airbnb-base: "npm:15.0.0"
