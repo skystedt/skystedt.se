@@ -15,7 +15,7 @@ export default class Renderer {
   createContainer = () => new Container();
 
   /** @type {Contract["createTexture"]} */
-  createTexture = (src) => Texture.createTexture(src);
+  createTexture = (source) => Texture.createTexture(source);
 
   /** @type {Contract["createSprite"]} */
   createSprite = (texture) => new Sprite(texture);

@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { dir } from './dir.mjs';
 import BrowserslistUpdatePlugin from './plugins/browserslist-update-plugin.mjs';
-import { browserslistBrowsers } from './utils.mjs';
+import { browserslistBrowsers } from './utilities.mjs';
 
 const babelTargets = /** @type {_babelTargets} */ (/** @type {any} */ (_babelTargets).default);
 
@@ -65,14 +65,14 @@ export default class BuildInfo {
 
   /** @returns {Promise<Sizes>} */
   async sizes() {
-    const fileTypes = ['.html', '.mjs', '.js'];
+    const fileTypes = new Set(['.html', '.mjs', '.js']);
 
     const relativePaths = await fs.readdir(dir.dist, { recursive: true });
 
     const result = /** @type {Sizes} */ ({});
     await Promise.all(
       relativePaths.map(async (relativePath) => {
-        if (fileTypes.includes(path.extname(relativePath))) {
+        if (fileTypes.has(path.extname(relativePath))) {
           const fullPath = path.join(dir.dist, relativePath);
           const stat = await fs.stat(fullPath);
           const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' }) ?? '?';
@@ -91,19 +91,19 @@ export default class BuildInfo {
    */
   #browserslistVersions = (environment) => {
     const browsers = browserslistBrowsers(environment);
-    const versions = browsers.reduce((map, value) => {
-      const split = value.split(' ');
-      map[split[0]] = [...(map[split[0]] || []), split[1]].sort();
-      return map;
-    }, /** @type {BrowserVersions} */ ({}));
+    const versions = /** @type {BrowserVersions} */ ({});
+    for (const browser of browsers) {
+      const [name, version] = browser.split(' ');
+      versions[name] = [...(versions[name] || []), version].sort();
+    }
     return versions;
   };
 
   /**
-   * @param {string} env
+   * @param {string} environment
    * @returns {BabelTargets}
    */
-  #resolveBabelTargets(env) {
-    return babelPrettifyTargets(babelTargets({}, { browserslistEnv: env }));
+  #resolveBabelTargets(environment) {
+    return babelPrettifyTargets(babelTargets({}, { browserslistEnv: environment }));
   }
 }

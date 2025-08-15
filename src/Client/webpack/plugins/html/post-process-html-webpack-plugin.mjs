@@ -3,13 +3,16 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { defaultTreeAdapter, parseFragment, serialize } from 'parse5';
 import webpack from 'webpack';
 
+/** @typedef { import('diff').Change } DiffChange */
 /** @typedef { import('parse5').DefaultTreeAdapterTypes.ChildNode } Parse5ChildNode */
 /** @typedef { import('parse5').DefaultTreeAdapterTypes.TextNode } Parse5TextNode */
 /** @typedef { import('parse5').DefaultTreeAdapterTypes.CommentNode } Parse5CommentNode */
 
-const whitespacesRegExp = /^\s*$/;
-const headTagRegExp = /^(?<start>(?<indent>\s*)<head\s*>)?\s*(?<end><\/head\s*>[\s\S]*$)/im;
-const bodyTagRegExp = /^(?<start>(?<indent>\s*)<body\s*>)?\s*(?<end><\/body\s*>[\s\S]*$)/im;
+/* eslint-disable security/detect-unsafe-regex */
+const whitespacesRegExp = /^[ \t]*$/;
+const headTagRegExp = /^(?<start>(?<indent>[ \t]*)<head[ \t]*>)?[ \t]*(?<end><\/head[ \t]*>[.\r\n]*$)/im;
+const bodyTagRegExp = /^(?<start>(?<indent>[ \t]*)<body[ \t]*>)?[ \t]*(?<end><\/body[ \t]*>[.\r\n]*$)/im;
+/* eslint-enable security/detect-unsafe-regex */
 
 export default class PostProcessHtmlWebpackPlugin {
   /**
@@ -79,25 +82,39 @@ export default class PostProcessHtmlWebpackPlugin {
    * @returns {{ index: number, html: string, singleLine: string? }?}
    */
   #diffHtml(html1, html2, tagRegExp) {
+    /**
+     * @param {DiffChange} change
+     * @param {DiffChange} nextChange
+     * @param {RegExp} regExp
+     * @returns {{ startIndex: number, html: string, singleLine: string? }?}
+     */
+    const matchInfo = (change, nextChange, regExp) => {
+      const match = change.value.match(regExp);
+      if (match?.groups) {
+        const endTag = match.groups.end;
+        if (nextChange.added && nextChange.value.endsWith(endTag)) {
+          const startIndex = match.groups.start?.length ?? 0;
+          const html = nextChange.value.slice(0, -endTag.length);
+          const singleLine = match.groups.start ? match.groups.indent : null;
+          return { startIndex, html, singleLine };
+        }
+      }
+      return null;
+    };
+
     const changes = diffLines(html1, html2);
-    let count = 0;
+    let startIndex = 0;
     for (let index = 0; index < changes.length - 1; index += 1) {
       const change = changes[index];
       if (!change.added && !change.removed) {
-        count += change.value.length;
+        startIndex += change.value.length;
       }
       if (change.removed) {
-        const match = change.value.match(tagRegExp);
-        if (match?.groups) {
-          count += match.groups.start?.length ?? 0;
-          const endTag = match.groups.end;
-          const nextChange = changes[index + 1];
-          if (nextChange.added && nextChange.value.endsWith(endTag)) {
-            const html = nextChange.value.slice(0, -endTag.length);
-            const singleLine = match.groups.start ? match.groups.indent : null;
-            return { index: count, html, singleLine };
-          }
-          break;
+        const nextChange = changes[index + 1];
+        const info = matchInfo(change, nextChange, tagRegExp);
+        if (info) {
+          startIndex += info.startIndex;
+          return { index: startIndex, html: info.html, singleLine: info.singleLine };
         }
       }
     }
@@ -119,7 +136,7 @@ export default class PostProcessHtmlWebpackPlugin {
     fragment.childNodes = fragment.childNodes
       // remove indentation
       .filter(
-        (node) => !(node.nodeName === '#text' && /** @type {Parse5TextNode} */ (node).value.match(whitespacesRegExp))
+        (node) => !(node.nodeName === '#text' && whitespacesRegExp.test(/** @type {Parse5TextNode} */ (node).value))
       )
       // add indentation and newlines
       .flatMap((node) => [

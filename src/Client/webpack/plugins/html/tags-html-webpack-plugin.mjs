@@ -77,14 +77,20 @@ export default class TagsHtmlWebpackPlugin {
    * @param {string[]} files
    */
   async #addMissingTags(assetTags, categorizedTags, files) {
-    this.#options.tags.forEach((tagOption) => {
-      files.forEach((file) => {
-        if (minimatch(file, tagOption.path) && !categorizedTags.some(([, , tagFile]) => tagFile === file)) {
+    for (const tagOption of this.#options.tags) {
+      for (const file of files) {
+        if (
+          minimatch(file, tagOption.path) &&
+          !categorizedTags.some(
+            // eslint-disable-next-line unicorn/no-unreadable-array-destructuring
+            ([, , tagFile]) => tagFile === file
+          )
+        ) {
           const tag = this.#createTag(file, tagOption.tag);
           this.#pushTag(assetTags, categorizedTags, tag);
         }
-      });
-    });
+      }
+    }
   }
 
   /**
@@ -92,28 +98,28 @@ export default class TagsHtmlWebpackPlugin {
    * @param {CategorizedTag[]} categorizedTags
    */
   #updateTagTypes(assetTags, categorizedTags) {
-    categorizedTags.forEach(([assetTagKey, tag, file]) => {
-      this.#options.tags.forEach((tagOption) => {
+    for (const [assetTagKey, tag, file] of categorizedTags) {
+      for (const tagOption of this.#options.tags) {
         if (minimatch(file, tagOption.path) && tag.tagName !== tagOption.tag) {
           assetTags[assetTagKey] = assetTags[assetTagKey].filter((assetTag) => assetTag !== tag);
           tag.tagName = tagOption.tag;
           this.#pushTag(assetTags, categorizedTags, tag);
         }
-      });
-    });
+      }
+    }
   }
 
   /** @param {CategorizedTag[]} categorizedTags */
   #updateAttributes(categorizedTags) {
-    categorizedTags.forEach(([, tag, file]) => {
-      this.#options.tags.forEach((tagOption) => {
+    for (const [, tag, file] of categorizedTags) {
+      for (const tagOption of this.#options.tags) {
         if (tagOption.attributes && minimatch(file, tagOption.path)) {
-          Object.entries(tagOption.attributes).forEach(([key, value]) => {
+          for (const [key, value] of Object.entries(tagOption.attributes)) {
             tag.attributes[key] = value;
-          });
+          }
         }
-      });
-    });
+      }
+    }
   }
 
   /**
@@ -126,7 +132,7 @@ export default class TagsHtmlWebpackPlugin {
       tagName,
       {
         src: tagName === 'script' ? file : undefined,
-        href: tagName !== 'script' ? file : undefined
+        href: tagName === 'script' ? undefined : file
       },
       null,
       // @ts-ignore

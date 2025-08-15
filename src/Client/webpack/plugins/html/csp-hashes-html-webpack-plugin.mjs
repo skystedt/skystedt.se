@@ -59,7 +59,7 @@ export default class CspHashesHtmlWebpackPlugin {
    */
   static buildPolicy(policy) {
     return Object.entries(policy)
-      .map(([directive, values]) => `${directive} ${/** @type {string[]} */ ([]).concat(values).join(' ')}`)
+      .map(([directive, values]) => `${directive} ${[values].flat().join(' ')}`)
       .join('; ');
   }
 
@@ -69,7 +69,7 @@ export default class CspHashesHtmlWebpackPlugin {
    * @returns {string}
    */
   static #hash(hashAlgorithm, data) {
-    const hash = crypto.createHash(hashAlgorithm).update(data, 'utf-8').digest('base64');
+    const hash = crypto.createHash(hashAlgorithm).update(data, 'utf8').digest('base64');
     return `'${hashAlgorithm}-${hash}'`;
   }
 
@@ -135,7 +135,12 @@ export default class CspHashesHtmlWebpackPlugin {
     /** @param {Parse5Node} node */
     function walk(node) {
       parseNode(node);
-      /** @type {Parse5Element} */ (node).childNodes?.forEach(walk);
+      const { childNodes } = /** @type {Parse5Element} */ (node);
+      if (childNodes) {
+        for (const child of childNodes) {
+          walk(child);
+        }
+      }
     }
 
     /** @param {Parse5Node} node */
@@ -144,7 +149,7 @@ export default class CspHashesHtmlWebpackPlugin {
         // <script src="...">...</script>
         tags.push({
           type: 'script',
-          url: node.attrs.find((attr) => attr.name === 'src')?.value || null,
+          url: node.attrs.find((attribute) => attribute.name === 'src')?.value || null,
           html: getInnerHtml(node)
         });
       }
@@ -156,24 +161,27 @@ export default class CspHashesHtmlWebpackPlugin {
           html: getInnerHtml(node)
         });
       }
-      if (node.nodeName === 'link' && node.attrs.some((attr) => attr.name === 'rel' && attr.value === 'stylesheet')) {
+      if (
+        node.nodeName === 'link' &&
+        node.attrs.some((attribute) => attribute.name === 'rel' && attribute.value === 'stylesheet')
+      ) {
         // <link rel="stylesheet" href="...">
         tags.push({
           type: 'style',
-          url: node.attrs.find((attr) => attr.name === 'href')?.value || null,
+          url: node.attrs.find((attribute) => attribute.name === 'href')?.value || null,
           html: null
         });
       }
       if (
         node.nodeName === 'link' &&
-        node.attrs.some((attr) => attr.name === 'rel' && attr.value === 'preload') &&
-        node.attrs.some((attr) => attr.name === 'as' && attr.value === 'script')
+        node.attrs.some((attribute) => attribute.name === 'rel' && attribute.value === 'preload') &&
+        node.attrs.some((attribute) => attribute.name === 'as' && attribute.value === 'script')
       ) {
         // <link rel="preload" as="script" href="...">
         // Eventhough CSP blocks execution and not loading, preload script are also blocked
         tags.push({
           type: 'script',
-          url: node.attrs.find((attr) => attr.name === 'href')?.value || null,
+          url: node.attrs.find((attribute) => attribute.name === 'href')?.value || null,
           html: null
         });
       }
@@ -197,7 +205,7 @@ export default class CspHashesHtmlWebpackPlugin {
    * @returns {ParsedTag[]}
    */
   #filterTags(tags) {
-    const externalPatterns = /** @type {string[]} */ ([]).concat(this.#options.ignore?.externalPatterns || []);
+    const externalPatterns = [this.#options.ignore?.externalPatterns || []].flat();
     const filteredTags = tags.filter((tag) => {
       if (tag.type === 'script' && tag.html && this.#options.ignore?.inlineScripts) {
         return false;
@@ -218,25 +226,23 @@ export default class CspHashesHtmlWebpackPlugin {
    * @param {ParsedTag[]} tags
    */
   #addLocalSources(compilation, tags) {
-    tags.forEach((tag) => {
+    for (const tag of tags) {
       if (tag.url) {
         const asset = compilation.getAsset(tag.url);
         if (!asset) {
-          throw Error(`Asset not found: ${tag.url}`);
+          throw new Error(`Asset not found: ${tag.url}`);
         }
 
         tag.html = asset.source.source().toString();
       }
-    });
+    }
   }
 
   /** @param {ParsedTag[]} tags */
   #calculateIntegrityHashes(tags) {
-    tags
-      .filter((tag) => tag.html)
-      .forEach((tag) => {
-        tag.integrity = CspHashesHtmlWebpackPlugin.#hash(this.#options.hashAlgorithm, /** @type {string} */ (tag.html));
-      });
+    for (const tag of tags.filter((tag) => tag.html)) {
+      tag.integrity = CspHashesHtmlWebpackPlugin.#hash(this.#options.hashAlgorithm, /** @type {string} */ (tag.html));
+    }
   }
 
   /**
@@ -245,7 +251,7 @@ export default class CspHashesHtmlWebpackPlugin {
    */
   #addTagsToPolicy(tags) {
     const policy = { ...this.#policy };
-    tags.forEach((tag) => {
+    for (const tag of tags) {
       if (tag.integrity) {
         if (tag.type === 'script') {
           policy[SCRIPT_SRC] = [...policy[SCRIPT_SRC], tag.integrity];
@@ -254,7 +260,7 @@ export default class CspHashesHtmlWebpackPlugin {
           policy[STYLE_SRC] = [...policy[STYLE_SRC], tag.integrity];
         }
       }
-    });
+    }
     return policy;
   }
 
@@ -262,9 +268,10 @@ export default class CspHashesHtmlWebpackPlugin {
   #reorderPolicy(policy) {
     if (policy[SCRIPT_SRC]?.includes(STRICT_DYNAMIC)) {
       // Move 'strict-dynamic' to the end of the script-src directive
-      policy[SCRIPT_SRC] = /** @type {string[]} */ (policy[SCRIPT_SRC])
-        .filter((value) => value !== STRICT_DYNAMIC)
-        .concat(STRICT_DYNAMIC);
+      policy[SCRIPT_SRC] = [
+        .../** @type {string[]} */ (policy[SCRIPT_SRC]).filter((value) => value !== STRICT_DYNAMIC),
+        STRICT_DYNAMIC
+      ];
     }
   }
 
@@ -274,6 +281,7 @@ export default class CspHashesHtmlWebpackPlugin {
    */
   #buildMetaTagPolicy(policy) {
     const {
+      // eslint-disable-next-line sonarjs/no-unused-vars
       'report-uri': _, // Not allowed in <meta> tag
       ...metaTagPolicy
     } = policy;

@@ -1,4 +1,4 @@
-import util from 'node:util';
+import { inspect } from 'node:util';
 import webpack from 'webpack';
 
 /** @typedef { string | { [key: string]: {} } } Content */
@@ -25,7 +25,7 @@ export default class PostCompilationPrintPlugin {
     // breakLength is tuned so single element arrays are printed on one line
     // multi element arrays are printed on multiple lines
     // objects are printed on multiple lines
-    const message = util.inspect(data, { depth: Infinity, colors: true, compact: 1, breakLength: 28 });
+    const message = inspect(data, { depth: Infinity, colors: true, compact: 1, breakLength: 28 });
     // eslint-disable-next-line no-console
     console.log(message);
   }

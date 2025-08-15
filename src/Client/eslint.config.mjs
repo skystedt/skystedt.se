@@ -8,30 +8,34 @@ import compat from 'eslint-plugin-compat';
 import { flatConfigs as importX } from 'eslint-plugin-import-x';
 import jsdoc from 'eslint-plugin-jsdoc';
 import nodePlugin from 'eslint-plugin-n';
-import pluginPromise from 'eslint-plugin-promise';
+import promisePlugin from 'eslint-plugin-promise';
+import security from 'eslint-plugin-security';
+import sonarjs from 'eslint-plugin-sonarjs';
+import unicorn from 'eslint-plugin-unicorn';
 import globals from 'globals';
-import RendererImplementation from './src/renderers/rendererImplementation.mjs';
+import RendererImplementation from './src/renderers/renderer-implementation.mjs';
 import { rendererPath } from './webpack/dir.mjs';
 
 /** @typedef { import("eslint").Linter.Config } Config */
 /** @typedef { import("eslint").Linter.RulesRecord } Rules */
+/** @typedef { import("eslint").Linter.RuleEntry } RuleEntry */
 
 /** @typedef { keyof import("@stylistic/eslint-plugin").UnprefixedRuleOptions } StylisticRuleKey */
 
-/** @typedef { typeof pluginPromise & { configs: { [config: string]: Config } } } PromiseConfig */
+/** @typedef { typeof promisePlugin & { configs: { [config: string]: Config } } } PromiseConfig */
 
 /** @returns {Promise<Rules>} */
 const loadAirbnbRules = async () => {
   const promises = /** @type {Promise<Rules>[]} */ ([]);
 
-  airbnb.extends.forEach((rulesFile) => {
+  for (const rulesFile of airbnb.extends) {
     // Resolve the rules file and import it
     const filePath = import.meta.resolve(rulesFile, 'eslint-config-airbnb-base');
     const pathPrefix = process.platform === 'win32' ? 'file://' : '';
     const fileImport = import(`${pathPrefix}${filePath}`);
     const promise = fileImport.then((file) => file.default.rules);
     promises.push(promise);
-  });
+  }
 
   const rulesArray = await Promise.all(promises);
   const rules = /** @type {Rules} */ (Object.assign({}, ...rulesArray));
@@ -61,7 +65,7 @@ const splitAirbnbRules = (rules) => {
     'no-path-concat': [nodeRules, 'n/no-path-concat']
   };
 
-  Object.entries(rules).forEach(([key, value]) => {
+  for (const [key, value] of Object.entries(rules)) {
     let newRules = baseRules;
     let newKey = key;
     if (stylistic.rules[/** @type {StylisticRuleKey} */ (key)]) {
@@ -74,7 +78,7 @@ const splitAirbnbRules = (rules) => {
       [newRules, newKey] = deprecatedMap[key];
     }
     newRules[newKey] = value;
-  });
+  }
 
   return {
     base: baseRules,
@@ -84,8 +88,22 @@ const splitAirbnbRules = (rules) => {
   };
 };
 
+/**
+ * @param {RuleEntry} entry
+ * @param {(value: any) => boolean} filterPredicate
+ * @returns {RuleEntry}
+ */
+const modifyRuleOptions = (entry, filterPredicate) => {
+  if (!Array.isArray(entry)) {
+    return entry;
+  }
+  return [entry[0], ...entry.slice(1).filter(filterPredicate)];
+};
+
 const airbnbUnsplitRules = await loadAirbnbRules();
 const airbnbRules = splitAirbnbRules(airbnbUnsplitRules);
+
+const buildFiles = ['*.mjs', 'webpack/**/*.mjs'];
 
 /** @type {Config[]} */
 export default [
@@ -100,7 +118,7 @@ export default [
   },
   {
     name: 'settings/build',
-    files: ['*.mjs', 'webpack/**/*.mjs'],
+    files: buildFiles,
     languageOptions: {
       globals: {
         ...globals.node
@@ -130,7 +148,7 @@ export default [
     rules: { ...jsdoc.configs['flat/recommended'].rules }
   },
   {
-    .../** @type {PromiseConfig} */ (pluginPromise).configs['flat/recommended'],
+    .../** @type {PromiseConfig} */ (promisePlugin).configs['flat/recommended'],
     name: 'plugin/promise/recommended'
   },
   {
@@ -138,7 +156,14 @@ export default [
     name: 'plugin/compat/recommended',
     files: ['src/**/*.mjs'],
     settings: {
-      polyfills: ['Promise', 'fetch', 'navigator.sendBeacon', 'Array.from', 'Map'],
+      polyfills: [
+        'Promise', // core-js
+        'fetch', // unfetch
+        'navigator.sendBeacon', // navigator.sendbeacon
+        'Array.from', // core-js
+        'Map', // core-js
+        'Number.parseInt' // core-js
+      ],
       browserslistOpts: { env: 'eslint-plugin-compat' }
     }
   },
@@ -148,7 +173,7 @@ export default [
     // only added to map deprecated airbnb rules to n plugin rules
   },
   {
-    .../** @type {Config} */ (importX.recommended),
+    ...importX.recommended,
     name: 'plugin/import-x/recommended',
     settings: {
       'import-x/resolver': {
@@ -160,6 +185,18 @@ export default [
         }
       }
     }
+  },
+  {
+    .../** @type {Config} */ (security.configs.recommended),
+    name: 'plugin/security/recommended'
+  },
+  {
+    ...unicorn.configs.recommended,
+    name: 'plugin/unicorn/recommended'
+  },
+  {
+    ...sonarjs.configs.recommended,
+    name: 'plugin/sonarjs/recommended'
   },
   {
     ...stylistic.configs.recommended,
@@ -198,6 +235,10 @@ export default [
     name: 'overrides/airbnb',
     rules: {
       curly: ['error', 'all'],
+      'no-restricted-syntax': modifyRuleOptions(
+        airbnbRules.base['no-restricted-syntax'],
+        (option) => option.selector !== 'ForOfStatement'
+      ),
       'no-console': ['error', { allow: ['warn', 'error'] }],
       'no-shadow': ['error', { ignoreOnInitialization: true }],
       'no-use-before-define': ['error', { functions: false, classes: false, variables: true }],
@@ -211,6 +252,42 @@ export default [
     rules: {
       'import-x/extensions': ['error', 'ignorePackages'],
       'import-x/no-extraneous-dependencies': ['error', { devDependencies: ['!src/**'] }]
+    }
+  },
+  {
+    name: 'overrides/security/build',
+    files: buildFiles,
+    rules: {
+      'security/detect-object-injection': 'off',
+      'security/detect-non-literal-fs-filename': 'off'
+    }
+  },
+  {
+    name: 'overrides/unicorn',
+    rules: {
+      'unicorn/no-null': 'off', // Opinionated
+      'unicorn/consistent-function-scoping': 'off', // Opinionated
+      'unicorn/no-array-callback-reference': 'off', // Opinionated
+      'unicorn/no-zero-fractions': 'off', // Opinionated
+      'unicorn/prefer-set-has': 'off', // Needs polyfills in some older browsers
+      'unicorn/prefer-top-level-await': 'off', // Makes babel give warnings
+      'unicorn/prefer-global-this': 'off' // Breaks SplitChunksPlugin with cache group conflict for 'polyfills'
+    }
+  },
+  {
+    name: 'overrides/unicorn/build',
+    files: buildFiles,
+    rules: {
+      'unicorn/prevent-abbreviations': /* Opinionated */ [
+        'error',
+        {
+          allowList: {
+            args: true,
+            dir: true,
+            src: true
+          }
+        }
+      ]
     }
   },
   {

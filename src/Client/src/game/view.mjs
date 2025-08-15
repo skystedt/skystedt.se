@@ -128,10 +128,10 @@ class ViewConverter {
       return new Borders(0, 0, 0, 0);
     }
     const style = getComputedStyle(this.#element);
-    const top = parseInt(style.getPropertyValue('border-top-width'), 10);
-    const right = parseInt(style.getPropertyValue('border-right-width'), 10);
-    const bottom = parseInt(style.getPropertyValue('border-bottom-width'), 10);
-    const left = parseInt(style.getPropertyValue('border-left-width'), 10);
+    const top = Number.parseInt(style.getPropertyValue('border-top-width'), 10);
+    const right = Number.parseInt(style.getPropertyValue('border-right-width'), 10);
+    const bottom = Number.parseInt(style.getPropertyValue('border-bottom-width'), 10);
+    const left = Number.parseInt(style.getPropertyValue('border-left-width'), 10);
     return new Borders(top, right, bottom, left);
   }
 

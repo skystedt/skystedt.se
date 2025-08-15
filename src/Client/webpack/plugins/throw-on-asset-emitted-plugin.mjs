@@ -7,7 +7,7 @@ export default class ThrowOnAssetEmittedPlugin {
 
   /** @param {...string} patterns */
   constructor(...patterns) {
-    this.#patterns = /** @type {string[]} */ ([]).concat(patterns || []);
+    this.#patterns = [patterns].flat();
   }
 
   /** @param {webpack.Compiler} compiler */

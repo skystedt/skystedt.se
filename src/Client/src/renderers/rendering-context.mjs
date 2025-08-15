@@ -16,6 +16,7 @@ export default class RenderingContext {
     let contextId;
     let contextInformation;
 
+    /* eslint-disable sonarjs/no-nested-assignment */
     if ((context = element.getContext((contextId = 'webgpu')))) {
       contextInformation = this.#webgpuContext(context);
     } else if ((context = element.getContext((contextId = 'webgl2')))) {
@@ -26,12 +27,14 @@ export default class RenderingContext {
       (context = /** @type {WebGLRenderingContext} */ (element.getContext((contextId = 'experimental-webgl'))))
     ) {
       contextInformation = this.#webglInformation(context);
-    } else if ((context = element.getContext((contextId = '2d')))) {
+    } else if (element.getContext((contextId = '2d'))) {
       contextInformation = '';
     } else {
       contextId = 'unknown';
       contextInformation = '';
     }
+    /* eslint-enable sonarjs/no-nested-assignment */
+
     return {
       context: contextId,
       information: contextInformation

@@ -15,7 +15,7 @@ export default class Application {
     this.#elementOuter.style.overflow = 'hidden';
     this.#elementOffset = document.createElement('div');
     this.#elementOffset.style.position = 'absolute';
-    this.#elementOuter.appendChild(this.#elementOffset);
+    this.#elementOuter.append(this.#elementOffset);
   }
 
   /** @type {Contract["element"]} */
@@ -75,6 +75,6 @@ export default class Application {
 
   /** @type {Contract["addContainer"]} */
   addContainer(container) {
-    this.#elementOffset.appendChild(/** @type {ImplementationContainer} */ (container).element);
+    this.#elementOffset.append(/** @type {ImplementationContainer} */ (container).element);
   }
 }

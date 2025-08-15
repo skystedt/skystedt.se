@@ -30,6 +30,7 @@ export default class Container extends PIXI.Container {
     if (index !== -1) {
       this.#items.splice(index, 1);
     }
+    // eslint-disable-next-line unicorn/prefer-dom-node-remove
     this.removeChild(/** @type { PIXI.Sprite | PIXI.Graphics } */ (/** @type {unknown} */ (item)));
   }
 }

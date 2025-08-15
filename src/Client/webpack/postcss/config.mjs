@@ -1,6 +1,6 @@
 import postcssMergeRules from 'postcss-merge-rules';
 import postcssPresetEnv from 'postcss-preset-env';
-import { browserslistBrowsers } from '../utils.mjs';
+import { browserslistBrowsers } from '../utilities.mjs';
 import postcssRemoveCarriageReturn from './postcss-remove-carriage-return.mjs';
 
 /** @typedef { import("postcss-load-config").Config } PostcssConfig */
