@@ -1,4 +1,2 @@
-import initializeRenderer from './implementation/initialization.mjs';
-
 // eslint-disable-next-line import-x/prefer-default-export
-export { initializeRenderer };
+export { default as initializeRenderer } from './implementation/initialization.mjs';

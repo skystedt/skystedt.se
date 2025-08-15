@@ -45,7 +45,7 @@ export default class Stars {
    */
   load(gameSize, numberOfStars) {
     this.#gameSize = gameSize;
-    for (let i = 0; i < numberOfStars; i += 1) {
+    for (let index = 0; index < numberOfStars; index += 1) {
       const star = this.#newStar();
       this.#stars.push(star);
       this.#container.addItem(star.graphics);
@@ -53,9 +53,9 @@ export default class Stars {
   }
 
   tick() {
-    this.#stars.forEach((star) => {
+    for (const star of this.#stars) {
       this.#move(star);
-    });
+    }
   }
 
   /** @param {Star} star */
@@ -71,9 +71,9 @@ export default class Stars {
       this.#setGraphicsColor(star.graphics, star.color);
     } else if (star.blinking > 1) {
       star.blinking -= 1;
-    } else if (Math.random() < BLINK_PROBABILITY) {
+    } else if (Stars.#random() < BLINK_PROBABILITY) {
       star.blinking = BLINK_DURATION;
-      this.#setGraphicsColor(star.graphics, 0x000000);
+      this.#setGraphicsColor(star.graphics, 0x00_00_00);
     }
   }
 
@@ -92,33 +92,29 @@ export default class Stars {
   #resetStar(star, outside) {
     star.color = this.#randomLightColor();
     this.#setGraphicsColor(star.graphics, star.color);
-    const x = Math.floor(Math.random() * this.#gameSize.width);
-    const y = Math.floor(Math.random() * (outside ? -10 : this.#gameSize.height)) - 1;
+    const x = Math.floor(Stars.#random() * this.#gameSize.width);
+    const y = Math.floor(Stars.#random() * (outside ? -10 : this.#gameSize.height)) - 1;
     star.graphics.move(x, y);
     star.speed = this.#randomSpeed();
   }
 
   #randomLightColor() {
-    const red = Math.floor(Math.random() * 80 + 176);
-    const blue = Math.floor(Math.random() * 80 + 176);
-    const green = Math.floor(Math.random() * 80 + 176);
-    return 0x10000 * red + 0x100 * blue + 0x1 * green;
+    const red = Math.floor(Stars.#random() * 80 + 176);
+    const blue = Math.floor(Stars.#random() * 80 + 176);
+    const green = Math.floor(Stars.#random() * 80 + 176);
+    return 0x1_00_00 * red + 0x1_00 * blue + 0x1 * green;
   }
 
   #randomSpeed() {
-    const random = Math.random();
-    let p = 0;
-    const speed = SPEED_PROBABILITIES.reduce((speed, sp) => {
-      if (speed) {
+    const random = Stars.#random();
+    let sum = 0;
+    for (const { speed, p } of SPEED_PROBABILITIES) {
+      sum += p;
+      if (random <= sum) {
         return speed;
       }
-      p += sp.p;
-      if (random <= p) {
-        return sp.speed;
-      }
-      return null;
-    }, /** @type {number?} */ (null));
-    return speed ?? 1;
+    }
+    return 1;
   }
 
   /**
@@ -128,5 +124,11 @@ export default class Stars {
   #setGraphicsColor(graphics, color) {
     graphics.clear();
     graphics.fillRect(color, 0, 0, 1, 1);
+  }
+
+  /** @returns {number} */
+  static #random() {
+    // eslint-disable-next-line sonarjs/pseudo-random
+    return Math.random();
   }
 }

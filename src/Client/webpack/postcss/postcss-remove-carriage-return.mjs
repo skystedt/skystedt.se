@@ -5,32 +5,37 @@ import postcss from 'postcss';
 const postcssRemoveCarriageReturn = () => {
   /** @param {postcss.AnyNode} node */
   const removeCarriageReturn = (node) => {
-    const replace = (/** @type {string} */ str) => str.replace(/\r/g, '');
+    const replace = (/** @type {string} */ string) => string.replaceAll('\r', '');
 
     switch (node.type) {
-      case 'atrule':
+      case 'atrule': {
         node.name = replace(node.name);
         break;
-      case 'rule':
+      }
+      case 'rule': {
         node.selector = replace(node.selector);
         break;
-      case 'decl':
+      }
+      case 'decl': {
         node.prop = replace(node.prop);
         node.value = replace(node.value);
         break;
-      case 'comment':
+      }
+      case 'comment': {
         node.text = replace(node.text);
         break;
-      default:
+      }
+      default: {
         // do nothing
         break;
+      }
     }
 
-    Object.entries(node.raws).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(node.raws)) {
       if (typeof value === 'string') {
         node.raws[key] = replace(value);
       }
-    });
+    }
   };
 
   return {

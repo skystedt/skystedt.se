@@ -37,15 +37,13 @@ export default class Input {
    * @returns {any}
    */
   static #minBy(array, by) {
-    return array.reduce((best, next) => {
-      if (!best) {
-        return next;
+    let best = null;
+    for (const element of array) {
+      if (!best || by(best) > by(element)) {
+        best = element;
       }
-      if (by(best) <= by(next)) {
-        return best;
-      }
-      return next;
-    }, null);
+    }
+    return best;
   }
 
   /** @param {View} view */
@@ -62,7 +60,7 @@ export default class Input {
     window.addEventListener('touchend', this.#touchend.bind(this));
     window.addEventListener('touchcancel', this.#touchcancel.bind(this));
 
-    window.addEventListener('mousedown', this.#mousedown.bind(this));
+    window.addEventListener('mousedown', this.#mousemove.bind(this));
     window.addEventListener('mousemove', this.#mousemove.bind(this));
     window.addEventListener('mouseup', this.#mouseup.bind(this));
 
@@ -95,42 +93,35 @@ export default class Input {
 
   /** @param {TouchEvent} event */
   #touchstart(event) {
-    Array.from(event.changedTouches).forEach((touch) => {
+    for (const touch of event.changedTouches) {
       this.#addTouch(touch, event.timeStamp);
-    });
+    }
   }
 
   /** @param {TouchEvent} event */
   #touchmove(event) {
-    Array.from(event.changedTouches).forEach((touch) => {
+    for (const touch of event.changedTouches) {
       const foundTouch = this.#touches.find((t) => t.id === touch.identifier);
       if (foundTouch) {
         foundTouch.position = new AbsolutePosition(touch.clientX, touch.clientY);
       } else {
         this.#addTouch(touch, event.timeStamp);
       }
-    });
+    }
   }
 
   /** @param {TouchEvent} event */
   #touchend(event) {
-    Array.from(event.changedTouches).forEach((touch) => {
+    for (const touch of event.changedTouches) {
       this.#deleteTouch(touch);
-    });
+    }
     event.preventDefault();
   }
 
   /** @param {TouchEvent} event */
   #touchcancel(event) {
-    Array.from(event.changedTouches).forEach((touch) => {
+    for (const touch of event.changedTouches) {
       this.#deleteTouch(touch);
-    });
-  }
-
-  /** @param {MouseEvent} event */
-  #mousedown(event) {
-    if (MOUSE_BUTTONS.includes(event.buttons)) {
-      this.#mouse = new AbsolutePosition(event.clientX, event.clientY);
     }
   }
 
@@ -166,20 +157,25 @@ export default class Input {
    */
   #keySwitch(event, value) {
     switch (event.keyCode) {
-      case KEY_CODE_UP:
+      case KEY_CODE_UP: {
         this.#keys.up = value;
         break;
-      case KEY_CODE_RIGHT:
+      }
+      case KEY_CODE_RIGHT: {
         this.#keys.right = value;
         break;
-      case KEY_CODE_DOWN:
+      }
+      case KEY_CODE_DOWN: {
         this.#keys.down = value;
         break;
-      case KEY_CODE_LEFT:
+      }
+      case KEY_CODE_LEFT: {
         this.#keys.left = value;
         break;
-      default:
+      }
+      default: {
         return false;
+      }
     }
     return true;
   }
@@ -199,27 +195,28 @@ export default class Input {
   /** @param {Touch} touch */
   #deleteTouch(touch) {
     const index = this.#touches.findIndex((t) => t.id === touch.identifier);
-    if (index > -1) {
+    if (index !== -1) {
       this.#touches.splice(index, 1);
     }
   }
 
+  /* eslint-disable security/detect-object-injection */
   #gamepadInput() {
     if (!navigator.getGamepads) {
       return null;
     }
     // navigator.getGamepads() is not supported in IE 11 (we don't support gamepads in old browsers)
     // eslint-disable-next-line compat/compat
-    const gamepads = Array.from(navigator.getGamepads());
+    const gamepads = [...navigator.getGamepads()];
     const gamepad = gamepads.find((gamepad) => gamepad?.index === this.#gamepadIndex);
     if (!gamepad) {
       return null;
     }
 
     // axes take precedence over buttons
-    for (let i = 0; i < gamepad.axes.length; i += 2) {
-      const dx = gamepad.axes[i];
-      const dy = gamepad.axes[i + 1];
+    for (let index = 0; index < gamepad.axes.length; index += 2) {
+      const dx = gamepad.axes[index];
+      const dy = gamepad.axes[index + 1];
       if (Math.abs(dx) >= GAMEPAD_AXIS_MINIMUM_VALUE || Math.abs(dy) >= GAMEPAD_AXIS_MINIMUM_VALUE) {
         return new Movement(dx, dy);
       }
@@ -235,6 +232,7 @@ export default class Input {
 
     return null;
   }
+  /* eslint-enable security/detect-object-injection */
 
   /**
    * @param {AbsolutePosition} position

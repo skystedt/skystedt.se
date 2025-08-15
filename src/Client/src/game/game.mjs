@@ -1,6 +1,5 @@
 import { initializeRenderer } from '$renderer';
-import { ApplicationInsights } from '@microsoft/applicationinsights-web';
-import RenderingContext from '../renderers/renderingContext.mjs';
+import RenderingContext from '../renderers/rendering-context.mjs';
 import Communication, { MessageType } from './communication.mjs';
 import './game.css';
 import Input from './input.mjs';
@@ -14,6 +13,7 @@ import View from './view.mjs';
 /** @typedef { ReturnType<RenderingContext.information> } RenderingInformation */
 /** @typedef { import("../renderers/contract").Renderer } Renderer */
 /** @typedef { import("../renderers/contract").Application } Application */
+/** @typedef { import("@microsoft/applicationinsights-web").ApplicationInsights } ApplicationInsights */
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;
@@ -51,7 +51,7 @@ export default class Game {
 
     const application = await renderer.createApplication();
     application.element.classList.add('game');
-    this.#parent.appendChild(application.element);
+    this.#parent.append(application.element);
 
     this.#renderingInformation = RenderingContext.information(application.element);
 
@@ -160,8 +160,7 @@ export default class Game {
    * @param {number} logTry
    */
   #logFpsMetric(fps, logTry) {
-    /** @type {{ insights: ApplicationInsights }} */
-    const { insights } = /** @type {any} */ (window);
+    const { insights } = /** @type {{ insights: ApplicationInsights }} */ (/** @type {unknown} */ (window));
 
     if (insights) {
       insights.trackMetric({ name: 'fps', average: fps }, this.#renderingInformation);
@@ -196,9 +195,9 @@ export default class Game {
     switch (data.type) {
       case MessageType.Init: {
         this.#minis.clear();
-        data.ids.forEach((/** @type {string} */ id) => {
+        for (const id of /** @type {string[]} */ (data.ids)) {
           this.#minis.add(id);
-        });
+        }
         break;
       }
 
@@ -217,9 +216,10 @@ export default class Game {
         break;
       }
 
-      default:
+      default: {
         console.warn('Unknown communication type', data);
         break;
+      }
     }
   }
 

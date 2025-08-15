@@ -53,11 +53,11 @@ export default class Container {
         this.#svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         this.#svg.style.width = 'inherit';
         this.#svg.style.height = 'inherit';
-        this.#element.appendChild(this.#svg);
+        this.#element.append(this.#svg);
       }
-      this.#svg.appendChild(element);
+      this.#svg.append(element);
     } else {
-      this.#element.appendChild(element);
+      this.#element.append(element);
     }
   }
 
@@ -68,10 +68,6 @@ export default class Container {
       this.#items.splice(index, 1);
     }
     const { element } = /** @type {ImplementationSprite | ImplementationGraphics} */ (item);
-    if (element.namespaceURI?.match(/svg/)) {
-      this.#svg?.removeChild(element);
-    } else {
-      this.#element.removeChild(element);
-    }
+    element.remove();
   }
 }

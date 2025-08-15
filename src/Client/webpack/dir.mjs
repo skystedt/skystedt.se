@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-/** @typedef {import("../src/renderers/rendererImplementation.mjs").default} RendererImplementation */
+/** @typedef {import("../src/renderers/renderer-implementation.mjs").default} RendererImplementation */
 
 const cwd = process.cwd();
 export const dir = {

@@ -20,33 +20,32 @@ export default class ThrowOnNestedPackagePlugin {
    */
   constructor(nodeModules, packages) {
     this.#nodeModules = nodeModules;
-    this.#packageArray = /** @type {string[][]} */ ([]).concat(packages || []);
+    this.#packageArray = [packages].flat();
   }
 
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
     if (this.#packageArray.length > 0) {
       compiler.hooks.afterEnvironment.tap(ThrowOnNestedPackagePlugin.name, () => {
-        this.#packageArray.forEach((packages) => {
-          const [firstPackage, ...otherPackages] = /** @type {string[]} */ ([]).concat(packages || []);
+        for (const packages of this.#packageArray) {
+          const [firstPackage, ...otherPackages] = [packages].flat();
           const finalPackage = otherPackages.at(-1) ?? '';
 
           const firstPath = path.resolve(this.#nodeModules, firstPackage, 'package.json');
           const targetPath = path.resolve(this.#nodeModules, finalPackage, 'package.json');
 
           let nestedPath = path.resolve(firstPath, firstPackage);
-          otherPackages.forEach((module) => {
+          for (const module of otherPackages) {
             const resolvedPath = resolver(nestedPath, module);
-            if (!resolvedPath) {
-              return;
+            if (resolvedPath) {
+              nestedPath = resolvedPath;
             }
-            nestedPath = resolvedPath;
-          });
+          }
 
           if (targetPath !== nestedPath) {
             throw new Error(`found nested version of '${finalPackage}' in '${firstPackage}'`);
           }
-        });
+        }
       });
     }
   }

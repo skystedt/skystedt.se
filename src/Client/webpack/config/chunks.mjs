@@ -35,12 +35,7 @@ export const sideEffects = {
 };
 
 /** @type {(assetFilename: string) => boolean} */
-export const performanceFilter = (assetFilename) => {
-  if (minimatch(assetFilename, 'pixi.*.*js')) {
-    return false;
-  }
-  return true;
-};
+export const performanceFilter = (assetFilename) => !minimatch(assetFilename, 'pixi.*.*js');
 
 /** @type {CacheGroups} */
 export const cacheGroups = {
@@ -124,28 +119,36 @@ function mapVendorModuleToChunk(moduleName) {
     case 'ansi-html-community':
     case 'html-entities':
     case 'events':
-    case 'mini-css-extract-plugin':
+    case 'mini-css-extract-plugin': {
       return 'development';
+    }
     case 'pixi.js':
     case '@pixi/colord':
     case 'earcut':
     case 'eventemitter3':
-    case 'parse-svg-path':
+    case 'parse-svg-path': {
       return 'pixi';
-    case 'core-js':
+    }
+    case 'core-js': {
       return 'polyfills';
-    case 'unfetch-polyfill':
+    }
+    case 'unfetch-polyfill': {
       return 'polyfills';
-    case 'navigator.sendbeacon':
+    }
+    case 'navigator.sendbeacon': {
       return 'polyfills';
-    case 'element-polyfill':
+    }
+    case 'element-polyfill': {
       return 'polyfills';
+    }
     case '@microsoft/dynamicproto-js':
     case '@nevware21/ts-async':
-    case '@nevware21/ts-utils':
+    case '@nevware21/ts-utils': {
       return 'insights';
-    default:
-      throw Error(`Unspecified cache group for node_modules package: ${moduleName}`);
+    }
+    default: {
+      throw new Error(`Unspecified cache group for node_modules package: ${moduleName}`);
+    }
   }
   // cSpell:enable
 }

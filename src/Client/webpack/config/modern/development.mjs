@@ -18,9 +18,7 @@ export const cspCallback = (/** @type {CspPolicy}} */ policy) => {
 
   policy['trusted-types'] = ['webpack', "'allow-duplicates'", 'webpack#dev-overlay'];
 
-  policy['script-src'] = /** @type {string[]} */ ([])
-    .concat(policy['script-src'])
-    .filter((src) => src !== "'strict-dynamic'");
+  policy['script-src'] = [policy['script-src']].flat().filter((src) => src !== "'strict-dynamic'");
 
   policy['style-src-attr'] = [
     "'unsafe-hashes'",

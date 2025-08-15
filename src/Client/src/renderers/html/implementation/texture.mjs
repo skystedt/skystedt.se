@@ -8,13 +8,15 @@ export default class Texture {
   #height;
 
   /** @type {Renderer["createTexture"]} */
-  static async createTexture(src) {
+  static async createTexture(source) {
     const image = /** @type HTMLImageElement */ (
       await new Promise((resolve, reject) => {
         const element = document.createElement('img');
+        // eslint-disable-next-line unicorn/prefer-add-event-listener
         element.onload = () => resolve(element);
+        // eslint-disable-next-line unicorn/prefer-add-event-listener
         element.onerror = reject;
-        element.src = src;
+        element.src = source;
       })
     );
 

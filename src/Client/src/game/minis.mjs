@@ -79,12 +79,12 @@ export default class Minis {
   }
 
   tick() {
-    Array.from(this.#map.values()).forEach((item) => {
+    for (const item of this.#map.values()) {
       const { state, wait, alpha } = this.#tickMini(item);
       item.state = state;
       item.wait = wait;
       item.sprite.alpha = alpha;
-    });
+    }
   }
 
   /**
@@ -95,13 +95,13 @@ export default class Minis {
     const { alpha } = sprite;
     // prettier-ignore
     switch (true) {
-      case state === MiniState.FadeIn && alpha < 1:             return { state,                    wait,           alpha: Math.min(alpha + ALPHA_DELTA, 1) };
-      case state === MiniState.FadeIn:                          return { state: MiniState.Shown,   wait: 0,        alpha };
-      case state === MiniState.Shown && wait < SHOWN_DURATION:  return { state,                    wait: wait + 1, alpha };
-      case state === MiniState.Shown:                           return { state: MiniState.FadeOut, wait,           alpha };
-      case state === MiniState.FadeOut && alpha >= 0:           return { state,                    wait,           alpha: Math.max(alpha - ALPHA_DELTA, 0) };
-      case state === MiniState.FadeOut:                         return { state: MiniState.Hidden,  wait,           alpha };
-      default:                                                  return { state,                    wait,           alpha };
+      case state === MiniState.FadeIn && alpha < 1:            { return { state,                    wait,           alpha: Math.min(alpha + ALPHA_DELTA, 1) }; }
+      case state === MiniState.FadeIn:                         { return { state: MiniState.Shown,   wait: 0,        alpha };                                   }
+      case state === MiniState.Shown && wait < SHOWN_DURATION: { return { state,                    wait: wait + 1, alpha };                                   }
+      case state === MiniState.Shown:                          { return { state: MiniState.FadeOut, wait,           alpha };                                   }
+      case state === MiniState.FadeOut && alpha >= 0:          { return { state,                    wait,           alpha: Math.max(alpha - ALPHA_DELTA, 0) }; }
+      case state === MiniState.FadeOut:                        { return { state: MiniState.Hidden,  wait,           alpha };                                   }
+      default:                                                 { return { state,                    wait,           alpha };                                   }
     }
   }
 

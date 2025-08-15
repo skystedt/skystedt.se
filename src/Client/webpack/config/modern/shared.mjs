@@ -8,8 +8,8 @@ import path from 'node:path';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
-import { polyfillCorejs, polyfillCorejsExcluded } from '../../../babel.config.mjs';
-import RendererImplementation from '../../../src/renderers/rendererImplementation.mjs';
+import { polyfillCorejs, polyfillCorejsModern } from '../../../babel.config.mjs';
+import RendererImplementation from '../../../src/renderers/renderer-implementation.mjs';
 import BuildInfo from '../../build-info.mjs';
 import { dir, rendererPath } from '../../dir.mjs';
 import CreateFilePlugin from '../../plugins/create-file-plugin.mjs';
@@ -116,13 +116,7 @@ export default {
           loader: 'babel-loader',
           options: {
             browserslistEnv: 'modern',
-            plugins: [
-              polyfillCorejs({
-                exclude: polyfillCorejsExcluded,
-                // when ThrowOnAssetEmittedPlugin is thrown for polyfills.*.mjs, set debug to true to find what files/polyfills is causing it
-                debug: false
-              })
-            ]
+            plugins: [polyfillCorejs(polyfillCorejsModern)]
           }
         }
       },

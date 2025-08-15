@@ -6,7 +6,7 @@ import webpack from 'webpack';
 import settings from '../../../settings.mjs';
 import { dir } from '../../dir.mjs';
 import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
-import { printProgress } from '../../utils.mjs';
+import { printProgress } from '../../utilities.mjs';
 import { buildInfo } from './shared.mjs';
 
 /** @type {webpack.Configuration} */

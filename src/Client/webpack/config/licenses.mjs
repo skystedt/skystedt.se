@@ -15,6 +15,7 @@ import unfetch from 'unfetch/package.json' with { type: 'json' };
  *   apply(compiler: Compiler): void
  * }} LicenseWebpackPlugin
  */
+// eslint-disable-next-line unicorn/prefer-export-from
 export const LicenseWebpackPlugin = /** @type {LicenseWebpackPlugin} */ (/** @type {any} */ (_LicenseWebpackPlugin));
 
 const filename = 'THIRD-PARTY-LICENSES.txt';

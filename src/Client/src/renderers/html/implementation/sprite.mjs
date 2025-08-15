@@ -78,6 +78,6 @@ export default class Sprite {
   /** @type {Contract["destroy"]} */
   destroy() {
     this.#element.src = '';
-    this.#element.parentNode?.removeChild(this.#element);
+    this.#element.remove();
   }
 }

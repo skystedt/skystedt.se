@@ -1,7 +1,7 @@
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
-import RendererImplementation from '../../../src/renderers/rendererImplementation.mjs';
+import RendererImplementation from '../../../src/renderers/renderer-implementation.mjs';
 import { dir, rendererPath } from '../../dir.mjs';
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';

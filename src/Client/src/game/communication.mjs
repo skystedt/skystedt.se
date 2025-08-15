@@ -74,6 +74,7 @@ export default class Communication {
 
     // Events will not run before the websocket has connected, https://stackoverflow.com/a/53519282
 
+    // eslint-disable-next-line unicorn/prefer-add-event-listener
     ws.onopen = () => {
       this.#connectionAttempt = 1;
 
@@ -91,6 +92,7 @@ export default class Communication {
       this.#connection = { ws, token, expiresAt, intervalId, reconnect: false };
     };
 
+    // eslint-disable-next-line unicorn/prefer-add-event-listener
     ws.onclose = (event) => {
       if (this.#connection) {
         clearInterval(this.#connection.intervalId);
@@ -110,6 +112,7 @@ export default class Communication {
       }
     };
 
+    // eslint-disable-next-line unicorn/prefer-add-event-listener
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       this.#receivedCallback(data);
@@ -117,24 +120,37 @@ export default class Communication {
   }
 
   /**
+   * @param {number} min
+   * @param {number} max
+   * @returns {number}
+   */
+  static #random(min, max) {
+    // eslint-disable-next-line sonarjs/pseudo-random
+    return Math.floor(Math.random() * (max - min + 1) + min);
+  }
+
+  /**
    * @param {number} attempt
    * @returns {number}
    */
   static #retryDelay(attempt) {
-    const random = (/** @type {number} */ min, /** @type {number} */ max) =>
-      Math.floor(Math.random() * (max - min + 1) + min);
     switch (attempt) {
       // first time there is a retry it will be attempt
-      case 2:
+      case 2: {
         return 0;
-      case 3:
-        return random(1_000, 2_000);
-      case 4:
-        return random(5_000, 10_000);
-      case 5:
-        return random(30_000, 40_000);
-      default:
-        return random(600_000, 900_000);
+      }
+      case 3: {
+        return Communication.#random(1000, 2000);
+      }
+      case 4: {
+        return Communication.#random(5000, 10_000);
+      }
+      case 5: {
+        return Communication.#random(30_000, 40_000);
+      }
+      default: {
+        return Communication.#random(600_000, 900_000);
+      }
     }
   }
 }
