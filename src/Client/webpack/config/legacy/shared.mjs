@@ -5,7 +5,7 @@ import RendererImplementation from '../../../src/renderers/renderer-implementati
 import { dir, rendererPath } from '../../dir.mjs';
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
-import { licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
+import { additionalModules, licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
@@ -79,5 +79,11 @@ export default {
       }
     ]
   },
-  plugins: [new LicenseWebpackPlugin(licenseOptions), new ThrowOnUnnamedChunkPlugin()]
+  plugins: [
+    new LicenseWebpackPlugin({
+      ...licenseOptions,
+      additionalModules: additionalModules.legacy
+    }),
+    new ThrowOnUnnamedChunkPlugin()
+  ]
 };

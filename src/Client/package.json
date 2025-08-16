@@ -69,6 +69,7 @@
     "postcss-merge-rules": "7.0.6",
     "postcss-preset-env": "10.2.4",
     "prettier": "3.6.2",
+    "regenerator-runtime": "0.14.1",
     "spdx-satisfies": "6.0.0",
     "stylelint": "16.23.1",
     "stylelint-config-standard": "39.0.0",
