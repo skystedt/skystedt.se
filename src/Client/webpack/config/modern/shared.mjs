@@ -22,7 +22,7 @@ import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mj
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { postcssOptions } from '../../postcss/config.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
-import { licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
+import { additionalModules, licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
 import staticWebApp from '../../../staticwebapp.config.template.json' with { type: 'json' };
@@ -156,7 +156,10 @@ export default {
     ]
   },
   plugins: [
-    new LicenseWebpackPlugin(licenseOptions),
+    new LicenseWebpackPlugin({
+      ...licenseOptions,
+      additionalModules: additionalModules.modern
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
       favicon: path.resolve(dir.src, 'favicon.ico'),

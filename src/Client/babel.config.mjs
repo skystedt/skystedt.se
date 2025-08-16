@@ -81,7 +81,7 @@ export default function babelConfig(api) {
     plugins: [
       [
         '@babel/plugin-transform-runtime', // "Enables the re-use of Babel's injected helper code"
-        /** @type {BabelPluginTransformRuntimeOptions}*/
+        /** @type {BabelPluginTransformRuntimeOptions} */
         ({
           moduleName: '@babel/runtime',
           version: babelRuntime.version // https://babeljs.io/docs/babel-plugin-transform-runtime#version
