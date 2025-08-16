@@ -73,7 +73,7 @@ export default class BuildInfo {
     await Promise.all(
       relativePaths.map(async (relativePath) => {
         if (fileTypes.has(path.extname(relativePath))) {
-          const fullPath = path.join(dir.dist, relativePath);
+          const fullPath = path.resolve(dir.dist, relativePath);
           const stat = await fs.stat(fullPath);
           const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' }) ?? '?';
           result[relativePath] = size;
