@@ -22,7 +22,7 @@ jobs:
         working-directory: ${{ env.SRC_DIR }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Dotnet Setup
         uses: actions/setup-dotnet@v4
@@ -58,7 +58,7 @@ jobs:
         working-directory: ${{ env.SRC_DIR }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Node Setup
         uses: actions/setup-node@v4
