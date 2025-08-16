@@ -1,4 +1,5 @@
 import { minimatch } from 'minimatch';
+import fs from 'node:fs';
 import path from 'node:path';
 import webpack from 'webpack';
 import { dir } from '../dir.mjs';
@@ -25,6 +26,46 @@ const cacheGroupFolderTest = (targetFolder, module) =>
   minimatch(/** @type {webpack.NormalModule} */ (module).resource, path.resolve(targetFolder, '**'), {
     windowsPathsNoEscape: true
   });
+
+/**
+ * @param {string} identifier
+ * @param {string | undefined} relativePath
+ * @returns {string}
+ */
+const resolveVendorModuleName = (identifier, relativePath) => {
+  if (!relativePath) {
+    throw new Error(`Can not resolve name for: ${identifier}`);
+  }
+
+  const packageJsonPath = path.resolve(dir.node_modules, relativePath, 'package.json');
+
+  const packageJson = fs.existsSync(packageJsonPath) && fs.readFileSync(packageJsonPath, 'utf8');
+  if (packageJson) {
+    const { name } = JSON.parse(packageJson);
+    if (name) {
+      return name;
+    }
+  }
+
+  const parentPath = path.dirname(relativePath);
+  if (parentPath === '.') {
+    return '';
+  }
+
+  return resolveVendorModuleName(identifier, parentPath);
+};
+
+/**
+ * @param {webpack.Module} module
+ * @returns {string}
+ */
+const vendorModuleToModuleName = (module) => {
+  const normalModule = /** @type {webpack.NormalModule} */ (module);
+  return (
+    /** @type {string | undefined} */ (normalModule.resourceResolveData?.descriptionFileData?.name) ||
+    resolveVendorModuleName(normalModule.identifier(), normalModule.resourceResolveData?.descriptionFileRoot)
+  );
+};
 
 const pixiSideEffects = [path.resolve(dir.src, 'renderers', 'pixi', 'implementation', 'initialization.mjs')];
 
@@ -83,12 +124,7 @@ export const cacheGroups = {
   vendors: {
     test: (/** @type {webpack.Module} */ module) => cacheGroupFolderTest(dir.node_modules, module),
     type: wildcardMatch('javascript/*'),
-    name: (/** @type {webpack.Module} */ module) =>
-      mapVendorModuleToChunk(
-        /** @type {string | undefined} */ (
-          /** @type {webpack.NormalModule} */ (module).resourceResolveData?.descriptionFileData?.name
-        )
-      )
+    name: (/** @type {webpack.Module} */ module) => mapVendorModuleNameToChunk(vendorModuleToModuleName(module))
   },
   ignored: {
     test: (/** @type {webpack.Module} */ module) => module.identifier && module.identifier().startsWith('ignored|'),
@@ -97,7 +133,7 @@ export const cacheGroups = {
       console.warn(`Using ignored module: ${module.identifier()}`);
       const [, modulePath] = module.identifier().split('|');
       const moduleName = path.relative(dir.node_modules, modulePath);
-      return mapVendorModuleToChunk(moduleName);
+      return mapVendorModuleNameToChunk(moduleName);
     }
   }
 };
@@ -106,7 +142,7 @@ export const cacheGroups = {
  * @param {string | undefined} moduleName
  * @returns {string}
  */
-function mapVendorModuleToChunk(moduleName) {
+function mapVendorModuleNameToChunk(moduleName) {
   // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunksname
   // "You can also use on demand named chunks, but you must be careful that the selected modules are only used under this chunk."
   if (moduleName?.startsWith('@microsoft/applicationinsights-')) {
@@ -121,6 +157,9 @@ function mapVendorModuleToChunk(moduleName) {
     case 'events':
     case 'mini-css-extract-plugin': {
       return 'development';
+    }
+    case '@babel/runtime': {
+      return 'app';
     }
     case 'pixi.js':
     case '@pixi/colord':

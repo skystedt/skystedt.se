@@ -49,7 +49,7 @@ export default class CreateFilePlugin {
 
   /** @param {string} data */
   async #createFile(data) {
-    const fullPath = path.join(this.#filePath, this.#fileName);
+    const fullPath = path.resolve(this.#filePath, this.#fileName);
     const directory = path.dirname(fullPath);
     await fs.mkdir(directory, { recursive: true });
     await fs.writeFile(fullPath, data);

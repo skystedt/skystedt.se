@@ -1,4 +1,5 @@
 // cSpell:ignore: corejs
+import babelRuntime from '@babel/runtime/package.json' with { type: 'json' };
 import corejs from 'core-js/package.json' with { type: 'json' };
 
 /** @typedef { import("@babel/core").TransformOptions } TransformOptions */
@@ -11,24 +12,9 @@ import corejs from 'core-js/package.json' with { type: 'json' };
 
 /** @typedef { import("@babel/preset-env").Options } BabelPresetEnvOptions */
 
-/**
- * @param {PluginOptions} [additionalOptions]
- * @returns {PluginItem}
- */
-export const polyfillCorejs = (additionalOptions) => [
-  'polyfill-corejs3',
-  {
-    method: 'usage-global',
-    // https://github.com/babel/babel-polyfills/tree/main/packages/babel-plugin-polyfill-corejs3#version
-    // "It is recommended to specify the minor version"
-    version: corejs.version,
-
-    ...additionalOptions
-  }
-];
+/** @typedef { import("@babel/plugin-transform-runtime").Options } BabelPluginTransformRuntimeOptions */
 
 // we don't want polyfills in modern, but instead of disabling them, we exclude the ones that would be added (to check that we don't use unwanted functionality)
-
 /** @type {PluginOptions} */
 export const polyfillCorejsModern = {
   // prettier-ignore
@@ -36,7 +22,7 @@ export const polyfillCorejsModern = {
     // versions checked with
     //   core-js: 3.44.0, https://zloirock.github.io/core-js/master/compat/
     //   browserslist: 1.0.30001727
-                                   // chrome  edge        firefox     ios         opera   opera_m safari      samsung
+    // chrome  edge        firefox     ios         opera   opera_m safari      samsung
     'es.array.includes',           //                     78
     'es.array.push',               // 66-121  18,92-121               10.3-15.8   89-102  80      13.1-15.6   21-25
     'es.error.cause',              // 66      18          78          10.3                        13.1
@@ -62,6 +48,22 @@ export const polyfillCorejsModern = {
   debug: false
 };
 
+/**
+ * @param {PluginOptions} [additionalOptions]
+ * @returns {PluginItem}
+ */
+export const polyfillCorejs = (additionalOptions) => [
+  'polyfill-corejs3',
+  {
+    method: 'usage-global',
+    // https://github.com/babel/babel-polyfills/tree/main/packages/babel-plugin-polyfill-corejs3#version
+    // "It is recommended to specify the minor version"
+    version: corejs.version,
+
+    ...additionalOptions
+  }
+];
+
 /** @type {ConfigFunction} */
 export default function babelConfig(api) {
   api.cache(true);
@@ -76,6 +78,16 @@ export default function babelConfig(api) {
         })
       ]
     ],
-    plugins: [polyfillCorejs()]
+    plugins: [
+      [
+        '@babel/plugin-transform-runtime', // "Enables the re-use of Babel's injected helper code"
+        /** @type {BabelPluginTransformRuntimeOptions}*/
+        ({
+          moduleName: '@babel/runtime',
+          version: babelRuntime.version // https://babeljs.io/docs/babel-plugin-transform-runtime#version
+        })
+      ],
+      polyfillCorejs()
+    ]
   };
 }
