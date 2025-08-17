@@ -17,12 +17,21 @@ import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpa
 import DataUriFaviconHtmlWebpackPlugin from '../../plugins/html/data-uri-favicon-html-webpack-plugin.mjs';
 import MoveHookHtmlWebpackPlugin from '../../plugins/html/move-hook-html-webpack-plugin.mjs';
 import TagsHtmlWebpackPlugin from '../../plugins/html/tags-html-webpack-plugin.mjs';
+import LicenseCheckUsePlugin from '../../plugins/license-check-use-plugin.mjs';
+import LicenseWebpackPluginWrapper from '../../plugins/license-webpack-plugin-wrapper.mjs';
 import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plugin.mjs';
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { postcssOptions } from '../../postcss/config.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
-import { additionalModules, licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
+import {
+  licenseAcceptable,
+  licenseAdditionals,
+  licenseFilename,
+  licenseFormatter,
+  licenseOverrides,
+  licensePreamble
+} from '../licenses.mjs';
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
 import staticWebApp from '../../../staticwebapp.config.template.json' with { type: 'json' };
@@ -156,10 +165,15 @@ export default {
     ]
   },
   plugins: [
-    new LicenseWebpackPlugin({
-      ...licenseOptions,
-      additionalModules: additionalModules.modern
+    new LicenseWebpackPluginWrapper({
+      nodeModulesDirectory: dir.node_modules,
+      filename: licenseFilename,
+      acceptableLicenses: licenseAcceptable.redistributed,
+      formatter: licenseFormatter,
+      additionals: licenseAdditionals.modern,
+      overrides: licenseOverrides
     }),
+    new LicenseCheckUsePlugin(licenseAcceptable.used),
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
       favicon: path.resolve(dir.src, 'favicon.ico'),
