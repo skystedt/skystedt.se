@@ -1,96 +1,59 @@
 // cSpell:ignore unfetch, cfgsync
-import { LicenseWebpackPlugin as _LicenseWebpackPlugin } from 'license-webpack-plugin';
-import path from 'node:path';
-import spdxSatisfies from 'spdx-satisfies';
-import { dir } from '../dir.mjs';
 
 // eslint-disable-next-line import-x/order
 import unfetch from 'unfetch/package.json' with { type: 'json' };
 
-/** @typedef { import("webpack").Compiler } Compiler */
-/** @typedef { Parameters<NonNullable<LicenseWebpackPluginOptions["renderLicenses"]>>[0][number] } LicenseIdentifiedModule */
-/** @typedef { NonNullable<LicenseWebpackPluginOptions["additionalModules"]>[number] } LicenseAdditionalModule */
-/** @typedef { NonNullable<ConstructorParameters<typeof _LicenseWebpackPlugin>[0]> } LicenseWebpackPluginOptions */
-/**
- * @typedef {{
- *   new (pluginOptions?: LicenseWebpackPluginOptions) : LicenseWebpackPlugin,
- *   apply(compiler: Compiler): void
- * }} LicenseWebpackPlugin
- */
+/** @typedef { import('../plugins/license-webpack-plugin-wrapper.mjs').LicenseWebpackPluginWrapperOptions["overrides"] } LicenseOverrides */
+/** @typedef { import('../plugins/license-webpack-plugin-wrapper.mjs').LicenseFormatter } LicenseFormatter */
 
-/** @type {LicenseWebpackPlugin} */
-// eslint-disable-next-line unicorn/prefer-export-from
-export const LicenseWebpackPlugin = /** @type {any} */ (_LicenseWebpackPlugin);
+export const licenseFilename = 'THIRD-PARTY-LICENSES.txt';
+export const licensePreamble = `/*! License information in ${licenseFilename} */`;
 
-const filename = 'THIRD-PARTY-LICENSES.txt';
-
-const acceptableLicenses = ['MIT', 'Apache-2.0', 'ISC'];
-
-// Manually add modules that are not explicitly referenced but used in runtime/added by the build process
-export const additionalModules = {
-  /** @type {LicenseAdditionalModule[]} */
-  modern: [
-    {
-      name: 'webpack',
-      directory: path.resolve(dir.node_modules, 'webpack')
-    }
+export const licenseAcceptable = {
+  redistributed: [
+    'MIT', //           https://www.tldrlegal.com/license/mit-license
+    'ISC' //            https://www.tldrlegal.com/license/isc-license
   ],
-  /** @type {LicenseAdditionalModule[]} */
-  legacy: [
-    {
-      name: 'webpack',
-      directory: path.resolve(dir.node_modules, 'webpack')
-    },
-    {
-      name: '@babel/plugin-transform-regenerator',
-      directory: path.resolve(dir.node_modules, '@babel/plugin-transform-regenerator')
-    },
-    {
-      name: 'regenerator-runtime',
-      directory: path.resolve(dir.node_modules, 'regenerator-runtime')
-    }
+  used: [
+    'MIT', //           https://www.tldrlegal.com/license/mit-license
+    'MIT-0', //         https://opensource.org/license/mit-0
+    'ISC', //           https://www.tldrlegal.com/license/isc-license
+    'Apache-2.0', //    https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0
+    '0BSD', //          https://www.tldrlegal.com/license/bsd-0-clause-license
+    'BSD-2-Clause', //  https://www.tldrlegal.com/license/bsd-2-clause-license-freebsd
+    'BSD-3-Clause', //  https://www.tldrlegal.com/license/bsd-3-clause-license-revised
+    'CC0-1.0', //       https://www.tldrlegal.com/license/creative-commons-cc0-1-0-universal
+    'CC-BY-3.0', //     https://www.tldrlegal.com/license/creative-commons-attribution-cc
+    'CC-BY-4.0', //     https://www.tldrlegal.com/license/creative-commons-attribution-4-0-international-cc-by-4
+    'Python-2.0', //    https://www.tldrlegal.com/license/python-license-2-0
+    'LGPL-3.0-only', // https://www.tldrlegal.com/license/gnu-lesser-general-public-license-v3-lgpl-3
+    'BlueOak-1.0.0' //  https://opensource.org/license/blue-oak-model-license
   ]
 };
 
-/** @type {{ [sourcePackage: string]: string }} */
-const typeOverrides = {
-  'unfetch-polyfill': unfetch.license
+// Manually add modules that are not explicitly referenced but used in runtime/added by the build process
+export const licenseAdditionals = {
+  /** @type {string[]} */
+  modern: ['webpack'],
+  /** @type {string[]} */
+  legacy: ['webpack', '@babel/plugin-transform-regenerator', 'regenerator-runtime']
 };
 
-/** @type { [sourcePackage: string, targetPackage: string, file: string][] } */
-const fileOverrides = [
-  ['unfetch-polyfill', '.', 'LICENSE.md'],
-  ['@microsoft/applicationinsights-cfgsync-js', '@microsoft/applicationinsights-web', 'LICENSE'],
-  ['@pixi/colord', 'pixi.js', 'LICENSE']
-];
-
-/** @type {{ [sourcePackage: string]: string }} */
-const versionOverrides = {
-  'unfetch-polyfill': unfetch.version
-};
-
-export const licensePreamble = `/*! License information in ${filename} */`;
-
-const renderLicence = (/** @type {LicenseIdentifiedModule} */ module) => {
-  const version = versionOverrides[module.name] || module.packageJson?.version;
-  if (!version) {
-    throw new Error(`Version not found for module: ${module.name}`);
+/** @type {LicenseOverrides} */
+export const licenseOverrides = {
+  licenses: {
+    'unfetch-polyfill': unfetch.license
+  },
+  files: {
+    'unfetch-polyfill': { module: '.', file: 'LICENSE.md' },
+    '@microsoft/applicationinsights-cfgsync-js': { module: '@microsoft/applicationinsights-web', file: 'LICENSE' },
+    '@pixi/colord': { module: 'pixi.js', file: 'LICENSE' }
+  },
+  versions: {
+    'unfetch-polyfill': unfetch.version
   }
-  return `${module.name} v${version}\n${module.licenseId}\n\n${module.licenseText?.trim()}\n\n----------\n\n`;
 };
 
-/** @type {LicenseWebpackPluginOptions} */
-export const licenseOptions = {
-  outputFilename: filename,
-  modulesDirectories: [dir.node_modules],
-  unacceptableLicenseTest: (licenseType) => !!licenseType && !spdxSatisfies(licenseType, acceptableLicenses),
-  renderLicenses: (modules) => modules.reduce((file, module) => file + renderLicence(module), ''),
-  licenseTypeOverrides: typeOverrides,
-  licenseFileOverrides: Object.fromEntries(
-    fileOverrides.map(([sourcePackage, targetPackage, file]) => [
-      sourcePackage,
-      path.relative(sourcePackage, path.resolve(targetPackage, file))
-    ])
-  ),
-  perChunkOutput: false
-};
+/** @type { LicenseFormatter } */
+export const licenseFormatter = (name, version, licenseId, licenseText) =>
+  `${name} v${version}\n${licenseId}\n\n${licenseText}\n\n----------\n\n`;

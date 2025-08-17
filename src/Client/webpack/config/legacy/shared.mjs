@@ -3,9 +3,17 @@ import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import RendererImplementation from '../../../src/renderers/renderer-implementation.mjs';
 import { dir, rendererPath } from '../../dir.mjs';
+import LicenseWebpackPluginWrapper from '../../plugins/license-webpack-plugin-wrapper.mjs';
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
-import { additionalModules, licenseOptions, licensePreamble, LicenseWebpackPlugin } from '../licenses.mjs';
+import {
+  licenseAcceptable,
+  licenseAdditionals,
+  licenseFilename,
+  licenseFormatter,
+  licenseOverrides,
+  licensePreamble
+} from '../licenses.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
@@ -80,9 +88,13 @@ export default {
     ]
   },
   plugins: [
-    new LicenseWebpackPlugin({
-      ...licenseOptions,
-      additionalModules: additionalModules.legacy
+    new LicenseWebpackPluginWrapper({
+      nodeModulesDirectory: dir.node_modules,
+      filename: licenseFilename,
+      acceptableLicenses: licenseAcceptable.redistributed,
+      formatter: licenseFormatter,
+      additionals: licenseAdditionals.legacy,
+      overrides: licenseOverrides
     }),
     new ThrowOnUnnamedChunkPlugin()
   ]
