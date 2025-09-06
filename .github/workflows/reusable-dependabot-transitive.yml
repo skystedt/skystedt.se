@@ -40,7 +40,7 @@ jobs:
         run: echo "TARGET_DIR=$(echo '${{ needs.dependabot_metadata.outputs.directory }}' | sed 's|^/||')" >> $GITHUB_ENV # Ensure no leading slash
 
       - name: Node Setup
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version-file: ${{ env.TARGET_DIR }}/package.json
           check-latest: true
