@@ -1,7 +1,7 @@
-name: Close Pull Request
+name: Pull Request - Closed
 
 concurrency:
-  group: close-pull-request-${{ github.ref }}
+  group: pull-request-closed-${{ github.ref }}
   cancel-in-progress: false
 
 on:

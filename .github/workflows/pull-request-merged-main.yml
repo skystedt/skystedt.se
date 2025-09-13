@@ -1,0 +1,50 @@
+name: Pull Request - Merged main
+
+concurrency:
+  group: pull-request-merged-main-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot_metadata:
+    name: Dependabot Metadata
+    if: |
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Dependabot Metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set Target Directory
+        id: directory
+        run: echo "path=$(echo '${{ steps.metadata.outputs.directory }}' | sed 's|^/||')" >> $GITHUB_OUTPUT # Ensure no leading slash
+    outputs:
+      package-ecosystem: ${{ steps.metadata.outputs.package-ecosystem }}
+      dependency-group: ${{ steps.metadata.outputs.dependency-group }}
+      update-type: ${{ steps.metadata.outputs.update-type }}
+      directory: ${{ steps.directory.outputs.path }}
+      
+  update_transitive_dependencies:
+    name: Update Transitive Dependencies
+    needs: dependabot_metadata
+    if: |
+      needs.dependabot_metadata.outputs.package-ecosystem == 'npm_and_yarn' &&
+      needs.dependabot_metadata.outputs.dependency-group == 'client-development' &&
+      needs.dependabot_metadata.outputs.update-type != 'security'
+    uses: ./.github/workflows/reusable-update-transitive-dependencies.yml
+    secrets: inherit
+    with:
+      target-dir: ${{ needs.dependabot_metadata.outputs.directory }}
