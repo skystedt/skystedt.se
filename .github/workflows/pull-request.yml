@@ -16,6 +16,5 @@ permissions:
 jobs:
   build_test_and_deploy:
     name: Build, Test and Deploy
-    if: github.actor != 'dependabot[bot]' # Dependabot PRs are handled separately
     uses: ./.github/workflows/reusable-build-test-deploy.yml
     secrets: inherit

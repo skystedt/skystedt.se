@@ -1,0 +1,66 @@
+name: Reusable - Update Transitive Dependencies
+
+on:
+  workflow_call:
+    inputs:
+      target-dir:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  BRANCH_NAME: "client-transitive-dependencies-${{ github.run_id }}"
+  MESSAGE: "Bump Client with transitive updates"
+
+jobs:
+  update:
+    name: Update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        
+      - name: Git Branch
+        run: git checkout -b "${{ env.BRANCH_NAME }}"
+        
+      - name: Node Setup
+        uses: actions/setup-node@v5
+        with:
+          node-version-file: ${{ inputs.target-dir }}/package.json
+          check-latest: true
+
+      - name: Corepack Enable
+        run: corepack enable
+
+      - name: Yarn Install
+        run: yarn install --immutable
+        working-directory: ${{ inputs.target-dir }}
+
+      - name: Yarn Update Transitive Dependencies
+        run: yarn update-transitive
+        working-directory: ${{ inputs.target-dir }}
+        
+      - name: Git Commit
+        id: commit
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "${{ env.MESSAGE }}"
+          echo "commit_success=$([ $? -eq 0 ] && echo true || echo false)" >> $GITHUB_OUTPUT
+
+      - name: Git Push
+        if: steps.commit.outputs.commit_success
+        run: git push origin "${{ env.BRANCH_NAME }}"
+
+      - name: Pull Request
+        if: steps.commit.outputs.commit_success
+        run: |
+          gh pr create \
+            --title "${{ env.MESSAGE }}" \
+            --body "${{ env.MESSAGE }}" \
+            --head "${{ env.BRANCH_NAME }}" \
+            --base "main"
