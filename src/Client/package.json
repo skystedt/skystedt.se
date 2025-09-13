@@ -89,7 +89,7 @@
     "core-js": "3.45.1",
     "element-polyfill": "1.1.0",
     "navigator.sendbeacon": "0.0.20",
-    "pixi.js": "8.13.1",
+    "pixi.js": "8.13.2",
     "unfetch": "5.0.0"
   },
   "resolutions": {
