@@ -42,7 +42,7 @@ jobs:
         run: dotnet publish ${{ env.API_DIR }} --output ${{ env.PUBLISH_DIR }}/${{ env.API_DIR }} --configuration ${{ env.DOTNET_CONFIGURATION }} --no-build
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: api
           include-hidden-files: true
@@ -61,7 +61,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Node Setup
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version-file: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}/package.json
           check-latest: true
@@ -78,13 +78,13 @@ jobs:
         working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
 
       - name: Upload Config
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: config
           path: ${{ env.SRC_DIR }}/${{ env.PUBLISH_DIR }}/staticwebapp.config.json
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: client
           path: ${{ env.SRC_DIR }}/${{ env.PUBLISH_DIR }}/${{ env.CLIENT_DIR }}
@@ -95,19 +95,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Config
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: config
           path: ${{ github.workspace }}/artifacts/config
 
       - name: Download Api
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: api
           path: ${{ github.workspace }}/artifacts/api
 
       - name: Download Client
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: client
           path: ${{ github.workspace }}/artifacts/client

@@ -27,7 +27,7 @@ jobs:
         run: git checkout -b "${{ env.BRANCH_NAME }}"
         
       - name: Node Setup
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version-file: ${{ inputs.target-dir }}/package.json
           check-latest: true
