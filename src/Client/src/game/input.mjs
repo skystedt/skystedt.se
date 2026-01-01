@@ -32,9 +32,10 @@ export default class Input {
   #gamepadIndex = null;
 
   /**
-   * @param {any[]} array
-   * @param {(element: any) => number} by
-   * @returns {any}
+   * @template T
+   * @param {T[]} array
+   * @param {(item: T) => number} by
+   * @returns {T | null}
    */
   static #minBy(array, by) {
     let best = null;

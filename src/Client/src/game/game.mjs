@@ -14,6 +14,11 @@ import View from './view.mjs';
 /** @typedef { import("../renderers/contract").Renderer } Renderer */
 /** @typedef { import("../renderers/contract").Application } Application */
 /** @typedef { import("@microsoft/applicationinsights-web").ApplicationInsights } ApplicationInsights */
+/** @typedef { import("./communication-data").CommunicationData } CommunicationData */
+/** @typedef { import("./communication-data").CommunicationDataInit } CommunicationDataInit */
+/** @typedef { import("./communication-data").CommunicationDataConnect } CommunicationDataConnect */
+/** @typedef { import("./communication-data").CommunicationDataDisconnect } CommunicationDataDisconnect */
+/** @typedef { import("./communication-data").CommunicationDataUpdate } CommunicationDataUpdate */
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;
@@ -190,29 +195,26 @@ export default class Game {
     }
   }
 
-  /** @param {any} data  */
+  /** @param {CommunicationData} data  */
   #communicationReceived(data) {
     switch (data.type) {
       case MessageType.Init: {
-        this.#minis.clear();
-        for (const id of /** @type {string[]} */ (data.ids)) {
-          this.#minis.add(id);
-        }
+        this.#communicationReceivedInit(/** @type {CommunicationDataInit} */ (data));
         break;
       }
 
       case MessageType.Connect: {
-        this.#minis.add(data.id);
+        this.#communicationReceivedConnect(/** @type {CommunicationDataConnect} */ (data));
         break;
       }
 
       case MessageType.Disconnect: {
-        this.#minis.remove(data.id);
+        this.#communicationReceivedDisconnect(/** @type {CommunicationDataDisconnect} */ (data));
         break;
       }
 
       case MessageType.Update: {
-        this.#minis.update(data.id, data.x, data.y);
+        this.#communicationReceivedUpdate(/** @type {CommunicationDataUpdate} */ (data));
         break;
       }
 
@@ -221,6 +223,29 @@ export default class Game {
         break;
       }
     }
+  }
+
+  /** @param {CommunicationDataInit} data  */
+  #communicationReceivedInit(data) {
+    this.#minis.clear();
+    for (const id of /** @type {string[]} */ (data.ids)) {
+      this.#minis.add(id);
+    }
+  }
+
+  /** @param {CommunicationDataConnect} data  */
+  #communicationReceivedConnect(data) {
+    this.#minis.add(data.id);
+  }
+
+  /** @param {CommunicationDataDisconnect} data  */
+  #communicationReceivedDisconnect(data) {
+    this.#minis.remove(data.id);
+  }
+
+  /** @param {CommunicationDataUpdate} data  */
+  #communicationReceivedUpdate(data) {
+    this.#minis.update(data.id, data.x, data.y);
   }
 
   #communicationSendUpdate() {
