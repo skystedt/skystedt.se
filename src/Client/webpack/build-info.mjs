@@ -3,7 +3,7 @@ import bytes from 'bytes';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { dir } from './dir.mjs';
-import BrowserslistUpdatePlugin from './plugins/browserslist-update-plugin.mjs';
+import BrowserslistUpdatePlugin, { BrowserslistUpdateDependency } from './plugins/browserslist-update-plugin.mjs';
 import { browserslistBrowsers } from './utilities.mjs';
 
 const babelTargets = /** @type {_babelTargets} */ (/** @type {any} */ (_babelTargets).default);
@@ -17,7 +17,7 @@ export default class BuildInfo {
   /**
    * @typedef {{ [browser: string]: string[] }} BrowserVersions
    * @typedef {{ [target: string]: string }} BabelTargets
-   * @typedef {{ definitions: string, browserslist: Environments<BrowserVersions>, babel: Environments<BabelTargets> }} Browsers
+   * @typedef {{ "caniuse-lite": string, "baseline-browser-mapping": string, browserslist: Environments<BrowserVersions>, babel: Environments<BabelTargets> }} Browsers
    */
   /** @typedef {{ [file: string]: string }} Sizes */
 
@@ -44,9 +44,17 @@ export default class BuildInfo {
 
   /** @returns {Browsers} */
   browsers() {
-    const definitionsVersion = BrowserslistUpdatePlugin.definitionsVersion(dir.node_modules);
+    const definitionsCaniuseLite = BrowserslistUpdatePlugin.definitionsVersion(
+      dir.node_modules,
+      BrowserslistUpdateDependency.CaniuseLite
+    );
+    const definitionsBaselineBrowserMapping = BrowserslistUpdatePlugin.definitionsVersion(
+      dir.node_modules,
+      BrowserslistUpdateDependency.Baseline
+    );
     const result = {
-      definitions: definitionsVersion ?? '?',
+      'caniuse-lite': definitionsCaniuseLite ?? '?',
+      'baseline-browser-mapping': definitionsBaselineBrowserMapping ?? '?',
       browserslist: {
         all: this.#browserslistVersions('all'),
         modern: this.#browserslistVersions('modern'),
