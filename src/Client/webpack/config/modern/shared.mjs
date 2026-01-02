@@ -37,6 +37,7 @@ import csp from '../../../content-security-policy.json' with { type: 'json' };
 import staticWebApp from '../../../staticwebapp.config.template.json' with { type: 'json' };
 
 const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin} */ (
+  // eslint-disable-next-line jsdoc/reject-any-type
   /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
 );
 

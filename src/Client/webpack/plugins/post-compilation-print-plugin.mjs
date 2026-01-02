@@ -1,7 +1,7 @@
 import { inspect } from 'node:util';
 import webpack from 'webpack';
 
-/** @typedef { string | { [key: string]: {} } } Content */
+/** @typedef { string | object } Content */
 
 export default class PostCompilationPrintPlugin {
   /** @type {() => Content} */

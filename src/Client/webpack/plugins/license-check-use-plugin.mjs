@@ -76,7 +76,7 @@ export default class LicenseCheckUsePlugin {
 
   /**
    * @param {(message: string) => void} logError
-   * @param {any} baseDirectory
+   * @param {string} baseDirectory
    * @returns {Promise<licenseChecker.ModuleInfos>}
    */
   static async #resolvePackageLicenses(logError, baseDirectory) {
@@ -154,7 +154,7 @@ export default class LicenseCheckUsePlugin {
     return Object.fromEntries(
       [...grouped.entries()]
         .map(([license, modules]) => /** @type {[string, number]} */ ([license, modules.length]))
-        .sort((a, b) => (b[1] === a[1] ? a[0].localeCompare(b[0]) : b[1] - a[1]))
+        .toSorted((a, b) => (b[1] === a[1] ? a[0].localeCompare(b[0]) : b[1] - a[1]))
     );
   }
 
