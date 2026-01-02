@@ -1,6 +1,5 @@
 // cSpell:ignore unfetch, cfgsync
 
-// eslint-disable-next-line import-x/order
 import unfetch from 'unfetch/package.json' with { type: 'json' };
 
 /** @typedef { import('../plugins/license-webpack-plugin-wrapper.mjs').LicenseWebpackPluginWrapperOptions["overrides"] } LicenseOverrides */
@@ -10,10 +9,13 @@ export const licenseFilename = 'THIRD-PARTY-LICENSES.txt';
 export const licensePreamble = `/*! License information in ${licenseFilename} */`;
 
 export const licenseAcceptable = {
+  // Results in "ERROR in license-webpack-plugin: unacceptable license found for ..."
   redistributed: [
     'MIT', //           https://www.tldrlegal.com/license/mit-license
-    'ISC' //            https://www.tldrlegal.com/license/isc-license
+    'ISC', //           https://www.tldrlegal.com/license/isc-license
+    'Apache-2.0' //     https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0
   ],
+  // Results in " ERROR in LicenseCheckUsePlugin: Unacceptable license used in: ..."
   used: [
     'MIT', //           https://www.tldrlegal.com/license/mit-license
     'MIT-0', //         https://opensource.org/license/mit-0

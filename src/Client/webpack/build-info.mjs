@@ -6,6 +6,7 @@ import { dir } from './dir.mjs';
 import BrowserslistUpdatePlugin from './plugins/browserslist-update-plugin.mjs';
 import { browserslistBrowsers } from './utilities.mjs';
 
+// eslint-disable-next-line jsdoc/reject-any-type
 const babelTargets = /** @type {_babelTargets} */ (/** @type {any} */ (_babelTargets).default);
 
 export default class BuildInfo {
@@ -94,7 +95,7 @@ export default class BuildInfo {
     const versions = /** @type {BrowserVersions} */ ({});
     for (const browser of browsers) {
       const [name, version] = browser.split(' ');
-      versions[name] = [...(versions[name] || []), version].sort();
+      versions[name] = [...(versions[name] || []), version].toSorted();
     }
     return versions;
   };

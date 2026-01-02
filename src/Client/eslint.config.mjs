@@ -6,6 +6,7 @@ import airbnb from 'eslint-config-airbnb-base';
 import prettier from 'eslint-config-prettier/flat';
 import compat from 'eslint-plugin-compat';
 import { flatConfigs as importX } from 'eslint-plugin-import-x';
+// eslint-disable-next-line import-x/no-named-as-default
 import jsdoc from 'eslint-plugin-jsdoc';
 import nodePlugin from 'eslint-plugin-n';
 import promisePlugin from 'eslint-plugin-promise';
@@ -89,8 +90,9 @@ const splitAirbnbRules = (rules) => {
 };
 
 /**
+ * @template T
  * @param {RuleEntry} entry
- * @param {(value: any) => boolean} filterPredicate
+ * @param {(value: T) => boolean} filterPredicate
  * @returns {RuleEntry}
  */
 const modifyRuleOptions = (entry, filterPredicate) => {
