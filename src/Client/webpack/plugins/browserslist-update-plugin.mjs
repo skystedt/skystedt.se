@@ -5,6 +5,12 @@ import pc from 'picocolors';
 import updateDb from 'update-browserslist-db';
 import webpack from 'webpack';
 
+/** @enum {string} */
+export const BrowserslistUpdateDependency = {
+  CaniuseLite: 'caniuse-lite',
+  Baseline: 'baseline-browser-mapping'
+};
+
 export default class BrowserslistUpdatePlugin {
   /** @type {string} */
   #nodeModules;
@@ -17,16 +23,34 @@ export default class BrowserslistUpdatePlugin {
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
     compiler.hooks.environment.tap(BrowserslistUpdatePlugin.name, () => {
-      const versionBefore = BrowserslistUpdatePlugin.definitionsVersion(this.#nodeModules);
+      const versionBeforeCaniuse = BrowserslistUpdatePlugin.definitionsVersion(
+        this.#nodeModules,
+        BrowserslistUpdateDependency.CaniuseLite
+      );
+      const versionBeforeBaseline = BrowserslistUpdatePlugin.definitionsVersion(
+        this.#nodeModules,
+        BrowserslistUpdateDependency.Baseline
+      );
 
       const print = () => {}; // empty print function
       updateDb(print);
 
-      const versionAfter = BrowserslistUpdatePlugin.definitionsVersion(this.#nodeModules);
+      const versionAfterCaniuse = BrowserslistUpdatePlugin.definitionsVersion(
+        this.#nodeModules,
+        BrowserslistUpdateDependency.CaniuseLite
+      );
+      const versionAfterBaseline = BrowserslistUpdatePlugin.definitionsVersion(
+        this.#nodeModules,
+        BrowserslistUpdateDependency.Baseline
+      );
 
-      if (versionBefore !== versionAfter) {
+      if (versionBeforeCaniuse !== versionAfterCaniuse || versionBeforeBaseline !== versionAfterBaseline) {
         const message = pc.bold(
-          pc.bgYellow(pc.black(`Browserslist (caniuse-lite) updated from ${versionBefore} to ${versionAfter}`))
+          pc.bgYellow(
+            pc.black(
+              `Browserslist updated, caniuse-lite from ${versionBeforeCaniuse} to ${versionAfterCaniuse}, baseline-browser-mapping from ${versionBeforeBaseline} to ${versionAfterBaseline}`
+            )
+          )
         );
 
         console.warn(message);
@@ -40,10 +64,11 @@ export default class BrowserslistUpdatePlugin {
 
   /**
    * @param {string} nodeModules
+   * @param {BrowserslistUpdateDependency} dependency
    * @returns {string?}
    */
-  static definitionsVersion(nodeModules) {
-    const file = path.resolve(nodeModules, 'caniuse-lite', 'package.json');
+  static definitionsVersion(nodeModules, dependency) {
+    const file = path.resolve(nodeModules, dependency, 'package.json');
     if (!fs.existsSync(file)) {
       return null;
     }
