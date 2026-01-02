@@ -1,3 +1,6 @@
+/** @typedef { import("./communication-data").CommunicationData } CommunicationData */
+/** @typedef { import("./communication-data").CommunicationDataSend } CommunicationDataSend */
+
 const WebsocketNormalClose = 1000;
 
 /** @enum {string} */
@@ -9,7 +12,7 @@ export const MessageType = {
 };
 
 export default class Communication {
-  /** @type {(data: any) => void} */
+  /** @type {(data: CommunicationData) => void} */
   #receivedCallback;
   /** @type {() => void} */
   #updateCallback;
@@ -19,7 +22,7 @@ export default class Communication {
   #connection = null;
 
   /**
-   * @param {(data: any) => void} receivedCallback
+   * @param {(data: CommunicationData) => void} receivedCallback
    * @param {() => void} updateCallback
    */
   constructor(receivedCallback, updateCallback) {
@@ -39,7 +42,7 @@ export default class Communication {
     }
   }
 
-  /** @param {any} data */
+  /** @param {CommunicationDataSend} data */
   sendBeacon(data) {
     if (this.#connection) {
       const body = { token: this.#connection.token, ...data };
