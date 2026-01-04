@@ -2,7 +2,6 @@
 using Skystedt.Api.Functions;
 using Skystedt.Api.Test.Helpers;
 using Skystedt.Api.Test.Implementations;
-using Xunit.Abstractions;
 
 namespace Skystedt.Api.Test.E2E;
 
@@ -45,7 +44,7 @@ public class PositionTests(ITestOutputHelper output)
         var token = negotiation.Token;
         var connection = await clientConnect(user);
 
-        await Task.Delay(TestUpdateInterval);
+        await Task.Delay(TestUpdateInterval, TestContext.Current.CancellationToken);
         await function.Update(new TestHttpRequestData(new { Token = token, X = 1, Y = 2 }));
 
         await clientDisconnect(user, connection);
@@ -85,7 +84,7 @@ public class PositionTests(ITestOutputHelper output)
         var connection1 = await clientConnect(user1);
         var connection2 = await clientConnect(user2);
 
-        await Task.Delay(TestUpdateInterval);
+        await Task.Delay(TestUpdateInterval, TestContext.Current.CancellationToken);
         await function.Update(new TestHttpRequestData(new { Token = token1, X = 1, Y = 2 }));
         await function.Update(new TestHttpRequestData(new { Token = token2, X = 3, Y = 4 }));
 
