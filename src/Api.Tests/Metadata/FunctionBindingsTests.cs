@@ -46,9 +46,6 @@ public class FunctionBindingsTests
     [Fact]
     public async Task CanReadSourceGeneratedFunctionMetadata()
     {
-        // Source generators for function metadata is not yet GA
-        // https://github.com/Azure/azure-functions-dotnet-worker/milestone/65
-
         // Arrange
         var functionMetadata = new GeneratedFunctionMetadataProvider();
         var functionsDirectory = FunctionsDirectory();
