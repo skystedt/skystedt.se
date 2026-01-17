@@ -84,7 +84,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "dependencies": {
-    "@babel/runtime": "7.28.4",
+    "@babel/runtime": "7.28.6",
     "@microsoft/applicationinsights-web": "3.3.10",
     "core-js": "3.47.0",
     "element-polyfill": "1.1.0",
