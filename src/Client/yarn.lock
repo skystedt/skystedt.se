@@ -140,6 +140,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/helper-define-polyfill-provider@npm:^0.6.6":
+  version: 0.6.6
+  resolution: "@babel/helper-define-polyfill-provider@npm:0.6.6"
+  dependencies:
+    "@babel/helper-compilation-targets": "npm:^7.28.6"
+    "@babel/helper-plugin-utils": "npm:^7.28.6"
+    debug: "npm:^4.4.3"
+    lodash.debounce: "npm:^4.0.8"
+    resolve: "npm:^1.22.11"
+  peerDependencies:
+    "@babel/core": ^7.4.0 || ^8.0.0-0 <8.0.0
+  checksum: 10c0/1293d6f54d4ebb10c9e947e54de1aaa23b00233e19aca9790072f1893bf143af01442613f7b413300be7016d8e41b550af77acab28e7fa5fb796b2a175c528a1
+  languageName: node
+  linkType: hard
+
 "@babel/helper-globals@npm:^7.28.0":
   version: 7.28.0
   resolution: "@babel/helper-globals@npm:7.28.0"
@@ -3767,7 +3782,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-plugin-polyfill-corejs3@npm:0.13.0, babel-plugin-polyfill-corejs3@npm:^0.13.0":
+"babel-plugin-polyfill-corejs3@npm:0.14.0":
+  version: 0.14.0
+  resolution: "babel-plugin-polyfill-corejs3@npm:0.14.0"
+  dependencies:
+    "@babel/helper-define-polyfill-provider": "npm:^0.6.6"
+    core-js-compat: "npm:^3.48.0"
+  peerDependencies:
+    "@babel/core": ^7.4.0 || ^8.0.0-0 <8.0.0
+  checksum: 10c0/db7f530752a2bcb891c0dc80c3d025a48d49c78d41b0ad91cc853669460cd9e3107857a3667f645f0e25c2af9fc3d1e38d5b1c4e3e60aa22e7df9d68550712a4
+  languageName: node
+  linkType: hard
+
+"babel-plugin-polyfill-corejs3@npm:^0.13.0":
   version: 0.13.0
   resolution: "babel-plugin-polyfill-corejs3@npm:0.13.0"
   dependencies:
@@ -4304,6 +4331,15 @@ __metadata:
   dependencies:
     browserslist: "npm:^4.28.0"
   checksum: 10c0/71da415899633120db7638dd7b250eee56031f63c4560dcba8eeeafd1168fae171d59b223e3fd2e0aa543a490d64bac7d946764721e2c05897056fdfb22cce33
+  languageName: node
+  linkType: hard
+
+"core-js-compat@npm:^3.48.0":
+  version: 3.48.0
+  resolution: "core-js-compat@npm:3.48.0"
+  dependencies:
+    browserslist: "npm:^4.28.1"
+  checksum: 10c0/7bb6522127928fff5d56c7050f379a034de85fe2d5c6e6925308090d4b51fb0cb88e0db99619c932ee84d8756d531bf851232948fe1ad18598cb1e7278e8db13
   languageName: node
   linkType: hard
 
@@ -9078,7 +9114,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@npm:^1.20.0, resolve@npm:^1.22.10, resolve@npm:^1.22.2":
+"resolve@npm:^1.20.0, resolve@npm:^1.22.10, resolve@npm:^1.22.11, resolve@npm:^1.22.2":
   version: 1.22.11
   resolution: "resolve@npm:1.22.11"
   dependencies:
@@ -9091,7 +9127,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"resolve@patch:resolve@npm%3A^1.20.0#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.10#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.2#optional!builtin<compat/resolve>":
+"resolve@patch:resolve@npm%3A^1.20.0#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.10#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.11#optional!builtin<compat/resolve>, resolve@patch:resolve@npm%3A^1.22.2#optional!builtin<compat/resolve>":
   version: 1.22.11
   resolution: "resolve@patch:resolve@npm%3A1.22.11#optional!builtin<compat/resolve>::version=1.22.11&hash=c3c19d"
   dependencies:
@@ -9431,7 +9467,7 @@ __metadata:
     "@microsoft/applicationinsights-web": "npm:3.3.11"
     "@stylistic/eslint-plugin": "npm:5.7.0"
     babel-loader: "npm:10.0.0"
-    babel-plugin-polyfill-corejs3: "npm:0.13.0"
+    babel-plugin-polyfill-corejs3: "npm:0.14.0"
     browserslist: "npm:4.28.1"
     bytes: "npm:3.1.2"
     core-js: "npm:3.48.0"
