@@ -44,3 +44,13 @@ updates:
     groups:
       client-development:
         dependency-type: "development"
+        
+  - package-ecosystem: "npm"
+    directory: "/src/Plugins"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "10:00"
+      timezone: "Europe/Stockholm"
+    ignore:
+      - dependency-name: "*"
