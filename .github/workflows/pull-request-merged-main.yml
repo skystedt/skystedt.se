@@ -19,6 +19,7 @@ jobs:
   dependabot_metadata:
     name: Dependabot Metadata
     if: |
+      false && # Workflow disabled
       github.event.pull_request.merged == true &&
       github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
