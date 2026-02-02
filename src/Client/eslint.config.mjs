@@ -11,7 +11,7 @@ import jsdoc from 'eslint-plugin-jsdoc';
 import nodePlugin from 'eslint-plugin-n';
 import promisePlugin from 'eslint-plugin-promise';
 import security from 'eslint-plugin-security';
-import sonarjs from 'eslint-plugin-sonarjs';
+import { configs as sonarjs } from 'eslint-plugin-sonarjs';
 import unicorn from 'eslint-plugin-unicorn';
 import globals from 'globals';
 import RendererImplementation from './src/renderers/renderer-implementation.mjs';
@@ -197,7 +197,7 @@ export default [
     name: 'plugin/unicorn/recommended'
   },
   {
-    ...sonarjs.configs.recommended,
+    ...sonarjs.recommended,
     name: 'plugin/sonarjs/recommended'
   },
   {
