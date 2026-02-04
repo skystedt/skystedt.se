@@ -14,6 +14,9 @@ export default class Application extends PIXI.Application {
       skipExtensionImports: true
     });
 
+    // ResizePlugin overwrite the resize method, we overwrite it back to the original
+    app.resize = Application.prototype.resize.bind(app);
+
     return app;
   }
 
