@@ -29,7 +29,6 @@ const STARS = 100;
 
 export default class Game {
   #parent;
-  #renderingInformation = /** @type {RenderingInformation} */ (Uninitialized);
   #currentFps = /** @type {() => number} */ (Uninitialized);
   #view = /** @type {View} */ (Uninitialized);
   #input = /** @type {Input} */ (Uninitialized);
@@ -58,8 +57,6 @@ export default class Game {
     application.element.classList.add('game');
     this.#parent.append(application.element);
 
-    this.#renderingInformation = RenderingContext.information(application.element);
-
     await this.load(renderer, application);
     this.#startFrameLoop();
     await this.#communication.connect();
@@ -71,7 +68,7 @@ export default class Game {
    */
   async load(renderer, application) {
     this.#currentFps = () => application.ticker.FPS;
-    this.#view = new View(application, application.element, true);
+    this.#view = new View(application, true);
     this.#input = new Input(this.#view);
     this.#communication = new Communication(
       this.#communicationReceived.bind(this),
@@ -144,13 +141,12 @@ export default class Game {
 
   #checkFps() {
     const fps = Math.round(this.#currentFps());
+    const renderingInformation = RenderingContext.information(this.#view.element);
 
-    this.#logFpsMetric(fps, 0);
+    this.#logFpsMetric(fps, renderingInformation, 0);
 
     // eslint-disable-next-line no-console
-    console.debug(
-      `Context: ${this.#renderingInformation.context}, Information: ${this.#renderingInformation.information}`
-    );
+    console.debug(`Context: ${renderingInformation.context}, Information: ${renderingInformation.information}`);
 
     if (fps >= LOGIC_FPS) {
       // eslint-disable-next-line no-console
@@ -162,13 +158,14 @@ export default class Game {
 
   /**
    * @param {number} fps
+   * @param {RenderingInformation} renderingInformation
    * @param {number} logTry
    */
-  #logFpsMetric(fps, logTry) {
+  #logFpsMetric(fps, renderingInformation, logTry) {
     const { insights } = /** @type {{ insights: ApplicationInsights }} */ (/** @type {unknown} */ (window));
 
     if (insights) {
-      insights.trackMetric({ name: 'fps', average: fps }, this.#renderingInformation);
+      insights.trackMetric({ name: 'fps', average: fps }, renderingInformation);
     } else if (logTry < MAX_LOG_METRIC_RETRIES) {
       setTimeout(this.#logFpsMetric.bind(this), 1000, fps, logTry + 1);
     }

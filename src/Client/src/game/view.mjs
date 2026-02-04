@@ -14,15 +14,14 @@ export default class View {
 
   /**
    * @param {Application} application
-   * @param {HTMLElement} element
    * @param {boolean} ignoreBorders
    */
-  constructor(application, element, ignoreBorders = false) {
+  constructor(application, ignoreBorders = false) {
     this.#application = application;
 
-    this.#converter = new ViewConverter(this, element, ignoreBorders);
+    this.#converter = new ViewConverter(this, application.element, ignoreBorders);
 
-    element.addEventListener('contextmenu', (event) => event.preventDefault());
+    application.element.addEventListener('contextmenu', (event) => event.preventDefault());
 
     this.#gameSize = new Size(WIDTH, HEIGHT);
     this.#viewSize = new Size(WIDTH, HEIGHT);
@@ -30,6 +29,10 @@ export default class View {
     this.#resize();
 
     window.addEventListener('resize', this.#resize.bind(this));
+  }
+
+  get element() {
+    return this.#application.element;
   }
 
   get convert() {
