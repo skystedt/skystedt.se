@@ -23,7 +23,7 @@ import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plug
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { postcssOptions } from '../../postcss/config.mjs';
-import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
+import { Chunks, performanceFilter, sideEffects } from '../chunks.mjs';
 import {
   licenseAcceptable,
   licenseAdditionals,
@@ -80,7 +80,7 @@ export default {
       chunks: 'all',
       minSize: 0,
       minSizeReduction: 0,
-      cacheGroups
+      cacheGroups: Chunks.cacheGroups('modern')
     },
     minimizer: [
       new TerserPlugin({
@@ -121,7 +121,7 @@ export default {
       },
       {
         test: /\.m?js$/i,
-        include: dir.src,
+        include: dir.src, // node_modules is not included in modern
         use: {
           loader: 'babel-loader',
           options: {
