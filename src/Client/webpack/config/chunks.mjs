@@ -23,6 +23,129 @@ export const sideEffects = {
 };
 
 /**
+ * @param {string | undefined} moduleName
+ * @returns {string}
+ */
+const mapVendorModuleNameToChunk = (moduleName) => {
+  // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunksname
+  // "You can also use on demand named chunks, but you must be careful that the selected modules are only used under this chunk."
+
+  if (moduleName?.startsWith('@microsoft/applicationinsights-')) {
+    return 'insights';
+  }
+  // cSpell:disable
+  switch (moduleName) {
+    case 'webpack':
+    case 'webpack-dev-server':
+    case 'ansi-html-community':
+    case 'html-entities':
+    case 'events':
+    case 'mini-css-extract-plugin': {
+      return 'development';
+    }
+    case '@babel/runtime': {
+      return 'babel_runtime';
+    }
+    case 'pixi.js':
+    case '@pixi/colord':
+    case 'earcut':
+    case 'eventemitter3':
+    case 'parse-svg-path': {
+      return 'pixi';
+    }
+    case 'core-js': {
+      return 'polyfills';
+    }
+    case 'unfetch-polyfill': {
+      return 'polyfills';
+    }
+    case 'navigator.sendbeacon': {
+      return 'polyfills';
+    }
+    case 'element-polyfill': {
+      return 'polyfills';
+    }
+    case '@microsoft/dynamicproto-js':
+    case '@nevware21/ts-async':
+    case '@nevware21/ts-utils': {
+      return 'insights';
+    }
+    default: {
+      throw new Error(`Unspecified cache group for node_modules package: ${moduleName}`);
+    }
+  }
+  // cSpell:enable
+};
+
+/**
+ * @param {'modern' | 'legacy'} build
+ * @returns {CacheGroups}
+ */
+export const cacheGroups = (build) =>
+  /** @type {CacheGroups} */ ({
+    default: false, // disable default/defaultVendors cache groups, to prevent entrypoints to end up in their own chunks
+    defaultVendors: false,
+    app: {
+      test: path.resolve(dir.src, 'index.mjs'),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'app'
+    },
+    styles: {
+      test: dir.src,
+      type: Helpers.wildcardMatch('css/*'),
+      name: 'styles'
+    },
+    game: {
+      test: path.resolve(dir.src, 'game'),
+      type: Helpers.wildcardMatch('javascript/*', 'asset/inline'),
+      name: 'game'
+    },
+    renderers: {
+      // Have all renderers except for Pixi be in the game chunk
+      test: (module) =>
+        Helpers.cacheGroupFolderTest(path.resolve(dir.src, 'renderers'), module) &&
+        !Helpers.cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'game'
+    },
+    pixi: {
+      test: (module) => Helpers.cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'pixi'
+    },
+    insights: {
+      test: path.resolve(dir.src, 'insights'),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'insights'
+    },
+    polyfills: {
+      test: path.resolve(dir.src, 'polyfills.mjs'),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'polyfills'
+    },
+    babel_runtime: {
+      test: (module) => Helpers.cacheGroupFolderTest(path.resolve(dir.node_modules, '@babel/runtime'), module),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: build === 'modern' ? 'app' : 'polyfills'
+    },
+    vendors: {
+      test: (module) => Helpers.cacheGroupFolderTest(dir.node_modules, module),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: (module) => mapVendorModuleNameToChunk(Helpers.vendorModuleToModuleName(module))
+    },
+    ignored: {
+      test: (module) => module.identifier && module.identifier().startsWith('ignored|'),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: (module) => {
+        console.warn(`Using ignored module: ${module.identifier()}`);
+        const [, modulePath] = module.identifier().split('|');
+        const moduleName = path.relative(dir.node_modules, modulePath);
+        return mapVendorModuleNameToChunk(moduleName);
+      }
+    }
+  });
+
+/**
  * @param {string} filePath
  * @returns {boolean}
  */
@@ -32,8 +155,8 @@ export const transformPackages = (filePath) => {
     return false;
   }
 
-  const moduleName = Chunks.resolveModuleName(filePath);
-  const chunk = Chunks.mapVendorModuleNameToChunk(moduleName);
+  const moduleName = Helpers.resolveModuleName(filePath);
+  const chunk = mapVendorModuleNameToChunk(moduleName);
 
   switch (chunk) {
     case 'development': {
@@ -66,131 +189,8 @@ export const transformPackages = (filePath) => {
   }
 };
 
-export class Chunks {
-  /**
-   * @param {'modern' | 'legacy'} build
-   * @returns {CacheGroups}
-   */
-  static cacheGroups(build) {
-    return /** @type {CacheGroups} */ ({
-      default: false, // disable default/defaultVendors cache groups, to prevent entrypoints to end up in their own chunks
-      defaultVendors: false,
-      app: {
-        test: path.resolve(dir.src, 'index.mjs'),
-        type: this.#wildcardMatch('javascript/*'),
-        name: 'app'
-      },
-      styles: {
-        test: dir.src,
-        type: this.#wildcardMatch('css/*'),
-        name: 'styles'
-      },
-      game: {
-        test: path.resolve(dir.src, 'game'),
-        type: this.#wildcardMatch('javascript/*', 'asset/inline'),
-        name: 'game'
-      },
-      renderers: {
-        // Have all renderers except for Pixi be in the game chunk
-        test: (module) =>
-          this.#cacheGroupFolderTest(path.resolve(dir.src, 'renderers'), module) &&
-          !this.#cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
-        type: this.#wildcardMatch('javascript/*'),
-        name: 'game'
-      },
-      pixi: {
-        test: (module) => this.#cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
-        type: this.#wildcardMatch('javascript/*'),
-        name: 'pixi'
-      },
-      insights: {
-        test: path.resolve(dir.src, 'insights'),
-        type: this.#wildcardMatch('javascript/*'),
-        name: 'insights'
-      },
-      polyfills: {
-        test: path.resolve(dir.src, 'polyfills.mjs'),
-        type: this.#wildcardMatch('javascript/*'),
-        name: 'polyfills'
-      },
-      babel_runtime: {
-        test: (module) => this.#cacheGroupFolderTest(path.resolve(dir.node_modules, '@babel/runtime'), module),
-        type: this.#wildcardMatch('javascript/*'),
-        name: build === 'modern' ? 'app' : 'polyfills'
-      },
-      vendors: {
-        test: (module) => this.#cacheGroupFolderTest(dir.node_modules, module),
-        type: this.#wildcardMatch('javascript/*'),
-        name: (module) => this.mapVendorModuleNameToChunk(this.#vendorModuleToModuleName(module))
-      },
-      ignored: {
-        test: (module) => module.identifier && module.identifier().startsWith('ignored|'),
-        type: this.#wildcardMatch('javascript/*'),
-        name: (module) => {
-          console.warn(`Using ignored module: ${module.identifier()}`);
-          const [, modulePath] = module.identifier().split('|');
-          const moduleName = path.relative(dir.node_modules, modulePath);
-          return this.mapVendorModuleNameToChunk(moduleName);
-        }
-      }
-    });
-  }
-
-  /**
-   * @param {string | undefined} moduleName
-   * @returns {string}
-   */
-  static mapVendorModuleNameToChunk(moduleName) {
-    // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunksname
-    // "You can also use on demand named chunks, but you must be careful that the selected modules are only used under this chunk."
-
-    if (moduleName?.startsWith('@microsoft/applicationinsights-')) {
-      return 'insights';
-    }
-    // cSpell:disable
-    switch (moduleName) {
-      case 'webpack':
-      case 'webpack-dev-server':
-      case 'ansi-html-community':
-      case 'html-entities':
-      case 'events':
-      case 'mini-css-extract-plugin': {
-        return 'development';
-      }
-      case '@babel/runtime': {
-        return 'babel_runtime';
-      }
-      case 'pixi.js':
-      case '@pixi/colord':
-      case 'earcut':
-      case 'eventemitter3':
-      case 'parse-svg-path': {
-        return 'pixi';
-      }
-      case 'core-js': {
-        return 'polyfills';
-      }
-      case 'unfetch-polyfill': {
-        return 'polyfills';
-      }
-      case 'navigator.sendbeacon': {
-        return 'polyfills';
-      }
-      case 'element-polyfill': {
-        return 'polyfills';
-      }
-      case '@microsoft/dynamicproto-js':
-      case '@nevware21/ts-async':
-      case '@nevware21/ts-utils': {
-        return 'insights';
-      }
-      default: {
-        throw new Error(`Unspecified cache group for node_modules package: ${moduleName}`);
-      }
-    }
-    // cSpell:enable
-  }
-
+// eslint-disable-next-line unicorn/no-static-only-class
+class Helpers {
   /**
    * @param {string | undefined} relativePath
    * @returns {string}
@@ -222,7 +222,7 @@ export class Chunks {
    * @param {...string} patterns
    * @returns {(value: string) => boolean}
    */
-  static #wildcardMatch(...patterns) {
+  static wildcardMatch(...patterns) {
     return (value) => patterns.some((pattern) => minimatch(value, pattern));
   }
 
@@ -231,7 +231,7 @@ export class Chunks {
    * @param {webpack.Module} module
    * @returns {boolean}
    */
-  static #cacheGroupFolderTest(targetFolder, module) {
+  static cacheGroupFolderTest(targetFolder, module) {
     return isSubPath(targetFolder, /** @type {webpack.NormalModule} */ (module).resource);
   }
 
@@ -239,7 +239,7 @@ export class Chunks {
    * @param {webpack.Module} module
    * @returns {string}
    */
-  static #vendorModuleToModuleName(module) {
+  static vendorModuleToModuleName(module) {
     const normalModule = /** @type {webpack.NormalModule} */ (module);
 
     const descriptionFileName = /** @type {string | undefined} */ (

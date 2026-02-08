@@ -5,7 +5,7 @@ import RendererImplementation from '../../../src/renderers/renderer-implementati
 import { dir, rendererPath } from '../../dir.mjs';
 import LicenseWebpackPluginWrapper from '../../plugins/license-webpack-plugin-wrapper.mjs';
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
-import { Chunks, performanceFilter, sideEffects, transformPackages } from '../chunks.mjs';
+import { cacheGroups, performanceFilter, sideEffects, transformPackages } from '../chunks.mjs';
 import {
   licenseAcceptable,
   licenseAdditionals,
@@ -32,7 +32,7 @@ export default {
       chunks: 'all',
       minSize: 0,
       minSizeReduction: 0,
-      cacheGroups: Chunks.cacheGroups('legacy')
+      cacheGroups: cacheGroups('legacy')
     },
     minimizer: [
       new TerserPlugin({

@@ -23,7 +23,7 @@ import ThrowOnAssetEmittedPlugin from '../../plugins/throw-on-asset-emitted-plug
 import ThrowOnNestedPackagePlugin from '../../plugins/throw-on-nested-package.mjs';
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { postcssOptions } from '../../postcss/config.mjs';
-import { Chunks, performanceFilter, sideEffects } from '../chunks.mjs';
+import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 import {
   licenseAcceptable,
   licenseAdditionals,
@@ -80,7 +80,7 @@ export default {
       chunks: 'all',
       minSize: 0,
       minSizeReduction: 0,
-      cacheGroups: Chunks.cacheGroups('modern')
+      cacheGroups: cacheGroups('modern')
     },
     minimizer: [
       new TerserPlugin({
