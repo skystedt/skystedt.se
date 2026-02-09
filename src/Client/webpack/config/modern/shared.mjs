@@ -80,7 +80,7 @@ export default {
       chunks: 'all',
       minSize: 0,
       minSizeReduction: 0,
-      cacheGroups
+      cacheGroups: cacheGroups('modern')
     },
     minimizer: [
       new TerserPlugin({
@@ -121,7 +121,7 @@ export default {
       },
       {
         test: /\.m?js$/i,
-        include: dir.src,
+        include: dir.src, // node_modules is not included in modern
         use: {
           loader: 'babel-loader',
           options: {

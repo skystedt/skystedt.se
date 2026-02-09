@@ -1,5 +1,7 @@
 // cSpell:ignore picocolors
 import browserslist from 'browserslist';
+import { minimatch } from 'minimatch';
+import path from 'node:path';
 import pc from 'picocolors';
 import webpack from 'webpack';
 
@@ -35,3 +37,11 @@ export const mergeConfigurationRules = (configuration) => ({
   devServer: { $set: configuration.devServer },
   plugins: { $push: configuration.plugins || [] }
 });
+
+/**
+ * @param {string} parentPath
+ * @param {string} subPath
+ * @returns {boolean}
+ */
+export const isSubPath = (parentPath, subPath) =>
+  !!subPath && minimatch(subPath, path.resolve(parentPath, '**'), { windowsPathsNoEscape: true });

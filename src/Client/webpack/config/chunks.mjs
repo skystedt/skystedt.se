@@ -3,69 +3,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import webpack from 'webpack';
 import { dir } from '../dir.mjs';
+import { isSubPath } from '../utilities.mjs';
 
 /** @typedef { Pick<webpack.RuleSetRule, 'include' | 'exclude'> } SideEffects */
-/** @typedef { Exclude<NonNullable<webpack.Configuration["optimization"]>["splitChunks"], boolean | undefined>["cacheGroups"] } CacheGroups */
+/** @typedef { NonNullable<Exclude<NonNullable<webpack.Configuration["optimization"]>["splitChunks"], boolean | undefined>["cacheGroups"]> } FullCacheGroups */
+// eslint-disable-next-line jsdoc/reject-function-type
+/** @typedef { Exclude<Exclude<Extract<FullCacheGroups[string], object>, Function>, RegExp> } CacheGroup */
+/** @typedef {{ [index: string]: false | CacheGroup } } CacheGroups */
 
-/**
- * @param {...string} patterns
- * @returns {(value: string) => boolean}
- */
-// eslint-disable-next-line arrow-body-style
-const wildcardMatch = (...patterns) => {
-  return (value) => patterns.some((pattern) => minimatch(value, pattern));
-};
-
-/**
- * @param {string} targetFolder
- * @param {webpack.Module} module
- * @returns {boolean}
- */
-const cacheGroupFolderTest = (targetFolder, module) =>
-  !!(/** @type {webpack.NormalModule} */ (module).resource) && // ensure module is webpack.NormalModule
-  minimatch(/** @type {webpack.NormalModule} */ (module).resource, path.resolve(targetFolder, '**'), {
-    windowsPathsNoEscape: true
-  });
-
-/**
- * @param {string} identifier
- * @param {string | undefined} relativePath
- * @returns {string}
- */
-const resolveVendorModuleName = (identifier, relativePath) => {
-  if (!relativePath) {
-    throw new Error(`Can not resolve name for: ${identifier}`);
-  }
-
-  const packageJsonPath = path.resolve(dir.node_modules, relativePath, 'package.json');
-
-  const packageJson = fs.existsSync(packageJsonPath) && fs.readFileSync(packageJsonPath, 'utf8');
-  if (packageJson) {
-    const { name } = JSON.parse(packageJson);
-    if (name) {
-      return name;
-    }
-  }
-
-  const parentPath = path.dirname(relativePath);
-  if (parentPath === '.') {
-    return '';
-  }
-
-  return resolveVendorModuleName(identifier, parentPath);
-};
-
-/**
- * @param {webpack.Module} module
- * @returns {string}
- */
-const vendorModuleToModuleName = (module) => {
-  const normalModule = /** @type {webpack.NormalModule} */ (module);
-  return (
-    /** @type {string | undefined} */ (normalModule.resourceResolveData?.descriptionFileData?.name) ||
-    resolveVendorModuleName(normalModule.identifier(), normalModule.resourceResolveData?.descriptionFileRoot)
-  );
-};
+/** @type {(assetFilename: string) => boolean} */
+export const performanceFilter = (assetFilename) => !minimatch(assetFilename, 'pixi.*.*js');
 
 const pixiSideEffects = [path.resolve(dir.src, 'renderers', 'pixi', 'implementation', 'initialization.mjs')];
 
@@ -75,76 +22,14 @@ export const sideEffects = {
   exclude: [path.resolve(dir.src, 'polyfills.mjs'), ...pixiSideEffects]
 };
 
-/** @type {(assetFilename: string) => boolean} */
-export const performanceFilter = (assetFilename) => !minimatch(assetFilename, 'pixi.*.*js');
-
-/** @type {CacheGroups} */
-export const cacheGroups = {
-  default: false, // disable default/defaultVendors cache groups, to prevent entrypoints to end up in their own chunks
-  defaultVendors: false,
-  app: {
-    test: path.resolve(dir.src, 'index.mjs'),
-    type: wildcardMatch('javascript/*'),
-    name: 'app'
-  },
-  styles: {
-    test: dir.src,
-    type: wildcardMatch('css/*'),
-    name: 'styles'
-  },
-  game: {
-    test: path.resolve(dir.src, 'game'),
-    type: wildcardMatch('javascript/*', 'asset/inline'),
-    name: 'game'
-  },
-  renderers: {
-    // Have all renderers except for Pixi be in the game chunk
-    test: (/** @type {webpack.Module} */ module) =>
-      cacheGroupFolderTest(path.resolve(dir.src, 'renderers'), module) &&
-      !cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
-    type: wildcardMatch('javascript/*'),
-    name: 'game'
-  },
-  pixi: {
-    test: (/** @type {webpack.Module} */ module) =>
-      cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
-    type: wildcardMatch('javascript/*'),
-    name: 'pixi'
-  },
-  insights: {
-    test: path.resolve(dir.src, 'insights'),
-    type: wildcardMatch('javascript/*'),
-    name: 'insights'
-  },
-  polyfills: {
-    test: path.resolve(dir.src, 'polyfills.mjs'),
-    type: wildcardMatch('javascript/*'),
-    name: 'polyfills'
-  },
-  vendors: {
-    test: (/** @type {webpack.Module} */ module) => cacheGroupFolderTest(dir.node_modules, module),
-    type: wildcardMatch('javascript/*'),
-    name: (/** @type {webpack.Module} */ module) => mapVendorModuleNameToChunk(vendorModuleToModuleName(module))
-  },
-  ignored: {
-    test: (/** @type {webpack.Module} */ module) => module.identifier && module.identifier().startsWith('ignored|'),
-    type: wildcardMatch('javascript/*'),
-    name: (/** @type {webpack.Module} */ module) => {
-      console.warn(`Using ignored module: ${module.identifier()}`);
-      const [, modulePath] = module.identifier().split('|');
-      const moduleName = path.relative(dir.node_modules, modulePath);
-      return mapVendorModuleNameToChunk(moduleName);
-    }
-  }
-};
-
 /**
  * @param {string | undefined} moduleName
  * @returns {string}
  */
-function mapVendorModuleNameToChunk(moduleName) {
+const mapVendorModuleNameToChunk = (moduleName) => {
   // https://webpack.js.org/plugins/split-chunks-plugin/#splitchunksname
   // "You can also use on demand named chunks, but you must be careful that the selected modules are only used under this chunk."
+
   if (moduleName?.startsWith('@microsoft/applicationinsights-')) {
     return 'insights';
   }
@@ -159,7 +44,7 @@ function mapVendorModuleNameToChunk(moduleName) {
       return 'development';
     }
     case '@babel/runtime': {
-      return 'app';
+      return 'babel_runtime';
     }
     case 'pixi.js':
     case '@pixi/colord':
@@ -190,4 +75,185 @@ function mapVendorModuleNameToChunk(moduleName) {
     }
   }
   // cSpell:enable
+};
+
+/**
+ * @param {'modern' | 'legacy'} build
+ * @returns {CacheGroups}
+ */
+export const cacheGroups = (build) =>
+  /** @type {CacheGroups} */ ({
+    default: false, // disable default/defaultVendors cache groups, to prevent entrypoints to end up in their own chunks
+    defaultVendors: false,
+    app: {
+      test: path.resolve(dir.src, 'index.mjs'),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'app'
+    },
+    styles: {
+      test: dir.src,
+      type: Helpers.wildcardMatch('css/*'),
+      name: 'styles'
+    },
+    game: {
+      test: path.resolve(dir.src, 'game'),
+      type: Helpers.wildcardMatch('javascript/*', 'asset/inline'),
+      name: 'game'
+    },
+    renderers: {
+      // Have all renderers except for Pixi be in the game chunk
+      test: (module) =>
+        Helpers.cacheGroupFolderTest(path.resolve(dir.src, 'renderers'), module) &&
+        !Helpers.cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'game'
+    },
+    pixi: {
+      test: (module) => Helpers.cacheGroupFolderTest(path.resolve(dir.src, 'renderers', 'pixi'), module),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'pixi'
+    },
+    insights: {
+      test: path.resolve(dir.src, 'insights'),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'insights'
+    },
+    polyfills: {
+      test: path.resolve(dir.src, 'polyfills.mjs'),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: 'polyfills'
+    },
+    babel_runtime: {
+      test: (module) => Helpers.cacheGroupFolderTest(path.resolve(dir.node_modules, '@babel/runtime'), module),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: build === 'modern' ? 'app' : 'polyfills'
+    },
+    vendors: {
+      test: (module) => Helpers.cacheGroupFolderTest(dir.node_modules, module),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: (module) => mapVendorModuleNameToChunk(Helpers.vendorModuleToModuleName(module))
+    },
+    ignored: {
+      test: (module) => module.identifier && module.identifier().startsWith('ignored|'),
+      type: Helpers.wildcardMatch('javascript/*'),
+      name: (module) => {
+        console.warn(`Using ignored module: ${module.identifier()}`);
+        const [, modulePath] = module.identifier().split('|');
+        const moduleName = path.relative(dir.node_modules, modulePath);
+        return mapVendorModuleNameToChunk(moduleName);
+      }
+    }
+  });
+
+/**
+ * @param {string} filePath
+ * @returns {boolean}
+ */
+export const transformPackages = (filePath) => {
+  const isNodeModule = isSubPath(dir.node_modules, filePath);
+  if (!isNodeModule) {
+    return false;
+  }
+
+  const moduleName = Helpers.resolveModuleName(filePath);
+  const chunk = mapVendorModuleNameToChunk(moduleName);
+
+  switch (chunk) {
+    case 'development': {
+      return false;
+    }
+
+    case 'babel_runtime': {
+      return true;
+    }
+
+    case 'pixi': {
+      return false; // pixi.js is transformed but handled separately
+    }
+
+    case 'polyfills': {
+      // eslint-disable-next-line sonarjs/prefer-single-boolean-return
+      if (moduleName === 'core-js') {
+        return false; // don't transform core-js
+      }
+      return true;
+    }
+
+    case 'insights': {
+      return false; // application insights is already transformed to ES5
+    }
+
+    default: {
+      throw new Error(`Unspecified transform configuration for package: ${moduleName}, chunk: ${chunk}`);
+    }
+  }
+};
+
+// eslint-disable-next-line unicorn/no-static-only-class
+class Helpers {
+  /**
+   * @param {string | undefined} relativePath
+   * @returns {string}
+   */
+  static resolveModuleName = (relativePath) => {
+    if (!relativePath) {
+      return '';
+    }
+
+    const packageJsonPath = path.resolve(dir.node_modules, relativePath, 'package.json');
+
+    const packageJson = fs.existsSync(packageJsonPath) && fs.readFileSync(packageJsonPath, 'utf8');
+    if (packageJson) {
+      const { name } = JSON.parse(packageJson);
+      if (name) {
+        return name;
+      }
+    }
+
+    const parentPath = path.dirname(relativePath);
+    if (parentPath === '.') {
+      return '';
+    }
+
+    return this.resolveModuleName(parentPath);
+  };
+
+  /**
+   * @param {...string} patterns
+   * @returns {(value: string) => boolean}
+   */
+  static wildcardMatch(...patterns) {
+    return (value) => patterns.some((pattern) => minimatch(value, pattern));
+  }
+
+  /**
+   * @param {string} targetFolder
+   * @param {webpack.Module} module
+   * @returns {boolean}
+   */
+  static cacheGroupFolderTest(targetFolder, module) {
+    return isSubPath(targetFolder, /** @type {webpack.NormalModule} */ (module).resource);
+  }
+
+  /**
+   * @param {webpack.Module} module
+   * @returns {string}
+   */
+  static vendorModuleToModuleName(module) {
+    const normalModule = /** @type {webpack.NormalModule} */ (module);
+
+    const descriptionFileName = /** @type {string | undefined} */ (
+      normalModule.resourceResolveData?.descriptionFileData?.name
+    );
+    if (descriptionFileName) {
+      return descriptionFileName;
+    }
+
+    const descriptionFileRoot = normalModule.resourceResolveData?.descriptionFileRoot;
+    if (descriptionFileRoot) {
+      return this.resolveModuleName(descriptionFileRoot);
+    }
+
+    throw new Error(`Can not resolve name for: ${normalModule.identifier()}`);
+  }
 }
