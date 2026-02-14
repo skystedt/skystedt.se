@@ -53,6 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       YARN_ENABLE_HARDENED_MODE: 1
+      CUSTOM_YARN_PEER_DEPENDENCY_LEVEL: error
     defaults:
       run:
         working-directory: ${{ env.SRC_DIR }}
