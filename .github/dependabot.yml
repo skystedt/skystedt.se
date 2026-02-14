@@ -44,6 +44,8 @@ updates:
     groups:
       client-development:
         dependency-type: "development"
+        exclude-patterns:
+          - "eslint-plugin-sonarjs"
         
   - package-ecosystem: "npm"
     directory: "/src/Plugins"
