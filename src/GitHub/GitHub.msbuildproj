@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.Build.NoTargets/3.7.134">
+  <ItemGroup>
+    <None Include="../../.github/**/*" Exclude="*.msbuildproj;obj/**" />
+  </ItemGroup>
+</Project>

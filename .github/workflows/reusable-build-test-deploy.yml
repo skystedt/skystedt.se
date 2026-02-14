@@ -12,6 +12,7 @@ env:
   API_DIR: "Api"
   CLIENT_DIR: "Client"
   DOTNET_CONFIGURATION: "Release"
+  SCRIPTS_DIR: "${{ github.workspace }}/.github/scripts"
 
 jobs:
   build_api:
@@ -53,7 +54,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       YARN_ENABLE_HARDENED_MODE: 1
-      CUSTOM_YARN_PEER_DEPENDENCY_LEVEL: error
     defaults:
       run:
         working-directory: ${{ env.SRC_DIR }}
@@ -69,6 +69,14 @@ jobs:
 
       - name: Corepack Enable
         run: corepack enable
+        
+      - name: Dotnet Setup
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: ${{ env.SRC_DIR }}/global.json
+
+      - name: Merge Yarn Settings
+        run: dotnet run ${{ env.SCRIPTS_DIR }}/MergeYarnSettings.cs -- ${{ env.CLIENT_DIR }}/.yarnrc.production.yml
 
       - name: Yarn Install
         run: yarn install --immutable
