@@ -45,6 +45,7 @@ updates:
       client-development:
         dependency-type: "development"
         exclude-patterns:
+          - "eslint"
           - "eslint-plugin-sonarjs"
         
   - package-ecosystem: "npm"
