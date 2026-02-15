@@ -32,6 +32,8 @@ updates:
       api:
         patterns:
           - "*"
+        exclude-patterns:
+          - "Microsoft.ApplicationInsights.WorkerService"
           
   - package-ecosystem: "npm"
     directory: "/src/Client"
