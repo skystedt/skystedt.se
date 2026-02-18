@@ -4632,9 +4632,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-loader@npm:7.1.3":
-  version: 7.1.3
-  resolution: "css-loader@npm:7.1.3"
+"css-loader@npm:7.1.4":
+  version: 7.1.4
+  resolution: "css-loader@npm:7.1.4"
   dependencies:
     icss-utils: "npm:^5.1.0"
     postcss: "npm:^8.4.40"
@@ -4645,14 +4645,14 @@ __metadata:
     postcss-value-parser: "npm:^4.2.0"
     semver: "npm:^7.6.3"
   peerDependencies:
-    "@rspack/core": 0.x || 1.x
+    "@rspack/core": 0.x || ^1.0.0 || ^2.0.0-0
     webpack: ^5.27.0
   peerDependenciesMeta:
     "@rspack/core":
       optional: true
     webpack:
       optional: true
-  checksum: 10c0/8743a8f1a0beff371d0fbeae7dbae7b079e546c734e3c936f0c5dc4603a716a576200e9261c934565584cf0e090cca444efb613efa4282ee3fcab81db4c73c7e
+  checksum: 10c0/a3a3a6b564d4fcf978961be8bc6ca06fb3836fc8fbd729ddae4b0b94166a0f5ccf119fb3301a6fecbe90608a8edbfd418bdc644cf053615e6271aa65b3fdc00b
   languageName: node
   linkType: hard
 
@@ -5380,9 +5380,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-compat@npm:6.1.0":
-  version: 6.1.0
-  resolution: "eslint-plugin-compat@npm:6.1.0"
+"eslint-plugin-compat@npm:6.2.0":
+  version: 6.2.0
+  resolution: "eslint-plugin-compat@npm:6.2.0"
   dependencies:
     "@mdn/browser-compat-data": "npm:^6.1.1"
     ast-metadata-inferer: "npm:^0.8.1"
@@ -5393,8 +5393,8 @@ __metadata:
     lodash.memoize: "npm:^4.1.2"
     semver: "npm:^7.6.2"
   peerDependencies:
-    eslint: ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10c0/8210d30a28d10a9737ffc65394077a8f489f497e45346ee68aa0f15d757385f661ebbe59bd968a47008f9be9d032b716eb25a80fe3f9c2332c855a2d69f65d2f
+    eslint: ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+  checksum: 10c0/07214b9259010bdc1291cb98da72531b2829dd54e3d2224ec0888e3213e595b489be57234a961b27b38f663107aae0f18406221f5bca9d1e254276a5c652c642
   languageName: node
   linkType: hard
 
@@ -5437,9 +5437,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:62.5.5":
-  version: 62.5.5
-  resolution: "eslint-plugin-jsdoc@npm:62.5.5"
+"eslint-plugin-jsdoc@npm:62.6.0":
+  version: 62.6.0
+  resolution: "eslint-plugin-jsdoc@npm:62.6.0"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.84.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -5457,7 +5457,7 @@ __metadata:
     to-valid-identifier: "npm:^1.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10c0/1b7ebfe401031d28c1055898d1321deb8aff85c130d8c9f3975d2359627d7ba09202c47fbd4c43c34817c4a378e507f4cc7b8f80200fdb68e4800324eb1e17c3
+  checksum: 10c0/454bcdbe54628be9eac9bce64a3e4a44e85a73c535431ccb62a6469af5956fd7ff049974d9a91692bc89431ee719f71fa2477c0a1194f7add5b4b961f20f23fa
   languageName: node
   linkType: hard
 
@@ -7520,15 +7520,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:10.2.0":
-  version: 10.2.0
-  resolution: "minimatch@npm:10.2.0"
-  dependencies:
-    brace-expansion: "npm:^5.0.2"
-  checksum: 10c0/256e72812bb99a86cdc788bf46a4da3f6e139db9123e20ed85a6795b93fdc0b76468ac511eb5535a023adb02a53fd598f971e990d0ca3bd6de6d41ea0199def1
-  languageName: node
-  linkType: hard
-
 "minimatch@npm:10.2.1":
   version: 10.2.1
   resolution: "minimatch@npm:10.2.1"
@@ -8492,15 +8483,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-loader@npm:8.2.0":
-  version: 8.2.0
-  resolution: "postcss-loader@npm:8.2.0"
+"postcss-loader@npm:8.2.1":
+  version: 8.2.1
+  resolution: "postcss-loader@npm:8.2.1"
   dependencies:
     cosmiconfig: "npm:^9.0.0"
     jiti: "npm:^2.5.1"
     semver: "npm:^7.6.2"
   peerDependencies:
-    "@rspack/core": 0.x || 1.x
+    "@rspack/core": 0.x || ^1.0.0 || ^2.0.0-0
     postcss: ^7.0.0 || ^8.0.1
     webpack: ^5.0.0
   peerDependenciesMeta:
@@ -8508,7 +8499,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10c0/471f9a1c313522580f3385b92ab847cf161c6972bedc73525126a3c0a08733f0f6444d04ca9e0a8b1e36b44123e103dfcd8f53378b7e5afc95fa6d9ab423c480
+  checksum: 10c0/8ef4687f05972a85b4ad8e714f692fceec16f334d99edaa09c222dc08d01afcdcf7bed2b3a45f7888900cb9fd3324b9741d98ce694e33e87bebdc038dd17e30b
   languageName: node
   linkType: hard
 
@@ -9746,7 +9737,7 @@ __metadata:
     browserslist: "npm:4.28.1"
     bytes: "npm:3.1.2"
     core-js: "npm:3.48.0"
-    css-loader: "npm:7.1.3"
+    css-loader: "npm:7.1.4"
     css-minimizer-webpack-plugin: "npm:7.0.4"
     datauri: "npm:4.1.0"
     diff: "npm:8.0.3"
@@ -9757,9 +9748,9 @@ __metadata:
     eslint-config-prettier: "npm:10.1.8"
     eslint-import-resolver-custom-alias: "npm:1.3.2"
     eslint-import-resolver-exports: "npm:1.0.0-beta.5"
-    eslint-plugin-compat: "npm:6.1.0"
+    eslint-plugin-compat: "npm:6.2.0"
     eslint-plugin-import-x: "npm:4.16.1"
-    eslint-plugin-jsdoc: "npm:62.5.5"
+    eslint-plugin-jsdoc: "npm:62.6.0"
     eslint-plugin-n: "npm:17.24.0"
     eslint-plugin-prettier: "npm:5.5.5"
     eslint-plugin-promise: "npm:7.2.1"
@@ -9775,14 +9766,14 @@ __metadata:
     license-checker-rseidelsohn: "npm:4.4.2"
     license-webpack-plugin: "npm:4.0.2"
     mini-css-extract-plugin: "npm:2.10.0"
-    minimatch: "npm:10.2.0"
+    minimatch: "npm:10.2.1"
     navigator.sendbeacon: "npm:0.0.20"
     parse5: "npm:8.0.0"
     picocolors: "npm:1.1.1"
     pixi.js: "npm:8.16.0"
     postcss: "npm:8.5.6"
     postcss-load-config: "npm:6.0.1"
-    postcss-loader: "npm:8.2.0"
+    postcss-loader: "npm:8.2.1"
     postcss-merge-rules: "npm:7.0.7"
     postcss-preset-env: "npm:11.1.3"
     prettier: "npm:3.8.1"
