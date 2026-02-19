@@ -44,8 +44,6 @@ updates:
     groups:
       client-development:
         dependency-type: "development"
-        exclude-patterns:
-          - "eslint"
         
   - package-ecosystem: "npm"
     directory: "/src/Plugins"

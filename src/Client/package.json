@@ -22,11 +22,11 @@
   },
   "packageManager": "yarn@4.12.0+sha512.f45ab632439a67f8bc759bf32ead036a1f413287b9042726b7cc4818b7b49e14e9423ba49b18f9e06ea4941c1ad062385b1d8760a8d5091a1a31e5f6219afca8",
   "devDependencies": {
-    "@babel/core": "7.29.0",
-    "@babel/eslint-parser": "7.28.6",
-    "@babel/helper-compilation-targets": "7.28.6",
-    "@babel/plugin-transform-runtime": "7.29.0",
-    "@babel/preset-env": "7.29.0",
+    "@babel/core": "8.0.0-rc.2",
+    "@babel/eslint-parser": "8.0.0-rc.2",
+    "@babel/helper-compilation-targets": "8.0.0-rc.2",
+    "@babel/plugin-transform-runtime": "8.0.0-rc.2",
+    "@babel/preset-env": "8.0.0-rc.2",
     "@eslint-community/eslint-plugin-eslint-comments": "4.6.0",
     "@stylistic/eslint-plugin": "5.9.0",
     "babel-loader": "10.0.0",
@@ -38,7 +38,7 @@
     "datauri": "4.1.0",
     "diff": "8.0.3",
     "enhanced-resolve": "5.20.0",
-    "eslint": "9.39.2",
+    "eslint": "10.0.1",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-import-resolver-typescript": "4.4.4",
@@ -83,7 +83,7 @@
     "webpack-subresource-integrity": "5.1.0"
   },
   "dependencies": {
-    "@babel/runtime": "7.28.6",
+    "@babel/runtime": "8.0.0-rc.2",
     "@microsoft/applicationinsights-web": "3.3.11",
     "core-js": "3.48.0",
     "element-polyfill": "1.1.0",
@@ -92,7 +92,12 @@
     "unfetch": "5.0.0"
   },
   "resolutions": {
-    "eslint-config-airbnb-base": "peer-patch:#eslint@^9;eslint-plugin-import:eslint-plugin-import-x",
+    "babel-loader": "peer-patch:#@babel/core@^8",
+    "@eslint-community/eslint-plugin-eslint-comments": "peer-patch:#eslint@^10",
+    "eslint-plugin-import-x": "peer-patch:#eslint@^10",
+    "eslint-plugin-promise": "peer-patch:#eslint@^10",
+    "eslint-webpack-plugin": "peer-patch:#eslint@^10",
+    "eslint-config-airbnb-base": "peer-patch:#eslint@^10;eslint-plugin-import:eslint-plugin-import-x",
     "@microsoft/applicationinsights-web": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-analytics-js": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-cfgsync-js": "peer-patch:#tslib:-",

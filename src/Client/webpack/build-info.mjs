@@ -1,13 +1,10 @@
-import _babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
+import babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
 import bytes from 'bytes';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { dir } from './dir.mjs';
 import BrowserslistUpdatePlugin, { BrowserslistUpdateDependency } from './plugins/browserslist-update-plugin.mjs';
 import { browserslistBrowsers } from './utilities.mjs';
-
-// eslint-disable-next-line jsdoc/reject-any-type
-const babelTargets = /** @type {_babelTargets} */ (/** @type {any} */ (_babelTargets).default);
 
 export default class BuildInfo {
   /** @typedef {{ built: string }} Version */
