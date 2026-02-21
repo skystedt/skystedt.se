@@ -1,10 +1,10 @@
-﻿{
+{
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
 
-    "APPINSIGHTS_INSTRUMENTATIONKEY": "1ef798fd-96b6-4e8b-a8c0-ea41a23d05b8",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": "InstrumentationKey=1ef798fd-96b6-4e8b-a8c0-ea41a23d05b8;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/;ApplicationId=c5f5fbef-d0ce-4ca9-befe-794c4b287eb3",
     "CosmosDB": "<secret>",
     "WebPubSubConnectionString": "<secret>"
   }
