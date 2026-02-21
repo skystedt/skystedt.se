@@ -4,9 +4,9 @@ import comments from '@eslint-community/eslint-plugin-eslint-comments/configs';
 import stylistic from '@stylistic/eslint-plugin';
 import airbnb from 'eslint-config-airbnb-base';
 import prettier from 'eslint-config-prettier/flat';
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import compat from 'eslint-plugin-compat';
 import { flatConfigs as importX } from 'eslint-plugin-import-x';
-// eslint-disable-next-line import-x/no-named-as-default
 import jsdoc from 'eslint-plugin-jsdoc';
 import nodePlugin from 'eslint-plugin-n';
 import promisePlugin from 'eslint-plugin-promise';
@@ -14,8 +14,6 @@ import security from 'eslint-plugin-security';
 import { configs as sonarjs } from 'eslint-plugin-sonarjs';
 import unicorn from 'eslint-plugin-unicorn';
 import globals from 'globals';
-import RendererImplementation from './src/renderers/renderer-implementation.mjs';
-import { rendererPath } from './webpack/dir.mjs';
 
 /** @typedef { import("eslint").Linter.Config } Config */
 /** @typedef { import("eslint").Linter.RulesRecord } Rules */
@@ -178,14 +176,7 @@ export default [
     ...importX.recommended,
     name: 'plugin/import-x/recommended',
     settings: {
-      'import-x/resolver': {
-        'eslint-import-resolver-exports': {},
-        'eslint-import-resolver-custom-alias': {
-          alias: {
-            $renderer: rendererPath(RendererImplementation.PixiWithHtmlFallback)
-          }
-        }
-      }
+      'import-x/resolver-next': [createTypeScriptImportResolver()]
     }
   },
   {

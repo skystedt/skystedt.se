@@ -20,7 +20,6 @@ const sideEffects = () => {
 
 /** @type {Contract} */
 const initializeRenderer = async () => {
-  // @ts-ignore
   // Use unsafe-eval for PIXI to work correctly with CSP
   await import('pixi.js/unsafe-eval');
 
