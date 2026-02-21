@@ -2,15 +2,12 @@
 import babelRuntime from '@babel/runtime/package.json' with { type: 'json' };
 import corejs from 'core-js/package.json' with { type: 'json' };
 
-/** @typedef { import("@babel/core").TransformOptions } TransformOptions */
+/* eslint-disable jsdoc/reject-any-type */
 /** @typedef { import("@babel/core").PluginItem } PluginItem */
-/** @typedef { import("@babel/core").PluginOptions } PluginOptions */
-/** Augment types with newer definitions since DefinitelyTyped for '@babel/core' is not updated - 2025-06-01 */
-/** @typedef { import("@babel/core").SimpleCacheConfigurator & { (forever: boolean): void } } SimpleCacheConfigurator */
-/** @typedef { import("@babel/core").ConfigAPI & { cache: SimpleCacheConfigurator } } ConfigAPI */
-/** @typedef { (api: ConfigAPI) => TransformOptions } ConfigFunction */
-
-/** @typedef { import("@babel/preset-env").Options } BabelPresetEnvOptions */
+/** @typedef { Extract<PluginItem, [any, any]>[1] } PluginOptions */
+/** @typedef { import("@babel/core").PresetAPI } PresetAPI */
+/** @typedef { (api: PresetAPI) => import("@babel/core").InputOptions } ConfigFunction */
+/* eslint-enable jsdoc/reject-any-type */
 
 /** @typedef { import("@babel/plugin-transform-runtime").Options } BabelPluginTransformRuntimeOptions */
 
@@ -69,15 +66,7 @@ export default function babelConfig(api) {
   api.cache(true);
 
   return {
-    presets: [
-      [
-        '@babel/preset-env',
-        /** @type {BabelPresetEnvOptions} */
-        ({
-          bugfixes: true
-        })
-      ]
-    ],
+    presets: ['@babel/preset-env'],
     plugins: [
       [
         '@babel/plugin-transform-runtime', // "Enables the re-use of Babel's injected helper code"
