@@ -60,7 +60,7 @@
     "license-checker-rseidelsohn": "4.4.2",
     "license-webpack-plugin": "4.0.2",
     "mini-css-extract-plugin": "2.10.0",
-    "minimatch": "10.2.2",
+    "minimatch": "10.2.3",
     "parse5": "8.0.0",
     "picocolors": "1.1.1",
     "postcss": "8.5.6",
