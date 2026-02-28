@@ -37,7 +37,7 @@
     "css-minimizer-webpack-plugin": "7.0.4",
     "datauri": "4.1.0",
     "diff": "8.0.3",
-    "enhanced-resolve": "5.19.0",
+    "enhanced-resolve": "5.20.0",
     "eslint": "9.39.2",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "10.1.8",
