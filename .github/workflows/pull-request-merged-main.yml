@@ -1,7 +1,7 @@
 name: Pull Request - Merged main
 
 concurrency:
-  group: pull-request-merged-main-${{ github.ref }}
+  group: pull-request-merged-main-${{ github.event.number }}
   cancel-in-progress: false
 
 on:

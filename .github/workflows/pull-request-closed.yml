@@ -1,9 +1,8 @@
 name: Pull Request - Closed
 
-# use the same concurrency group as pull-request.yml
-# to force Closed to run after currently running actions are finished
+# wait for any in-progress pull-request.yml runs on the same PR to finish before starting cleanup
 concurrency:
-  group: pull-request-${{ github.ref }}
+  group: pull-request-${{ github.event.number }}
   cancel-in-progress: false
 
 on:
