@@ -1,7 +1,7 @@
 name: Pull Request
 
 concurrency:
-  group: pull-request-${{ github.ref }}
+  group: pull-request-${{ github.event.number }}
   cancel-in-progress: true
 
 on:
