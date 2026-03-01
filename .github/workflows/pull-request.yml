@@ -6,7 +6,7 @@ concurrency:
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, closed]
+    types: [opened, synchronize, reopened]
 
 permissions:
   actions: read
@@ -16,8 +16,5 @@ permissions:
 jobs:
   build_test_and_deploy:
     name: Build, Test and Deploy
-    # Triggering on 'closed' causes a new run in the same concurrency group, cancelling any in-progress run
-    # The if condition then prevents the job from actually doing any work when the PR is closed
-    if: github.event.action != 'closed'
     uses: ./.github/workflows/reusable-build-test-deploy.yml
     secrets: inherit
