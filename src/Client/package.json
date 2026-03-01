@@ -92,6 +92,7 @@
     "unfetch": "5.0.0"
   },
   "resolutions": {
+    "eslint-plugin-sonarjs/minimatch": "^10.2.4",
     "eslint-config-airbnb-base": "peer-patch:#eslint@^9;eslint-plugin-import:eslint-plugin-import-x",
     "@microsoft/applicationinsights-web": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-analytics-js": "peer-patch:#tslib:-",
