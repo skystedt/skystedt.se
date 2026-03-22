@@ -23,6 +23,7 @@ export const polyfillCorejsModern = {
     //   core-js: 3.44.0, https://zloirock.github.io/core-js/master/compat/
     //   browserslist: 1.0.30001727
     //                                            chrome  edge        firefox     ios         opera   opera_m safari      samsung
+    'es.array.includes',                      //                                  10.3+                       13.1
     'es.array.push',                          //  66-121  18,92-121               10.3-15.8   89-102  80      13.1-15.6   21-25
     'es.iterator.constructor',                //  66-121  18,92-121   78,115-128  10.3-18.3   89-102  80      13.1-18.3   21-25
     'es.iterator.find',                       //  66-134  18,92-134   78,115-140  10.3+       89-117  80      13.1+       21+
