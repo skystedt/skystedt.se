@@ -84,7 +84,7 @@
   },
   "dependencies": {
     "@babel/runtime": "7.29.2",
-    "@microsoft/applicationinsights-web": "3.3.11",
+    "@microsoft/applicationinsights-web": "3.4.1",
     "core-js": "3.49.0",
     "element-polyfill": "1.1.0",
     "navigator.sendbeacon": "0.0.20",
@@ -97,7 +97,6 @@
     "@microsoft/applicationinsights-analytics-js": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-cfgsync-js": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-channel-js": "peer-patch:#tslib:-",
-    "@microsoft/applicationinsights-common": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-core-js": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-dependencies-js": "peer-patch:#tslib:-",
     "@microsoft/applicationinsights-properties-js": "peer-patch:#tslib:-"
