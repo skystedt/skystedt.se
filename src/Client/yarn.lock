@@ -9583,6 +9583,11 @@ __metadata:
     webpack-cli: "npm:7.0.2"
     webpack-dev-server: "npm:5.2.3"
     webpack-subresource-integrity: "npm:5.1.0"
+  dependenciesMeta:
+    core-js:
+      built: false
+    unrs-resolver:
+      built: false
   languageName: unknown
   linkType: soft
 
