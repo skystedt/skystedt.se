@@ -91,6 +91,14 @@
     "pixi.js": "8.18.1",
     "unfetch": "5.0.0"
   },
+  "dependenciesMeta": {
+    "core-js": {
+      "built": false
+    },
+    "unrs-resolver": {
+      "built": false
+    }
+  },
   "resolutions": {
     "eslint-config-airbnb-base": "peer-patch:#eslint@^9;eslint-plugin-import:eslint-plugin-import-x",
     "@microsoft/applicationinsights-web": "peer-patch:#tslib:-",
