@@ -1,5 +1,5 @@
 // cSpell:ignore nonconstructor
-import babelParser from '@babel/eslint-parser';
+import * as babelParser from '@babel/eslint-parser';
 import comments from '@eslint-community/eslint-plugin-eslint-comments/configs';
 import stylistic from '@stylistic/eslint-plugin';
 import airbnb from 'eslint-config-airbnb-base';
