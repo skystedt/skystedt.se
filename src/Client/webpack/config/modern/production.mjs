@@ -4,10 +4,10 @@ import path from 'node:path';
 import StylelintPlugin from 'stylelint-webpack-plugin';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
+import BuildInfo from '../../build-info.mjs';
 import { dir } from '../../dir.mjs';
 import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
 import { printProgress } from '../../utilities.mjs';
-import { buildInfo } from './shared.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
@@ -42,6 +42,6 @@ export default {
       failOnError: true,
       failOnWarning: true
     }),
-    new PostCompilationPrintPlugin(() => buildInfo.resolved)
+    new PostCompilationPrintPlugin(() => BuildInfo.instance.resolved)
   ]
 };

@@ -12,10 +12,9 @@ export const licenseAcceptable = {
   // Results in "ERROR in license-webpack-plugin: unacceptable license found for ..."
   redistributed: [
     'MIT', //           https://www.tldrlegal.com/license/mit-license
-    'ISC', //           https://www.tldrlegal.com/license/isc-license
-    'Apache-2.0' //     https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0
+    'ISC' //            https://www.tldrlegal.com/license/isc-license
   ],
-  // Results in " ERROR in LicenseCheckUsePlugin: Unacceptable license used in: ..."
+  // Results in "ERROR in LicenseCheckUsePlugin: Unacceptable license used in: ..."
   used: [
     'MIT', //           https://www.tldrlegal.com/license/mit-license
     'MIT-0', //         https://opensource.org/license/mit-0
