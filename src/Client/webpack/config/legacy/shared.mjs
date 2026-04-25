@@ -2,6 +2,7 @@ import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import RendererImplementation from '../../../src/renderers/renderer-implementation.mjs';
+import BuildInfo from '../../build-info.mjs';
 import { dir, rendererPath } from '../../dir.mjs';
 import LicenseWebpackPluginWrapper from '../../plugins/license-webpack-plugin-wrapper.mjs';
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
@@ -104,7 +105,10 @@ export default {
       acceptableLicenses: licenseAcceptable.redistributed,
       formatter: licenseFormatter,
       additionals: licenseAdditionals.legacy,
-      overrides: licenseOverrides
+      overrides: licenseOverrides,
+      callback: (name, version, licenseId) => {
+        BuildInfo.instance.addLicense('redistributed', name, version, licenseId);
+      }
     }),
     new ThrowOnUnnamedChunkPlugin()
   ]

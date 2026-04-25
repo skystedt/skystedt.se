@@ -18,7 +18,8 @@ import webpack from 'webpack';
  *     licenses?: { [sourcePackage: string]: string },
  *     files?: { [sourcePackage: string]: { module: string, file: string }},
  *     versions?: { [sourcePackage: string]: string }
- *   }
+ *   },
+ *   callback?: (name: string, version: string, licenseId: string) => void
  * }} LicenseWebpackPluginWrapperOptions
  */
 /** @typedef { (name: string, version: string, licenseId: string, licenseText: string) => string } LicenseFormatter */
@@ -91,8 +92,15 @@ export default class LicenseWebpackPluginWrapper {
     if (!version) {
       throw new Error(`Version not found for module: ${module.name}`);
     }
+
+    const licenseId = module.licenseId || '';
+
     const formatter = options.formatter || LicenseWebpackPluginWrapper.#defaultFormatter;
-    return formatter(module.name, version, module.licenseId || '', module.licenseText?.trim() || '');
+    const formattedLicense = formatter(module.name, version, licenseId, module.licenseText?.trim() || '');
+
+    options.callback?.(module.name, version, licenseId);
+
+    return formattedLicense;
   }
 
   /** @type { LicenseFormatter } */

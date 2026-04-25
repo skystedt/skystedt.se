@@ -41,8 +41,6 @@ const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin
   /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
 );
 
-export const buildInfo = new BuildInfo();
-
 /** @typedef {{ [directive: string]: string | string[] }} CspPolicy */
 let /** @type {CspPolicy | undefined} */ cspPolicy;
 const cspCallback = (/** @type {CspPolicy} */ policy) => {
@@ -172,9 +170,14 @@ export default {
       acceptableLicenses: licenseAcceptable.redistributed,
       formatter: licenseFormatter,
       additionals: licenseAdditionals.modern,
-      overrides: licenseOverrides
+      overrides: licenseOverrides,
+      callback: (name, version, licenseId) => {
+        BuildInfo.instance.addLicense('redistributed', name, version, licenseId);
+      }
     }),
-    new LicenseCheckUsePlugin(licenseAcceptable.used),
+    new LicenseCheckUsePlugin(licenseAcceptable.used, (name, version, licenseId) => {
+      BuildInfo.instance.addLicense('used', name, version, licenseId);
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(dir.src, 'index.html'),
       favicon: path.resolve(dir.src, 'favicon.ico'),
@@ -247,8 +250,9 @@ export default {
     new ThrowOnUnnamedChunkPlugin(),
     new ThrowOnAssetEmittedPlugin('polyfills.*.mjs'), // if an error is thrown by this, enable debug in BabelOptions to check what rules are causing it
     new CreateFilePlugin(dir.publish, 'staticwebapp.config.json', staticWebAppConfig),
-    new CreateFilePlugin(dir.dist, 'build/version.json', () => buildInfo.version()),
-    new CreateFilePlugin(dir.dist, 'build/browsers.json', () => buildInfo.browsers()),
-    new CreateFilePlugin(dir.dist, 'build/sizes.json', () => buildInfo.sizes())
+    new CreateFilePlugin(dir.dist, 'build/version.json', () => BuildInfo.instance.version()),
+    new CreateFilePlugin(dir.dist, 'build/browsers.json', () => BuildInfo.instance.browsers()),
+    new CreateFilePlugin(dir.dist, 'build/licenses.json', () => BuildInfo.instance.licenseSummary()),
+    new CreateFilePlugin(dir.dist, 'build/sizes.json', () => BuildInfo.instance.sizes())
   ]
 };

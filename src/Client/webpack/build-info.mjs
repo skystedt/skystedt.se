@@ -8,6 +8,7 @@ import { browserslistBrowsers } from './utilities.mjs';
 
 export default class BuildInfo {
   /** @typedef {{ built: string }} Version */
+
   /**
    * @template T
    * @typedef {{ all: T, modern: T, legacy: T }} Environments
@@ -15,14 +16,32 @@ export default class BuildInfo {
   /**
    * @typedef {{ [browser: string]: string[] }} BrowserVersions
    * @typedef {{ [target: string]: string }} BabelTargets
-   * @typedef {{ "caniuse-lite": string, "baseline-browser-mapping": string, browserslist: Environments<BrowserVersions>, babel: Environments<BabelTargets> }} Browsers
+   * @typedef {{
+   *   "caniuse-lite": string,
+   *   "baseline-browser-mapping": string,
+   *   browserslist: Environments<BrowserVersions>,
+   *   babel: Environments<BabelTargets>
+   * }} Browsers
    */
+
+  /**
+   * @typedef {{ [package: string]: string }} LicenseDetails
+   * @typedef {{ [license: string]: number }} LicenseSummary
+   * @typedef {{
+   *   details: { redistributed: LicenseDetails, used: LicenseDetails },
+   *   summary: { redistributed: LicenseSummary, used: LicenseSummary }
+   * }} Licenses
+   */
+
   /** @typedef {{ [file: string]: string }} Sizes */
 
-  /** @type {{ version?: Version, browsers?: Browsers, sizes?: Sizes }} */
+  static instance = new BuildInfo();
+
+  /** @type {{ version?: Version, browsers?: Browsers, licenses?: Licenses, sizes?: Sizes }} */
   #resolved = {
     version: undefined,
     browsers: undefined,
+    licenses: undefined,
     sizes: undefined
   };
 
@@ -67,6 +86,46 @@ export default class BuildInfo {
 
     this.#resolved.browsers = result;
     return result;
+  }
+
+  /** @returns {Licenses["summary"]} */
+  licenseSummary() {
+    if (!this.#resolved.licenses) {
+      return { redistributed: {}, used: {} };
+    }
+
+    const summary = {
+      redistributed: this.#summarizeLicenses(this.#resolved.licenses.details.redistributed),
+      used: this.#summarizeLicenses(this.#resolved.licenses.details.used)
+    };
+
+    this.#resolved.licenses.summary = summary;
+    return summary;
+  }
+
+  /**
+   * @param {LicenseDetails} licenses
+   * @returns {LicenseSummary}
+   */
+  #summarizeLicenses(licenses) {
+    const summary = /** @type {LicenseSummary} */ ({});
+    for (const [, license] of Object.entries(licenses)) {
+      summary[license] = (summary[license] ?? 0) + 1;
+    }
+    return Object.fromEntries(
+      Object.entries(summary).toSorted((a, b) => (b[1] === a[1] ? a[0].localeCompare(b[0]) : b[1] - a[1]))
+    );
+  }
+
+  /**
+   * @param {"redistributed" | "used"} licenseType
+   * @param {string} name
+   * @param {string} version
+   * @param {string} licenseId
+   */
+  addLicense(licenseType, name, version, licenseId) {
+    this.#resolved.licenses ??= { details: { redistributed: {}, used: {} }, summary: { redistributed: {}, used: {} } };
+    this.#resolved.licenses.details[licenseType][`${name}@${version}`] = licenseId;
   }
 
   /** @returns {Promise<Sizes>} */
