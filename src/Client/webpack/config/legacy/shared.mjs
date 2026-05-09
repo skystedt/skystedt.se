@@ -1,5 +1,4 @@
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import TerserPlugin from 'terser-webpack-plugin';
+import MinimizerPlugin from 'minimizer-webpack-plugin';
 import webpack from 'webpack';
 import RendererImplementation from '../../../src/renderers/renderer-implementation.mjs';
 import BuildInfo from '../../build-info.mjs';
@@ -15,6 +14,9 @@ import {
   licenseOverrides,
   licensePreamble
 } from '../licenses.mjs';
+
+/** @typedef { import("terser").MinifyOptions } TerserMinifyOptions */
+/** @typedef { import("cssnano").Options } CssnanoOptions */
 
 /** @type {webpack.Configuration} */
 export default {
@@ -36,16 +38,27 @@ export default {
       cacheGroups: cacheGroups('legacy')
     },
     minimizer: [
-      new TerserPlugin({
+      new MinimizerPlugin({
+        test: [/\.m?js$/i, /\.css$/i],
+        minify: [MinimizerPlugin.terserMinify, MinimizerPlugin.cssnanoMinify],
         extractComments: false, // don't extract comments to a separate LICENSE file, license-webpack-plugin handles licenses
-        terserOptions: {
-          format: {
-            comments: false, // don't include comments in the output
-            preamble: licensePreamble
-          }
-        }
-      }),
-      new CssMinimizerPlugin()
+        minimizerOptions: [
+          /** @type {TerserMinifyOptions} */
+          ({
+            /* terser */
+            module: false,
+            format: {
+              comments: false, // don't include comments in the output
+              preamble: licensePreamble
+            }
+          }),
+          /** @type {CssnanoOptions} */
+          ({
+            /* cssnano */
+            preset: 'default'
+          })
+        ]
+      })
     ],
     realContentHash: true,
     removeAvailableModules: true,

@@ -1,11 +1,10 @@
 // cSpell:ignore staticwebapp, corejs, subresource, caniuse
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import _HtmlInlineCssWebpackPlugin from 'html-inline-css-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { minimatch } from 'minimatch';
+import MinimizerPlugin from 'minimizer-webpack-plugin';
 import path from 'node:path';
-import TerserPlugin from 'terser-webpack-plugin';
 import webpack from 'webpack';
 import { SubresourceIntegrityPlugin } from 'webpack-subresource-integrity';
 import { polyfillCorejs, polyfillCorejsModern } from '../../../babel.config.mjs';
@@ -40,6 +39,10 @@ const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin
   // eslint-disable-next-line jsdoc/reject-any-type
   /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
 );
+
+/** @typedef { import("terser").MinifyOptions } TerserMinifyOptions */
+/** @typedef { import("cssnano").Options } CssnanoOptions */
+/** @typedef { import("html-minifier-terser").Options } HtmlMinifierTerserOptions */
 
 /** @typedef {{ [directive: string]: string | string[] }} CspPolicy */
 let /** @type {CspPolicy | undefined} */ cspPolicy;
@@ -81,17 +84,27 @@ export default {
       cacheGroups: cacheGroups('modern')
     },
     minimizer: [
-      new TerserPlugin({
+      new MinimizerPlugin({
+        test: [/\.m?js$/i, /\.css$/i],
+        minify: [MinimizerPlugin.terserMinify, MinimizerPlugin.cssnanoMinify],
         extractComments: false, // don't extract comments to a separate LICENSE file, license-webpack-plugin handles licenses
-        terserOptions: {
-          module: true,
-          format: {
-            comments: false, // don't include comments in the output
-            preamble: licensePreamble
-          }
-        }
-      }),
-      new CssMinimizerPlugin()
+        minimizerOptions: [
+          /** @type {TerserMinifyOptions} */
+          ({
+            /* terser */
+            module: true,
+            format: {
+              comments: false, // don't include comments in the output
+              preamble: licensePreamble
+            }
+          }),
+          /** @type {CssnanoOptions} */
+          ({
+            /* cssnano */
+            preset: 'default'
+          })
+        ]
+      })
     ],
     realContentHash: true,
     removeAvailableModules: true,
@@ -182,7 +195,7 @@ export default {
       template: path.resolve(dir.src, 'index.html'),
       favicon: path.resolve(dir.src, 'favicon.ico'),
       scriptLoading: 'module',
-      minify: 'auto'
+      minify: true // don't use minimizer-webpack-plugin to minify html, since the html hasn't yet been emitted when it runs
     }),
     new MoveHookHtmlWebpackPlugin(), // Required for CSP
     new TagsHtmlWebpackPlugin({
