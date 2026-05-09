@@ -12,7 +12,8 @@ export const licenseAcceptable = {
   // Results in "ERROR in license-webpack-plugin: unacceptable license found for ..."
   redistributed: [
     'MIT', //           https://www.tldrlegal.com/license/mit-license
-    'ISC' //            https://www.tldrlegal.com/license/isc-license
+    'ISC', //           https://www.tldrlegal.com/license/isc-license                   /* only used for development */
+    'Apache-2.0' //     https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0 /* only used for development when running start */
   ],
   // Results in "ERROR in LicenseCheckUsePlugin: Unacceptable license used in: ..."
   used: [
