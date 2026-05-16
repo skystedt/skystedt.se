@@ -6362,13 +6362,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immutability-helper@npm:3.1.1":
-  version: 3.1.1
-  resolution: "immutability-helper@npm:3.1.1"
-  checksum: 10c0/daf4f3a696b8735c5d2c9b1bac42908b66bfc18ea5484bccf6658f3e622e1486663b5ef781e1a407ee81183e16942e8b2596cc859ea94d522ba07731c2845f0e
-  languageName: node
-  linkType: hard
-
 "import-fresh@npm:^3.3.0":
   version: 3.3.1
   resolution: "import-fresh@npm:3.3.1"
@@ -9303,7 +9296,6 @@ __metadata:
     html-inline-css-webpack-plugin: "npm:1.11.2"
     html-webpack-plugin: "npm:5.6.7"
     ignore-loader: "npm:0.1.2"
-    immutability-helper: "npm:3.1.1"
     license-checker-rseidelsohn: "npm:4.4.2"
     license-webpack-plugin: "npm:4.0.2"
     mini-css-extract-plugin: "npm:2.10.2"
@@ -9330,6 +9322,7 @@ __metadata:
     webpack: "npm:5.106.2"
     webpack-cli: "npm:7.0.2"
     webpack-dev-server: "npm:5.2.4"
+    webpack-merge: "npm:6.0.1"
     webpack-subresource-integrity: "npm:5.1.0"
   dependenciesMeta:
     core-js:
@@ -10334,7 +10327,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-merge@npm:^6.0.1":
+"webpack-merge@npm:6.0.1, webpack-merge@npm:^6.0.1":
   version: 6.0.1
   resolution: "webpack-merge@npm:6.0.1"
   dependencies:

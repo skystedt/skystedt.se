@@ -3,7 +3,6 @@ import browserslist from 'browserslist';
 import { minimatch } from 'minimatch';
 import path from 'node:path';
 import pc from 'picocolors';
-import webpack from 'webpack';
 
 export const printProgress =
   (/** @type {string} */ environment) =>
@@ -23,20 +22,6 @@ export const browserslistBrowsers = (environment) => {
   const browsers = browserslist(null, { env: environment });
   return browsers;
 };
-
-/**
- * @typedef {import("immutability-helper").Spec<webpack.Configuration>} ImmutabilityHelperSpec
- * @param {webpack.Configuration} configuration
- * @returns {ImmutabilityHelperSpec}
- */
-export const mergeConfigurationRules = (configuration) => ({
-  mode: { $set: configuration.mode },
-  devtool: { $set: configuration.devtool },
-  entry: { $set: configuration.entry },
-  optimization: { $merge: configuration.optimization || {} },
-  devServer: { $set: configuration.devServer },
-  plugins: { $push: configuration.plugins || [] }
-});
 
 /**
  * @param {string} parentPath
