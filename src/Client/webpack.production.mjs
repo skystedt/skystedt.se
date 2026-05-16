@@ -1,11 +1,10 @@
-import immutabilityHelper from 'immutability-helper';
+import { merge } from 'webpack-merge';
 import productionLegacy from './webpack/config/legacy/production.mjs';
 import sharedLegacy from './webpack/config/legacy/shared.mjs';
 import productionModern from './webpack/config/modern/production.mjs';
 import sharedModern from './webpack/config/modern/shared.mjs';
-import { mergeConfigurationRules } from './webpack/utilities.mjs';
 
-const legacy = immutabilityHelper(sharedLegacy, mergeConfigurationRules(productionLegacy));
-const modern = immutabilityHelper(sharedModern, mergeConfigurationRules(productionModern));
+const legacy = merge(sharedLegacy, productionLegacy);
+const modern = merge(sharedModern, productionModern);
 
 export default [legacy, modern];
