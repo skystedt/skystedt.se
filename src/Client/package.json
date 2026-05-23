@@ -101,6 +101,7 @@
     }
   },
   "resolutions": {
+    "sockjs/uuid": "^14",
     "@babel/plugin-bugfix-safari-rest-destructuring-rhs-array": "peer-patch:#@babel/core@^8",
     "babel-loader": "peer-patch:#@babel/core@^8",
     "eslint-config-airbnb-base": "peer-patch:#eslint@^10;eslint-plugin-import:eslint-plugin-import-x",
