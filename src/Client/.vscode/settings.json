@@ -1,4 +1,14 @@
 {
+  "files.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "Client.esproj.user": true
+  },
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true,
+    "Client.esproj.user": true
+  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
