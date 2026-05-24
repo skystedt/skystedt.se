@@ -6,14 +6,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "preinstall": "yarn dedupe caniuse-lite baseline-browser-mapping --strategy highest --mode=skip-build",
+    "preinstall": "yarn dedupe-browserslist-packages",
     "build": "webpack --progress --config webpack.development.mjs",
     "production": "webpack --progress --config webpack.production.mjs",
     "start": "webpack serve --config webpack.development.mjs --open",
+    "dedupe-browserslist-packages": "yarn dedupe caniuse-lite baseline-browser-mapping --strategy highest --mode=skip-build",
     "update-yarn": "corepack up",
-    "update-plugin-peer-patch": "yarn plugin import ../Plugins/yarn-plugin-peer-patch/bundles/@yarnpkg/plugin-peer-patch.js",
     "ncu": "yarn dlx npm-check-updates",
-    "update-transitive": "yarn dlx rimraf yarn.lock && yarn install --no-immutable",
+    "update-transitive": "yarn dlx rimraf yarn.lock && yarn install",
     "eslint-inspector": "yarn dlx @eslint/config-inspector"
   },
   "engines": {
@@ -101,16 +101,6 @@
     }
   },
   "resolutions": {
-    "sockjs/uuid": "^14",
-    "@babel/plugin-bugfix-safari-rest-destructuring-rhs-array": "peer-patch:#@babel/core@^8",
-    "babel-loader": "peer-patch:#@babel/core@^8",
-    "eslint-config-airbnb-base": "peer-patch:#eslint@^10;eslint-plugin-import:eslint-plugin-import-x",
-    "@microsoft/applicationinsights-web": "peer-patch:#tslib:-",
-    "@microsoft/applicationinsights-analytics-js": "peer-patch:#tslib:-",
-    "@microsoft/applicationinsights-cfgsync-js": "peer-patch:#tslib:-",
-    "@microsoft/applicationinsights-channel-js": "peer-patch:#tslib:-",
-    "@microsoft/applicationinsights-core-js": "peer-patch:#tslib:-",
-    "@microsoft/applicationinsights-dependencies-js": "peer-patch:#tslib:-",
-    "@microsoft/applicationinsights-properties-js": "peer-patch:#tslib:-"
+    "sockjs/uuid": "^14"
   }
 }
