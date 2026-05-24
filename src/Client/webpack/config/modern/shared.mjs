@@ -195,7 +195,7 @@ export default {
       template: path.resolve(dir.src, 'index.html'),
       favicon: path.resolve(dir.src, 'favicon.ico'),
       scriptLoading: 'module',
-      minify: true // don't use minimizer-webpack-plugin to minify html, since the html hasn't yet been emitted when it runs
+      minify: 'auto' // auto minifies in production but not development, don't use minimizer-webpack-plugin to minify html, since the html hasn't yet been emitted when it runs
     }),
     new MoveHookHtmlWebpackPlugin(), // Required for CSP
     new TagsHtmlWebpackPlugin({
