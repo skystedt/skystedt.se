@@ -1,0 +1,17 @@
+{
+  "folders": [
+    {
+      "name": ".github",
+      "path": "../../../.github"
+    },
+    {
+      "name": "client",
+      "path": ".."
+    },
+    {
+      "name": "publish",
+      "path": "../../publish/Client"
+    }
+  ],
+  "settings": {}
+}
