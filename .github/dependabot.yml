@@ -12,7 +12,7 @@ updates:
       github-actions:
         patterns:
           - "*"
-      
+
   - package-ecosystem: "dotnet-sdk"
     directory: "/src"
     schedule:
@@ -20,7 +20,7 @@ updates:
       day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
-          
+
   - package-ecosystem: "nuget"
     directory: "/src"
     schedule:
@@ -32,7 +32,7 @@ updates:
       api:
         patterns:
           - "*"
-          
+
   - package-ecosystem: "npm"
     directory: "/src/Client"
     schedule:
@@ -44,3 +44,6 @@ updates:
     groups:
       client-development:
         dependency-type: "development"
+      babel:
+        patterns:
+          - "@babel/*"
