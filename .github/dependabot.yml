@@ -50,5 +50,3 @@ updates:
           - "@babel/*"
       client-development:
         dependency-type: "development"
-        exclude-patterns:
-          - "eslint-plugin-unicorn"

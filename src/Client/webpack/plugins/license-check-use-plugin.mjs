@@ -158,7 +158,7 @@ export default class LicenseCheckUsePlugin {
     try {
       return spdxSatisfies(licenseType, acceptableLicenses);
     } catch (error) {
-      logError(`${error}`);
+      logError(String(error));
       return false;
     }
   }

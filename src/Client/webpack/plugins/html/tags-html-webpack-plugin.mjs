@@ -81,9 +81,9 @@ export default class TagsHtmlWebpackPlugin {
       for (const file of files) {
         if (
           minimatch(file, tagOption.path) &&
-          !categorizedTags.some(
+          categorizedTags.every(
             // eslint-disable-next-line unicorn/no-unreadable-array-destructuring
-            ([, , tagFile]) => tagFile === file
+            ([, , tagFile]) => tagFile !== file
           )
         ) {
           const tag = this.#createTag(file, tagOption.tag);

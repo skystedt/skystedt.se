@@ -152,16 +152,14 @@ export default class CspHashesHtmlWebpackPlugin {
           url: node.attrs.find((attribute) => attribute.name === 'src')?.value || null,
           html: getInnerHtml(node)
         });
-      }
-      if (node.nodeName === 'style') {
+      } else if (node.nodeName === 'style') {
         // <style>...</style>
         tags.push({
           type: 'style',
           url: null,
           html: getInnerHtml(node)
         });
-      }
-      if (
+      } else if (
         node.nodeName === 'link' &&
         node.attrs.some((attribute) => attribute.name === 'rel' && attribute.value === 'stylesheet')
       ) {
@@ -171,8 +169,7 @@ export default class CspHashesHtmlWebpackPlugin {
           url: node.attrs.find((attribute) => attribute.name === 'href')?.value || null,
           html: null
         });
-      }
-      if (
+      } else if (
         node.nodeName === 'link' &&
         node.attrs.some((attribute) => attribute.name === 'rel' && attribute.value === 'preload') &&
         node.attrs.some((attribute) => attribute.name === 'as' && attribute.value === 'script')
@@ -240,8 +237,10 @@ export default class CspHashesHtmlWebpackPlugin {
 
   /** @param {ParsedTag[]} tags */
   #calculateIntegrityHashes(tags) {
-    for (const tag of tags.filter((tag) => tag.html)) {
-      tag.integrity = CspHashesHtmlWebpackPlugin.#hash(this.#options.hashAlgorithm, /** @type {string} */ (tag.html));
+    for (const tag of tags) {
+      if (tag.html) {
+        tag.integrity = CspHashesHtmlWebpackPlugin.#hash(this.#options.hashAlgorithm, /** @type {string} */ (tag.html));
+      }
     }
   }
 
@@ -255,8 +254,7 @@ export default class CspHashesHtmlWebpackPlugin {
       if (tag.integrity) {
         if (tag.type === 'script') {
           policy[SCRIPT_SRC] = [...policy[SCRIPT_SRC], tag.integrity];
-        }
-        if (tag.type === 'style') {
+        } else if (tag.type === 'style') {
           policy[STYLE_SRC] = [...policy[STYLE_SRC], tag.integrity];
         }
       }
@@ -298,6 +296,7 @@ export default class CspHashesHtmlWebpackPlugin {
       return html;
     }
     const metaTagRegex = /(<meta\s+http-equiv=["']Content-Security-Policy["']\s+content=)["']["']/i;
+    // eslint-disable-next-line unicorn/no-unsafe-string-replacement
     return html.replace(metaTagRegex, `$1"${builtPolicy}"`);
   }
 }

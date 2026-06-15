@@ -19,6 +19,9 @@ const appInsights = new ApplicationInsights({
     autoTrackPageVisitTime: true
   }
 });
+
 appInsights.loadAppInsights();
 appInsights.trackPageView();
+
+// eslint-disable-next-line unicorn/no-global-object-property-assignment
 /** @type {Window & { insights?: ApplicationInsights }} */ (window).insights = appInsights;

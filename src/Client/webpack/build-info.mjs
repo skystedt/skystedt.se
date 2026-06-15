@@ -51,8 +51,9 @@ export default class BuildInfo {
 
   /** @returns {Version} */
   version() {
+    const date = new Date();
     const result = {
-      built: new Date().toISOString().replace('T', ' ').replace('Z', '')
+      built: date.toISOString().replace('T', ' ').replace('Z', '')
     };
 
     this.#resolved.version = result;
@@ -109,7 +110,7 @@ export default class BuildInfo {
    */
   #summarizeLicenses(licenses) {
     const summary = /** @type {LicenseSummary} */ ({});
-    for (const [, license] of Object.entries(licenses)) {
+    for (const license of Object.values(licenses)) {
       summary[license] = (summary[license] ?? 0) + 1;
     }
     return Object.fromEntries(
@@ -137,12 +138,14 @@ export default class BuildInfo {
     const result = /** @type {Sizes} */ ({});
     await Promise.all(
       relativePaths.map(async (relativePath) => {
-        if (fileTypes.has(path.extname(relativePath))) {
-          const fullPath = path.resolve(dir.dist, relativePath);
-          const stat = await fs.stat(fullPath);
-          const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' }) ?? '?';
-          result[relativePath] = size;
+        if (!fileTypes.has(path.extname(relativePath))) {
+          return;
         }
+
+        const fullPath = path.resolve(dir.dist, relativePath);
+        const stat = await fs.stat(fullPath);
+        const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' }) ?? '?';
+        result[relativePath] = size;
       })
     );
 
@@ -159,7 +162,7 @@ export default class BuildInfo {
     const versions = /** @type {BrowserVersions} */ ({});
     for (const browser of browsers) {
       const [name, version] = browser.split(' ');
-      versions[name] = [...(versions[name] || []), version].toSorted();
+      versions[name] = [...(versions[name] || []), version].toSorted((a, b) => a.localeCompare(b));
     }
     return versions;
   };

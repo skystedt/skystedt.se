@@ -47,6 +47,7 @@ const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin
 /** @typedef {{ [directive: string]: string | string[] }} CspPolicy */
 let /** @type {CspPolicy | undefined} */ cspPolicy;
 const cspCallback = (/** @type {CspPolicy} */ policy) => {
+  // eslint-disable-next-line unicorn/no-top-level-assignment-in-function
   cspPolicy = policy;
 };
 const staticWebAppConfig = () => {

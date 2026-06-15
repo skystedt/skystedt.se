@@ -21,22 +21,21 @@ import globals from 'globals';
 
 /** @typedef { keyof import("@stylistic/eslint-plugin").UnprefixedRuleOptions } StylisticRuleKey */
 
-/** @typedef { typeof promisePlugin & { configs: { [config: string]: Config } } } PromiseConfig */
+/** @typedef { typeof promisePlugin } PromiseConfig */
 
 /** @returns {Promise<Rules>} */
 const loadAirbnbRules = async () => {
-  const promises = /** @type {Promise<Rules>[]} */ ([]);
+  const rulesArray = /** @type {Rules[]} */ ([]);
 
   for (const rulesFile of airbnb.extends) {
     // Resolve the rules file and import it
     const filePath = import.meta.resolve(rulesFile, 'eslint-config-airbnb-base');
     const pathPrefix = process.platform === 'win32' ? 'file://' : '';
-    const fileImport = import(`${pathPrefix}${filePath}`);
-    const promise = fileImport.then((file) => file.default.rules);
-    promises.push(promise);
+    // eslint-disable-next-line no-await-in-loop
+    const fileImport = await import(`${pathPrefix}${filePath}`);
+    rulesArray.push(fileImport.default.rules);
   }
 
-  const rulesArray = await Promise.all(promises);
   const rules = /** @type {Rules} */ (Object.assign({}, ...rulesArray));
   return rules;
 };
@@ -148,7 +147,7 @@ export default [
     rules: { ...jsdoc.configs['flat/recommended'].rules }
   },
   {
-    .../** @type {PromiseConfig} */ (promisePlugin).configs['flat/recommended'],
+    .../** @type {Config} */ (promisePlugin.configs['flat/recommended']),
     name: 'plugin/promise/recommended'
   },
   {
@@ -262,6 +261,10 @@ export default [
       'unicorn/consistent-function-scoping': 'off', // Opinionated
       'unicorn/no-array-callback-reference': 'off', // Opinionated
       'unicorn/no-zero-fractions': 'off', // Opinionated
+      'unicorn/consistent-class-member-order': 'off', // Opinionated
+      'unicorn/comment-content': 'off', // Opinionated
+      'unicorn/consistent-boolean-name': 'off', // Opinionated
+      'unicorn/no-computed-property-existence-check': 'off', // Unnecessarly complicates code
       'unicorn/prefer-set-has': 'off', // Needs polyfills in some older browsers
       'unicorn/prefer-top-level-await': 'off', // Makes babel give warnings
       'unicorn/prefer-global-this': 'off' // Breaks SplitChunksPlugin with cache group conflict for 'polyfills'
