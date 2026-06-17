@@ -1161,10 +1161,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:8.0.0-rc.6":
-  version: 8.0.0-rc.6
-  resolution: "@babel/runtime@npm:8.0.0-rc.6"
-  checksum: 10c0/804991cfe1469c8f89bbf32fba4ba99b0594ce6d6f25e399e5696d504859684da316586f01d440d8ed093ec731c2a798ae40eba33fcc796c65ef5a0b77bed587
+"@babel/runtime@npm:8.0.0":
+  version: 8.0.0
+  resolution: "@babel/runtime@npm:8.0.0"
+  checksum: 10c0/450857cf52b3a3935d4aad505277201361c86185dad3bdd2ae083d78b76c6265c7fc7610e170c80de1b825d5bfdcfb50697f0853fff922b2661c91cff1fbbd81
   languageName: node
   linkType: hard
 
@@ -9664,7 +9664,7 @@ __metadata:
     "@babel/plugin-bugfix-safari-rest-destructuring-rhs-array": "npm:8.0.0-rc.6"
     "@babel/plugin-transform-runtime": "npm:8.0.0-rc.6"
     "@babel/preset-env": "npm:8.0.0-rc.6"
-    "@babel/runtime": "npm:8.0.0-rc.6"
+    "@babel/runtime": "npm:8.0.0"
     "@eslint-community/eslint-plugin-eslint-comments": "npm:4.7.2"
     "@microsoft/applicationinsights-web": "npm:3.4.1"
     "@stylistic/eslint-plugin": "npm:5.10.0"
