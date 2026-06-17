@@ -77,7 +77,7 @@ export default function babelConfig(api) {
           version: babelRuntime.version // https://babeljs.io/docs/babel-plugin-transform-runtime#version
         })
       ],
-      polyfillCorejs()
+      polyfillCorejs({})
     ]
   };
 }

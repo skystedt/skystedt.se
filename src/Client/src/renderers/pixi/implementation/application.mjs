@@ -15,6 +15,7 @@ export default class Application extends PIXI.Application {
     });
 
     // ResizePlugin overwrite the resize method, we overwrite it back to the original
+    // eslint-disable-next-line unicorn/class-reference-in-static-methods
     app.resize = Application.prototype.resize.bind(app);
 
     return app;

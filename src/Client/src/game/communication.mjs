@@ -44,10 +44,12 @@ export default class Communication {
 
   /** @param {CommunicationDataSend} data */
   sendBeacon(data) {
-    if (this.#connection) {
-      const body = { token: this.#connection.token, ...data };
-      navigator.sendBeacon('/api/position/update', JSON.stringify(body));
+    if (!this.#connection) {
+      return;
     }
+
+    const body = { token: this.#connection.token, ...data };
+    navigator.sendBeacon('/api/position/update', JSON.stringify(body));
   }
 
   /** @returns {Promise<{ token: string, expiresAt: Date, websocketUrl: string, updateInterval: number }?>} */
@@ -82,14 +84,17 @@ export default class Communication {
       this.#connectionAttempt = 1;
 
       const intervalId = setInterval(() => {
-        if (this.#connection) {
-          if (new Date() > this.#connection.expiresAt) {
-            this.#connection.reconnect = true;
-            this.#connection.ws.close();
-            return;
-          }
-          this.#updateCallback();
+        if (!this.#connection) {
+          return;
         }
+
+        if (new Date() > this.#connection.expiresAt) {
+          this.#connection.reconnect = true;
+          this.#connection.ws.close();
+          return;
+        }
+
+        this.#updateCallback();
       }, updateInterval);
 
       this.#connection = { ws, token, expiresAt, intervalId, reconnect: false };

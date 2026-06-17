@@ -84,7 +84,7 @@ export default {
     new AddInlineStylesHtmlWebpackPlugin('#webpack-dev-server-client-overlay { pointer-events: auto }'),
     new PostProcessHtmlWebpackPlugin({
       insertNewLines: true,
-      headIndentation: '    '
+      headIndentation: ' '.repeat(4)
     }),
     new ESLintPlugin({
       extensions: ['.mjs'],
