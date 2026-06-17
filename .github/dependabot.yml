@@ -42,10 +42,10 @@ updates:
       timezone: "Europe/Stockholm"
     open-pull-requests-limit: 10
     groups:
+      babel:
+        patterns:
+          - "@babel/*"
       client-development:
         dependency-type: "development"
         exclude-patterns:
           - "eslint-plugin-unicorn"
-      babel:
-        patterns:
-          - "@babel/*"
