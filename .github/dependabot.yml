@@ -11,7 +11,13 @@ updates:
     groups:
       github-actions:
         patterns:
-          - "*"
+          - "actions/*"
+      codeql:
+        patterns:
+          - "github/codeql-action/*"
+      azure:
+        patterns:
+          - "Azure/*"
 
   - package-ecosystem: "dotnet-sdk"
     directory: "/src"
