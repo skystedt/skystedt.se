@@ -3,10 +3,28 @@
   <head>
     <meta charset="utf-8" />
     <title>Skystedt</title>
-    <!-- prettier-ignore -->
-    <style>html{background:black}</style>
+    <style>
+      html {
+        background: black;
+      }
+      body {
+        flex-direction: column;
+      }
+      body p {
+        margin: 0;
+      }
+      #log {
+        height: 100px;
+        background: white;
+        width: 100%;
+        overflow-y: scroll;
+        pointer-events: all;
+      }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Skystedt" />
   </head>
-  <body></body>
+  <body>
+    <div id="log"></div>
+  </body>
 </html>
