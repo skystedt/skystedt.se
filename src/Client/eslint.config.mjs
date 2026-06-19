@@ -264,23 +264,26 @@ export default [
       'unicorn/consistent-class-member-order': 'off', // Opinionated
       'unicorn/comment-content': 'off', // Opinionated
       'unicorn/consistent-boolean-name': 'off', // Opinionated
+      'unicorn/prefer-continue': 'off', // Opinionated
       'unicorn/no-computed-property-existence-check': 'off', // Unnecessarly complicates code
       'unicorn/prefer-set-has': 'off', // Needs polyfills in some older browsers
       'unicorn/prefer-top-level-await': 'off', // Makes babel give warnings
-      'unicorn/prefer-global-this': 'off' // Breaks SplitChunksPlugin with cache group conflict for 'polyfills'
+      'unicorn/prefer-global-this': 'off', // Breaks SplitChunksPlugin with cache group conflict for 'polyfills'
+      'unicorn/name-replacements': ['error', { replacements: { application: false } }] /* Opinionated */,
+      'unicorn/default-export-style': ['error', { functions: 'separate' }]
     }
   },
   {
     name: 'overrides/unicorn/build',
     files: buildFiles,
     rules: {
-      'unicorn/prevent-abbreviations': /* Opinionated */ [
+      'unicorn/name-replacements': /* Opinionated */ [
         'error',
         {
-          allowList: {
-            args: true,
-            dir: true,
-            src: true
+          replacements: {
+            args: false,
+            dir: false,
+            src: false
           }
         }
       ]

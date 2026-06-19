@@ -79,13 +79,10 @@ export default class TagsHtmlWebpackPlugin {
   async #addMissingTags(assetTags, categorizedTags, files) {
     for (const tagOption of this.#options.tags) {
       for (const file of files) {
-        if (
-          minimatch(file, tagOption.path) &&
-          categorizedTags.every(
-            // eslint-disable-next-line unicorn/no-unreadable-array-destructuring
-            ([, , tagFile]) => tagFile !== file
-          )
-        ) {
+        const tagIsMissing =
+          // eslint-disable-next-line unicorn/no-unreadable-array-destructuring
+          minimatch(file, tagOption.path) && categorizedTags.every(([, , tagFile]) => tagFile !== file);
+        if (tagIsMissing) {
           const tag = this.#createTag(file, tagOption.tag);
           this.#pushTag(assetTags, categorizedTags, tag);
         }
@@ -100,7 +97,8 @@ export default class TagsHtmlWebpackPlugin {
   #updateTagTypes(assetTags, categorizedTags) {
     for (const [assetTagKey, tag, file] of categorizedTags) {
       for (const tagOption of this.#options.tags) {
-        if (minimatch(file, tagOption.path) && tag.tagName !== tagOption.tag) {
+        const tagNeedsUpdate = minimatch(file, tagOption.path) && tag.tagName !== tagOption.tag;
+        if (tagNeedsUpdate) {
           assetTags[assetTagKey] = assetTags[assetTagKey].filter((assetTag) => assetTag !== tag);
           tag.tagName = tagOption.tag;
           this.#pushTag(assetTags, categorizedTags, tag);

@@ -63,7 +63,7 @@ export const polyfillCorejs = (additionalOptions) => [
 ];
 
 /** @type {ConfigFunction} */
-export default function babelConfig(api) {
+const babelConfig = (api) => {
   api.cache(true);
 
   return {
@@ -80,4 +80,5 @@ export default function babelConfig(api) {
       polyfillCorejs({})
     ]
   };
-}
+};
+export default babelConfig;

@@ -172,11 +172,7 @@ export const transformPackages = (filePath) => {
     }
 
     case 'polyfills': {
-      // eslint-disable-next-line sonarjs/prefer-single-boolean-return
-      if (moduleName === 'core-js') {
-        return false; // don't transform core-js
-      }
-      return true;
+      return moduleName !== 'core-js'; // don't transform core-js
     }
 
     case 'insights': {
