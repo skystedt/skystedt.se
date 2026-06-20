@@ -5214,9 +5214,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:63.0.5":
-  version: 63.0.5
-  resolution: "eslint-plugin-jsdoc@npm:63.0.5"
+"eslint-plugin-jsdoc@npm:63.0.6":
+  version: 63.0.6
+  resolution: "eslint-plugin-jsdoc@npm:63.0.6"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.87.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -5234,7 +5234,7 @@ __metadata:
     to-valid-identifier: "npm:^1.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10c0/b11fcb7b871df6ccb5651e893ff7c43fd0762368517b44a06f73f3735503deabfa9e7ad3096fc815a3232ce3cf435aee469e362d87187527144621b50ee2a980
+  checksum: 10c0/0c8ae40ea75bc37c5fcccdba31dbdba269c029b5d7c8e16e87975662780c26e5e376219f2901c14fe03ffa04a3d3539d839e79e69321e9a6444b64efa4cf1f2a
   languageName: node
   linkType: hard
 
@@ -5303,25 +5303,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-sonarjs@npm:4.0.3":
-  version: 4.0.3
-  resolution: "eslint-plugin-sonarjs@npm:4.0.3"
+"eslint-plugin-sonarjs@npm:4.1.0":
+  version: 4.1.0
+  resolution: "eslint-plugin-sonarjs@npm:4.1.0"
   dependencies:
     "@eslint-community/regexpp": "npm:^4.12.2"
     builtin-modules: "npm:^3.3.0"
     bytes: "npm:^3.1.2"
     functional-red-black-tree: "npm:^1.0.1"
-    globals: "npm:^17.4.0"
+    globals: "npm:^17.6.0"
     jsx-ast-utils-x: "npm:^0.1.0"
     lodash.merge: "npm:^4.6.2"
     minimatch: "npm:^10.2.5"
     scslre: "npm:^0.3.0"
-    semver: "npm:^7.7.4"
+    semver: "npm:^7.8.4"
     ts-api-utils: "npm:^2.5.0"
     typescript: "npm:>=5"
+    yaml: "npm:^2.9.0"
   peerDependencies:
     eslint: ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10c0/9cd451d07e0d898cd99b3666c9d6083347a031db4c01f4c5528cf629ea56b0e484b43db8624e11853b825fab06454e0cf5f452c829763de3334a01fc9b716c2b
+  checksum: 10c0/48609dadd87b43c361df85203c57e56f8dc830ea9c3f7585bb167119757c5cdda0f27806421b09579fcf2dbd08e135189a0c2ab44a01128b3dbcfad51b546b52
   languageName: node
   linkType: hard
 
@@ -5988,7 +5989,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:17.6.0, globals@npm:^17.4.0, globals@npm:^17.6.0":
+"globals@npm:17.6.0, globals@npm:^17.6.0":
   version: 17.6.0
   resolution: "globals@npm:17.6.0"
   checksum: 10c0/cf94fb4329cc5c68cf81018fd68324f413181ee169f0235b0b33b82bc93fe7825a21beea951f83a80e8e4bbdad9c0c80515a145b5fd4b5cb52f2a80db899a93f
@@ -9337,7 +9338,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semver@npm:^7.1.1, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.6.2, semver@npm:^7.6.3, semver@npm:^7.7.1, semver@npm:^7.7.2, semver@npm:^7.7.3, semver@npm:^7.7.4, semver@npm:^7.8.2, semver@npm:^7.8.4":
+"semver@npm:^7.1.1, semver@npm:^7.3.5, semver@npm:^7.3.7, semver@npm:^7.5.3, semver@npm:^7.5.4, semver@npm:^7.6.2, semver@npm:^7.6.3, semver@npm:^7.7.1, semver@npm:^7.7.2, semver@npm:^7.7.3, semver@npm:^7.8.2, semver@npm:^7.8.4":
   version: 7.8.4
   resolution: "semver@npm:7.8.4"
   bin:
@@ -9546,12 +9547,12 @@ __metadata:
     eslint-import-resolver-typescript: "npm:4.4.5"
     eslint-plugin-compat: "npm:7.0.2"
     eslint-plugin-import-x: "npm:4.16.2"
-    eslint-plugin-jsdoc: "npm:63.0.5"
+    eslint-plugin-jsdoc: "npm:63.0.6"
     eslint-plugin-n: "npm:18.1.0"
     eslint-plugin-prettier: "npm:5.5.6"
     eslint-plugin-promise: "npm:7.3.0"
     eslint-plugin-security: "npm:4.0.1"
-    eslint-plugin-sonarjs: "npm:4.0.3"
+    eslint-plugin-sonarjs: "npm:4.1.0"
     eslint-plugin-unicorn: "npm:68.0.0"
     eslint-webpack-plugin: "npm:6.0.0"
     globals: "npm:17.6.0"
@@ -10815,6 +10816,15 @@ __metadata:
   version: 5.0.0
   resolution: "yallist@npm:5.0.0"
   checksum: 10c0/a499c81ce6d4a1d260d4ea0f6d49ab4da09681e32c3f0472dee16667ed69d01dae63a3b81745a24bd78476ec4fcf856114cb4896ace738e01da34b2c42235416
+  languageName: node
+  linkType: hard
+
+"yaml@npm:^2.9.0":
+  version: 2.9.0
+  resolution: "yaml@npm:2.9.0"
+  bin:
+    yaml: bin.mjs
+  checksum: 10c0/f340718df45e97a9551b9bf9dac61c80050bc464513b710debfb5067c380c8472e3b67809cffacb4ab5ffb5e66ef9310816c88b05f371cec60abfedd8c88e0a2
   languageName: node
   linkType: hard
 
