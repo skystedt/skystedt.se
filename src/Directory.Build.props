@@ -3,6 +3,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode>true</RestoreLockedMode>
     <!-- https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#analysismode -->
     <AnalysisMode>Recommended</AnalysisMode>
   </PropertyGroup>
