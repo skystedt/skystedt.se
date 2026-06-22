@@ -12,6 +12,8 @@ permissions:
 
 env:
   SRC_DIR: "src"
+  BRANCH_NAME: "vulnerability-scan/nuget-transitive-dependencies"
+  OUTPUT_FILE_NAME: "vulnerable.json"
 
 jobs:
   scan:
@@ -36,21 +38,28 @@ jobs:
 
       - name: Scan For Vulnerable Packages
         run: |
-          dotnet list package --vulnerable --include-transitive --format json --no-restore > vulnerable.json
-          cat vulnerable.json
+          dotnet list package --vulnerable --include-transitive --format json --no-restore > ${{ env.OUTPUT_FILE_NAME }} || true
+          cat ${{ env.OUTPUT_FILE_NAME }}
 
       - name: Evaluate Scan Result
         id: evaluate
         run: |
-          VULNERABLE=$(jq -r '[.projects[]?.frameworks[]?.transitivePackages[]] | length' vulnerable.json)
-          echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
+          VULNERABLE=$(jq -r '[.projects[]?.frameworks[]?.transitivePackages[]] | length' ${{ env.OUTPUT_FILE_NAME }})
+          echo "VULNERABLE=$VULNERABLE" >> "$GITHUB_ENV"
+          echo "Found $VULNERABLE vulnerable transitive dependencies"
+
+      - name: Check For Existing Pull Request
+        id: check-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --state open --json number --jq '.[0].number')
+          echo "EXISTING_PR=$EXISTING_PR" >> "$GITHUB_ENV"
+          echo "Existing PR: $EXISTING_PR"
 
       - name: Create Branch
-        id: create-branch
-        if: steps.evaluate.outputs.vulnerable != '0'
+        if: env.VULNERABLE != '0' && env.EXISTING_PR == ''
         run: |
-          BRANCH_NAME="vulnerability-scan/nuget-transitive-dependencies-$(date +%Y%m%d-%H%M%S)"
-          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
           git config user.name 'GitHub Actions'
           git config user.email 'actions@github.com'
           git checkout -b "$BRANCH_NAME"
@@ -58,12 +67,26 @@ jobs:
           git push origin "$BRANCH_NAME"
 
       - name: Create Pull Request
-        if: steps.evaluate.outputs.vulnerable != '0'
+        if: env.VULNERABLE != '0' && env.EXISTING_PR == ''
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          BRANCH_NAME="${{ steps.create-branch.outputs.branch_name }}"
-          VULNERABLE_JSON=$(cat vulnerable.json)
-          gh pr create \
-            --base main \
-            --head "$BRANCH_NAME" \
-            --title "Vulnerabilities found in transitive dependencies" \
-            --body "## Vulnerabilities Found in Transitive Dependencies\n\`\`\`json${VULNERABLE_JSON}\`\`\`"
+          VULNERABLE_JSON=$(cat ${{ env.OUTPUT_FILE_NAME }})
+          BODY=$'## Vulnerabilities Found in Transitive Dependencies\n```\n'"${VULNERABLE_JSON}"$'\n```'
+          gh pr create --base main --head "$BRANCH_NAME" --title "Vulnerabilities found in transitive dependencies" --body "$BODY"
+
+      - name: Comment on Existing Pull Request
+        if: env.VULNERABLE != '0' && env.EXISTING_PR != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VULNERABLE_JSON=$(cat ${{ env.OUTPUT_FILE_NAME }})
+          BODY=$'## Updated Vulnerabilities Found in Transitive Dependencies\n```\n'"${VULNERABLE_JSON}"$'\n```'
+          gh pr comment "$EXISTING_PR" --body "$BODY"
+
+      - name: Close Existing Pull Request
+        if: env.VULNERABLE == '0' && env.EXISTING_PR != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr close "$EXISTING_PR" --comment "No vulnerabilities found in transitive dependencies. Closing this PR."
