@@ -36,7 +36,7 @@ jobs:
 
       - name: Scan For Vulnerable Packages
         run: |
-          dotnet list package --vulnerable --include-transitive --format json --no-restore > vulnerable.json
+          dotnet list package --vulnerable --include-transitive --format json --no-restore > vulnerable.json || true
           cat vulnerable.json
 
       - name: Evaluate Scan Result
@@ -59,6 +59,8 @@ jobs:
 
       - name: Create Pull Request
         if: steps.evaluate.outputs.vulnerable != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           BRANCH_NAME="${{ steps.create-branch.outputs.branch_name }}"
           VULNERABLE_JSON=$(cat vulnerable.json)
