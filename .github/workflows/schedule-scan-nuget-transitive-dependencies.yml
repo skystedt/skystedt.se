@@ -1,0 +1,69 @@
+name: Schedule - Scan Nuget Transitive Dependencies
+
+on:
+  schedule:
+    # Run every Saturday at 08:00 UTC (09:00 CET/10:00 CEST), matching Dependabot nuget schedule
+    - cron: "0 8 * * 6"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  SRC_DIR: "src"
+
+jobs:
+  scan:
+    name: Scan Nuget Transitive Dependencies
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ env.SRC_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
+
+      - name: Dotnet Setup
+        uses: actions/setup-dotnet@9a946fdbd5fb07b82b2f5a4466058b876ab72bb2 # 5.3.0
+        with:
+          global-json-file: ${{ env.SRC_DIR }}/global.json
+
+      - name: Dotnet Restore
+        run: dotnet restore
+
+      - name: Scan For Vulnerable Packages
+        run: |
+          dotnet list package --vulnerable --include-transitive --format json --no-restore > vulnerable.json
+          cat vulnerable.json
+
+      - name: Evaluate Scan Result
+        id: evaluate
+        run: |
+          VULNERABLE=$(jq -r '[.projects[]?.frameworks[]?.transitivePackages[]] | length' vulnerable.json)
+          echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
+
+      - name: Create Branch
+        id: create-branch
+        if: steps.evaluate.outputs.vulnerable != '0'
+        run: |
+          BRANCH_NAME="vulnerability-scan/nuget-transitive-dependencies-$(date +%Y%m%d-%H%M%S)"
+          echo "branch_name=$BRANCH_NAME" >> "$GITHUB_OUTPUT"
+          git config user.name 'GitHub Actions'
+          git config user.email 'actions@github.com'
+          git checkout -b "$BRANCH_NAME"
+          git commit --allow-empty -m "Vulnerable Nuget transitive dependency [skip ci]"
+          git push origin "$BRANCH_NAME"
+
+      - name: Create Pull Request
+        if: steps.evaluate.outputs.vulnerable != '0'
+        run: |
+          BRANCH_NAME="${{ steps.create-branch.outputs.branch_name }}"
+          VULNERABLE_JSON=$(cat vulnerable.json)
+          gh pr create \
+            --base main \
+            --head "$BRANCH_NAME" \
+            --title "Vulnerabilities found in transitive dependencies" \
+            --body "## Vulnerabilities Found in Transitive Dependencies\n\`\`\`json${VULNERABLE_JSON}\`\`\`"
