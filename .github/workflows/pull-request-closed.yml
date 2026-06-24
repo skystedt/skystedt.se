@@ -17,4 +17,6 @@ jobs:
   cleanup:
     name: Cleanup
     uses: ./.github/workflows/reusable-cleanup.yml
+    with:
+      pr_number: ${{ github.event.number }}
     secrets: inherit
