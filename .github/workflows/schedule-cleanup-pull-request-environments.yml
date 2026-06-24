@@ -1,0 +1,50 @@
+name: Schedule - Cleanup PR Environments
+
+on:
+  schedule:
+    # Run every day at 07:00 UTC (08:00 CET/09:00 CEST), 1 hour before the other scheduled jobs
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  pull-requests: read
+
+jobs:
+  cleanup:
+    name: Cleanup PR Environments
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # 3.0.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Get Azure SWA Preview Environments
+        run: |
+          ENVIRONMENTS=$(az staticwebapp environment list --name skystedt --query "[?pullRequestTitle!=null].name" | jq -r -c '[.[] | tonumber]')
+          echo "ENVIRONMENTS=$ENVIRONMENTS" >> "$GITHUB_ENV"
+          echo "Found environments: $ENVIRONMENTS"
+
+      - name: Get Open PRs
+        if: env.ENVIRONMENTS != '[]'
+        run: |
+          OPEN_PRS=$(gh pr list --state open --json number | jq -r -c '[.[].number]')
+          echo "OPEN_PRS=$OPEN_PRS" >> "$GITHUB_ENV"
+          echo "Found open PRs: $OPEN_PRS"
+
+      - name: Cleanup Orphaned Environments
+        if: env.ENVIRONMENTS != '[]'
+        run: |
+          echo "$ENVIRONMENTS" | jq -r '.[]' | while IFS= read -r PR_NUMBER; do
+            if ! echo "$OPEN_PRS" | grep -Fw "$PR_NUMBER"; then
+              echo "Cleaning up PR #$PR_NUMBER"
+              gh workflow run reusable-cleanup.yml -f pr_number=$PR_NUMBER
+            fi
+          done
+
+      - name: Azure Logout
+        if: always()
+        run: az logout
