@@ -13,17 +13,36 @@ on:
         required: true
 
 permissions:
-  {}
+  id-token: write
+  
+env:
+  SWA_NAME: "skystedt"
 
 jobs:
   cleanup:
     name: Cleanup
     runs-on: ubuntu-latest
-    env:
-      GITHUB_REF: ${{ format('refs/pull/{0}/merge', inputs.pr_number) }}
     steps:
-      - name: Azure Static Web Apps - Close
-        uses: Azure/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1 # 1
+      - name: Azure Login
+        uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # 3.0.0
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          action: "close"
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Azure Static Web Apps - Close
+        run: |
+          DELETE_OUTPUT=$(az staticwebapp environment delete --name ${{ env.SWA_NAME }} --environment-name ${{ inputs.pr_number }} --yes 2>&1) || DELETE_EXIT=$?
+          if [ ${DELETE_EXIT:-0} -ne 0 ]; then
+            if echo "$DELETE_OUTPUT" | grep -q "Microsoft.Web/locations/staticSitesOperationStatuses/read"; then
+              echo "Ignored error: $DELETE_OUTPUT"
+            else
+              echo "Error deleting static web app environment:"
+              echo "$DELETE_OUTPUT"
+              exit ${DELETE_EXIT}
+            fi
+          fi
+
+      - name: Azure Logout
+        if: always()
+        run: az logout

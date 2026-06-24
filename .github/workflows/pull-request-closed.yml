@@ -10,8 +10,7 @@ on:
     types: [closed]
 
 permissions:
-  actions: read
-  pull-requests: read
+  id-token: write
 
 jobs:
   cleanup:
