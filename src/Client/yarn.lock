@@ -4989,7 +4989,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:5.24.0, enhanced-resolve@npm:^5.17.1, enhanced-resolve@npm:^5.22.0":
+"enhanced-resolve@npm:5.24.1":
+  version: 5.24.1
+  resolution: "enhanced-resolve@npm:5.24.1"
+  dependencies:
+    graceful-fs: "npm:^4.2.4"
+    tapable: "npm:^2.3.3"
+  checksum: 10c0/8716005cfe61b9fd528881d4ff59298c26aeae04184f2f8ae4145886dec71295eaee40a22485e70dd70d1a1b0ef01ae143dffa10c7c0d5f71648398bc0d666ba
+  languageName: node
+  linkType: hard
+
+"enhanced-resolve@npm:^5.17.1, enhanced-resolve@npm:^5.22.0":
   version: 5.24.0
   resolution: "enhanced-resolve@npm:5.24.0"
   dependencies:
@@ -5228,9 +5238,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:63.0.7":
-  version: 63.0.7
-  resolution: "eslint-plugin-jsdoc@npm:63.0.7"
+"eslint-plugin-jsdoc@npm:63.0.8":
+  version: 63.0.8
+  resolution: "eslint-plugin-jsdoc@npm:63.0.8"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.87.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -5248,7 +5258,7 @@ __metadata:
     to-valid-identifier: "npm:^1.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10c0/ad48b09bf90941d9fecdcc22275363dd56a342923b58532ed9945be8b86a1cf4659c849612d4b7e60d18b5dba5e742cf2bc6ed48f3fac7467b512a6d917f2f2f
+  checksum: 10c0/76a4014cd1f5ec20be960cc0aa4670152d86331a45424250e738a25644637d6c156bc36dad250570a8c7549f7157e181a9225bc27fc78cb79d32579a1ec061cb
   languageName: node
   linkType: hard
 
@@ -5340,9 +5350,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-unicorn@npm:68.0.0":
-  version: 68.0.0
-  resolution: "eslint-plugin-unicorn@npm:68.0.0"
+"eslint-plugin-unicorn@npm:69.0.0":
+  version: 69.0.0
+  resolution: "eslint-plugin-unicorn@npm:69.0.0"
   dependencies:
     "@babel/helper-validator-identifier": "npm:^7.29.7"
     "@eslint-community/eslint-utils": "npm:^4.9.1"
@@ -5362,7 +5372,7 @@ __metadata:
     strip-indent: "npm:^4.1.1"
   peerDependencies:
     eslint: ">=10.4"
-  checksum: 10c0/28c123b71d541d32ed1586e6962a6cdca72c70e776141aef63609fd560d16c2f805ff4ff8dccd8d3a66afc65dbfe3c45a1a9e65ebb9703b2082147fb44a2e35e
+  checksum: 10c0/77727900c29daf3850f354117a3781224b75d002122beb1574a39c5dd718d1285a48b50513e544083712ad0c2755136b5583ccac575a3f076d13e5a66726fa05
   languageName: node
   linkType: hard
 
@@ -9568,20 +9578,20 @@ __metadata:
     datauri: "npm:4.1.0"
     diff: "npm:9.0.0"
     element-polyfill: "npm:1.1.0"
-    enhanced-resolve: "npm:5.24.0"
+    enhanced-resolve: "npm:5.24.1"
     eslint: "npm:10.5.0"
     eslint-config-airbnb-base: "npm:15.0.0"
     eslint-config-prettier: "npm:10.1.8"
     eslint-import-resolver-typescript: "npm:4.4.5"
     eslint-plugin-compat: "npm:7.0.2"
     eslint-plugin-import-x: "npm:4.17.0"
-    eslint-plugin-jsdoc: "npm:63.0.7"
+    eslint-plugin-jsdoc: "npm:63.0.8"
     eslint-plugin-n: "npm:18.1.0"
     eslint-plugin-prettier: "npm:5.5.6"
     eslint-plugin-promise: "npm:7.3.0"
     eslint-plugin-security: "npm:4.0.1"
     eslint-plugin-sonarjs: "npm:4.1.0"
-    eslint-plugin-unicorn: "npm:68.0.0"
+    eslint-plugin-unicorn: "npm:69.0.0"
     eslint-webpack-plugin: "npm:6.0.0"
     globals: "npm:17.7.0"
     html-inline-css-webpack-plugin: "npm:1.11.2"
