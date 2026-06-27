@@ -2,8 +2,8 @@ name: Schedule - Scan Nuget Transitive Dependencies
 
 on:
   schedule:
-    # Run every Saturday at 08:00 UTC (09:00 CET/10:00 CEST), matching Dependabot nuget schedule
-    - cron: "0 8 * * 6"
+    # Run every Saturday at 08:40 UTC (09:40 CET/10:40 CEST), near in time when Dependabot is scheduled to run
+    - cron: "40 8 * * 6"
   workflow_dispatch:
 
 permissions:
