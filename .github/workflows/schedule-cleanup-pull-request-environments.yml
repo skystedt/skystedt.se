@@ -2,8 +2,8 @@ name: Schedule - Cleanup PR Environments
 
 on:
   schedule:
-    # Run every day at 07:00 UTC (08:00 CET/09:00 CEST), 1 hour before the other scheduled jobs
-    - cron: "0 7 * * *"
+    # Run every Saturday at 03:40 UTC (04:40 CET/05:40 CEST), some time before Dependabot is scheduled to run
+    - cron: "40 3 * * 6"
   workflow_dispatch:
 
 permissions:
