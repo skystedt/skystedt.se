@@ -89,4 +89,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr close "$EXISTING_PR" --comment "No vulnerabilities found in transitive dependencies. Closing this PR."
+          gh pr close "$EXISTING_PR" --comment "No vulnerabilities found in transitive dependencies. Closing this PR." --delete-branch
