@@ -2,7 +2,7 @@ import path from 'node:path';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
 import { dir } from '../../dir.mjs';
-import { printProgress } from '../../utilities.mjs';
+import ColorProgressPlugin from '../../plugins/color-progress-plugin.mjs';
 
 /** @type {webpack.Configuration} */
 export default {
@@ -16,9 +16,9 @@ export default {
     minimize: true
   },
   plugins: [
-    new webpack.ProgressPlugin(printProgress('legacy')),
     new webpack.DefinePlugin({
       INSTRUMENTATION_KEY: `"${settings.production.INSTRUMENTATION_KEY}"`
-    })
+    }),
+    new ColorProgressPlugin('legacy', true)
   ]
 };
