@@ -48,5 +48,9 @@ updates:
       babel:
         patterns:
           - "@babel/*"
+          - "babel-*"
       client-development:
         dependency-type: "development"
+        update-types:
+          - minor
+          - patch
