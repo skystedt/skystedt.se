@@ -26,16 +26,19 @@ import webpack from 'webpack';
 
 /** Wraps LicenseWebpackPlugin, manages third-party license compliance for redistributed code */
 export default class LicenseWebpackPluginWrapper {
+  /** @type {LicenseWebpackPlugin} */
+  #plugin;
+
   /** @param {LicenseWebpackPluginWrapperOptions} options */
   constructor(options) {
     const pluginOptions = LicenseWebpackPluginWrapper.#convertOptions(options);
-    this.plugin = new LicenseWebpackPlugin(pluginOptions);
+    this.#plugin = new LicenseWebpackPlugin(pluginOptions);
   }
 
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
     // @ts-ignore
-    this.plugin.apply(compiler);
+    this.#plugin.apply(compiler);
   }
 
   /**

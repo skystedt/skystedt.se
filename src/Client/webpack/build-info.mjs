@@ -1,10 +1,19 @@
 import babelTargets, { prettifyTargets as babelPrettifyTargets } from '@babel/helper-compilation-targets';
+import browserslist from 'browserslist';
 import bytes from 'bytes';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { dir } from './dir.mjs';
 import BrowserslistUpdatePlugin, { BrowserslistUpdateDependency } from './plugins/browserslist-update-plugin.mjs';
-import { browserslistBrowsers } from './utilities.mjs';
+
+/**
+ * @param {string} environment
+ * @returns { string[] }
+ */
+export const browserslistBrowsers = (environment) => {
+  const browsers = browserslist(null, { env: environment });
+  return browsers;
+};
 
 export default class BuildInfo {
   /** @typedef {{ built: string }} Version */
