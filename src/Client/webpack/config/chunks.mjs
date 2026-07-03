@@ -3,7 +3,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import webpack from 'webpack';
 import { dir } from '../dir.mjs';
-import { isSubPath } from '../utilities.mjs';
 
 /** @typedef { Pick<webpack.RuleSetRule, 'include' | 'exclude'> } SideEffects */
 /** @typedef { NonNullable<Exclude<NonNullable<webpack.Configuration["optimization"]>["splitChunks"], boolean | undefined>["cacheGroups"]> } FullCacheGroups */
@@ -150,7 +149,7 @@ export const cacheGroups = (build) =>
  * @returns {boolean}
  */
 export const transformPackages = (filePath) => {
-  const isNodeModule = isSubPath(dir.node_modules, filePath);
+  const isNodeModule = Helpers.isSubPath(dir.node_modules, filePath);
   if (!isNodeModule) {
     return false;
   }
@@ -187,6 +186,14 @@ export const transformPackages = (filePath) => {
 
 // eslint-disable-next-line unicorn/no-static-only-class
 class Helpers {
+  /**
+   * @param {string} parentPath
+   * @param {string} subPath
+   * @returns {boolean}
+   */
+  static isSubPath = (parentPath, subPath) =>
+    !!subPath && minimatch(subPath, path.resolve(parentPath, '**'), { windowsPathsNoEscape: true });
+
   /**
    * @param {string | undefined} relativePath
    * @returns {string}
@@ -228,7 +235,7 @@ class Helpers {
    * @returns {boolean}
    */
   static cacheGroupFolderTest(targetFolder, module) {
-    return isSubPath(targetFolder, /** @type {webpack.NormalModule} */ (module).resource);
+    return this.isSubPath(targetFolder, /** @type {webpack.NormalModule} */ (module).resource);
   }
 
   /**
