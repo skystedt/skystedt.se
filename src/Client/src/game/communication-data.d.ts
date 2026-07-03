@@ -4,10 +4,7 @@ export type CommunicationDataSend = {
 };
 
 export type CommunicationData =
-  | CommunicationDataInit
-  | CommunicationDataConnect
-  | CommunicationDataDisconnect
-  | CommunicationDataUpdate;
+  CommunicationDataInit | CommunicationDataConnect | CommunicationDataDisconnect | CommunicationDataUpdate;
 
 export type CommunicationDataInit = {
   type: MessageType.Init;
