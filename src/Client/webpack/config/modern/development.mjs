@@ -24,10 +24,9 @@ export const cspCallback = (/** @type {CspPolicy}} */ policy) => {
   policy['style-src-attr'] = [
     "'unsafe-hashes'",
     // Error overlay
-    "'sha256-dKPMtStvhWirlTIky2ozsboS0Q6fEpiYn8PJwiK2ywo='",
     "'sha256-9i4CO/Nl+gX45HxIVK0YGg311ZbVCsEZzl4uJ47ZNOo='",
     "'sha256-V4C0IT9aeNBiUnxIeGJONTAiAhnmC5iiZqBiYPLqrb0='",
-    "'sha256-2j+NsrE/qRlmhkADxLdqK0AALIC4Gcc77SVRgwXmYCc='"
+    "'sha256-cI6npbLAYrmkX3bdF4enQmhGkRX5+4yR2pVU4vNmPV8='"
   ];
 
   return policy;

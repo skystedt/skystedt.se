@@ -77,8 +77,8 @@
     "typescript": "6.0.3",
     "update-browserslist-db": "1.2.3",
     "webpack": "5.108.3",
-    "webpack-cli": "7.1.0",
-    "webpack-dev-server": "5.2.5",
+    "webpack-cli": "7.2.1",
+    "webpack-dev-server": "6.0.0",
     "webpack-merge": "6.0.1",
     "webpack-subresource-integrity": "5.1.0"
   },
@@ -98,8 +98,5 @@
     "unrs-resolver": {
       "built": false
     }
-  },
-  "resolutions": {
-    "sockjs/uuid": "^14"
   }
 }
