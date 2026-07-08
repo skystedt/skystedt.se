@@ -52,7 +52,7 @@ export default class Application extends PIXI.Application {
   }
 
   /** @type {Contract["resize"]} */
-  // @ts-ignore
+  // @ts-expect-error TS2416
   resize(width, height, scale) {
     this.renderer.resize(width, height, scale);
   }

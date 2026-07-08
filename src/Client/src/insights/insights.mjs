@@ -2,7 +2,7 @@ import { ApplicationInsights, DistributedTracingModes } from '@microsoft/applica
 
 const appInsights = new ApplicationInsights({
   config: {
-    // @ts-ignore
+    // @ts-expect-error TS2304
     // eslint-disable-next-line no-undef
     instrumentationKey: INSTRUMENTATION_KEY,
     cookieCfg: {

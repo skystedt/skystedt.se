@@ -1,18 +1,18 @@
 // cSpell:ignore nonconstructor
 import * as babelParser from '@babel/eslint-parser';
-import comments from '@eslint-community/eslint-plugin-eslint-comments/configs';
-import stylistic from '@stylistic/eslint-plugin';
-import airbnb from 'eslint-config-airbnb-base';
-import prettier from 'eslint-config-prettier/flat';
+import pluginComments from '@eslint-community/eslint-plugin-eslint-comments/configs';
+import pluginStylistic from '@stylistic/eslint-plugin';
+import configAirbnb from 'eslint-config-airbnb-base';
+import configPrettier from 'eslint-config-prettier/flat';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
-import compat from 'eslint-plugin-compat';
-import { flatConfigs as importX } from 'eslint-plugin-import-x';
-import jsdoc from 'eslint-plugin-jsdoc';
-import nodePlugin from 'eslint-plugin-n';
-import promisePlugin from 'eslint-plugin-promise';
-import security from 'eslint-plugin-security';
-import { configs as sonarjs } from 'eslint-plugin-sonarjs';
-import unicorn from 'eslint-plugin-unicorn';
+import pluginCompat from 'eslint-plugin-compat';
+import pluginImportX from 'eslint-plugin-import-x';
+import pluginJsdoc from 'eslint-plugin-jsdoc';
+import pluginN from 'eslint-plugin-n';
+import pluginPromise from 'eslint-plugin-promise';
+import pluginSecurity from 'eslint-plugin-security';
+import pluginSonarjs from 'eslint-plugin-sonarjs';
+import pluginUnicorn from 'eslint-plugin-unicorn';
 import globals from 'globals';
 
 /** @typedef { import("eslint").Linter.Config } Config */
@@ -21,13 +21,11 @@ import globals from 'globals';
 
 /** @typedef { keyof import("@stylistic/eslint-plugin").UnprefixedRuleOptions } StylisticRuleKey */
 
-/** @typedef { typeof promisePlugin } PromiseConfig */
-
 /** @returns {Promise<Rules>} */
 const loadAirbnbRules = async () => {
   const rulesArray = /** @type {Rules[]} */ ([]);
 
-  for (const rulesFile of airbnb.extends) {
+  for (const rulesFile of configAirbnb.extends) {
     // Resolve the rules file and import it
     const filePath = import.meta.resolve(rulesFile, 'eslint-config-airbnb-base');
     const pathPrefix = process.platform === 'win32' ? 'file://' : '';
@@ -66,7 +64,7 @@ const splitAirbnbRules = (rules) => {
   for (const [key, value] of Object.entries(rules)) {
     let newRules = baseRules;
     let newKey = key;
-    if (stylistic.rules[/** @type {StylisticRuleKey} */ (key)]) {
+    if (pluginStylistic.rules[/** @type {StylisticRuleKey} */ (key)]) {
       newRules = stylisticRules;
       newKey = `@stylistic/${key}`;
     } else if (key.startsWith('import/')) {
@@ -138,20 +136,21 @@ export default [
     }
   },
   {
-    .../** @type {Config} */ (comments.recommended),
+    ...pluginComments.recommended,
     name: 'plugin/comments/recommended'
   },
   {
-    ...jsdoc.configs['flat/recommended'],
+    ...pluginJsdoc.configs['flat/recommended'],
     name: 'plugin/jsdoc/recommended',
-    rules: { ...jsdoc.configs['flat/recommended'].rules }
+    rules: { ...pluginJsdoc.configs['flat/recommended'].rules }
   },
   {
-    .../** @type {Config} */ (promisePlugin.configs['flat/recommended']),
+    .../** @type {{ configs: { [config: string]: Config }}} */
+    (/** @type {unknown} */ (pluginPromise)).configs['flat/recommended'],
     name: 'plugin/promise/recommended'
   },
   {
-    ...compat.configs['flat/recommended'],
+    ...pluginCompat.configs['flat/recommended'],
     name: 'plugin/compat/recommended',
     files: ['src/**/*.mjs'],
     settings: {
@@ -167,31 +166,31 @@ export default [
     }
   },
   {
-    plugins: { n: nodePlugin },
+    plugins: { n: pluginN },
     name: 'plugin/node'
     // only added to map deprecated airbnb rules to n plugin rules
   },
   {
-    ...importX.recommended,
+    ...pluginImportX.flatConfigs.recommended,
     name: 'plugin/import-x/recommended',
     settings: {
       'import-x/resolver-next': [createTypeScriptImportResolver()]
     }
   },
   {
-    .../** @type {Config} */ (security.configs.recommended),
+    .../** @type {{ [config: string]: Config }} */ (pluginSecurity.configs).recommended,
     name: 'plugin/security/recommended'
   },
   {
-    ...unicorn.configs.recommended,
+    ...pluginUnicorn.configs.recommended,
     name: 'plugin/unicorn/recommended'
   },
   {
-    ...sonarjs.recommended,
+    .../** @type {{ [config: string]: Config }} */ (pluginSonarjs.configs).recommended,
     name: 'plugin/sonarjs/recommended'
   },
   {
-    ...stylistic.configs.recommended,
+    ...pluginStylistic.configs.recommended,
     name: 'plugin/@stylistic/recommended'
   },
   {
@@ -296,7 +295,7 @@ export default [
     }
   },
   {
-    ...prettier, // disables unnecessary/conflicting rules when using prettier, should be last, https://github.com/prettier/eslint-config-prettier#installation
+    ...configPrettier, // disables unnecessary/conflicting rules when using prettier, should be last, https://github.com/prettier/eslint-config-prettier#installation
     name: 'overrides/prettier'
   }
 ];
