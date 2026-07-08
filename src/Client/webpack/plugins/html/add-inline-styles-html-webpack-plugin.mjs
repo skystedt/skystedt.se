@@ -14,13 +14,8 @@ export default class AddInlineStylesHtmlWebpackPlugin {
   apply(compiler) {
     compiler.hooks.compilation.tap(AddInlineStylesHtmlWebpackPlugin.name, (compilation) => {
       HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tap(AddInlineStylesHtmlWebpackPlugin.name, (data) => {
-        const tag = HtmlWebpackPlugin.createHtmlTagObject(
-          'style',
-          { type: 'text/css' },
-          this.#styles,
-          // @ts-ignore
-          { plugin: AddInlineStylesHtmlWebpackPlugin.name }
-        );
+        const tag = HtmlWebpackPlugin.createHtmlTagObject('style', { type: 'text/css' }, this.#styles);
+        tag.meta = { plugin: AddInlineStylesHtmlWebpackPlugin.name };
         data.assetTags.styles.push(tag);
         return data;
       });

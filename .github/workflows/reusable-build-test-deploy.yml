@@ -82,6 +82,10 @@ jobs:
         run: yarn install --immutable
         working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
 
+      - name: Yarn Typecheck
+        run: yarn run typecheck
+        working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
+
       - name: Yarn Build
         run: yarn run production
         working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}

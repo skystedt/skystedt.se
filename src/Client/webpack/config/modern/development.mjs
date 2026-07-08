@@ -12,9 +12,12 @@ import PostProcessHtmlWebpackPlugin from '../../plugins/html/post-process-html-w
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
 
+/** @typedef { import('webpack-dev-server').Configuration } WebpackDevServerConfiguration */
+/** @typedef { Extract<WebpackDevServerConfiguration['client'], object>['overlay'] } WebpackDevServerClientOverlay */
+
 /** @typedef {{ [directive: string]: string | string[] }} CspPolicy */
 
-export const cspCallback = (/** @type {CspPolicy}} */ policy) => {
+export const cspCallback = (/** @type {CspPolicy} */ policy) => {
   // modify CSP for local development
 
   policy['trusted-types'] = ['webpack', "'allow-duplicates'", 'webpack#dev-overlay'];
@@ -58,10 +61,9 @@ export default {
       }
     ],
     client: {
-      overlay: {
-        // @ts-ignore
+      overlay: /** @type {WebpackDevServerClientOverlay} */ ({
         trustedTypesPolicyName: 'webpack#dev-overlay'
-      }
+      })
     }
   },
   watchOptions: {

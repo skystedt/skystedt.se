@@ -126,18 +126,9 @@ export default class TagsHtmlWebpackPlugin {
    * @returns {HtmlWebpackPlugin.HtmlTagObject}
    */
   #createTag(file, tagName) {
-    return HtmlWebpackPlugin.createHtmlTagObject(
-      tagName,
-      {
-        src: tagName === 'script' ? file : undefined,
-        href: tagName === 'script' ? undefined : file
-      },
-      null,
-      // @ts-ignore
-      {
-        plugin: TagsHtmlWebpackPlugin.name
-      }
-    );
+    const tag = HtmlWebpackPlugin.createHtmlTagObject(tagName, tagName === 'script' ? { src: file } : { href: file });
+    tag.meta = { plugin: TagsHtmlWebpackPlugin.name };
+    return tag;
   }
 
   /**

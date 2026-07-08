@@ -37,7 +37,7 @@ export default class LicenseWebpackPluginWrapper {
 
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
-    // @ts-ignore
+    // @ts-expect-error TS2345
     this.#plugin.apply(compiler);
   }
 
