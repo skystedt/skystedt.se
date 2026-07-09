@@ -19,7 +19,7 @@
   },
   "engines": {
     "yarn": "4.x",
-    "node": "24.x"
+    "node": "26.x"
   },
   "packageManager": "yarn@4.17.1+sha512.ccbfabf7d7b6b32075088be9386fb9a2e00bb6887ef07fa56effabc890a56d53da1ccc4128d62db245fcbd3961b236d75335bdf7d5320ed6eafb7588b7ad4697",
   "devDependencies": {
@@ -31,7 +31,7 @@
     "@eslint-community/eslint-plugin-eslint-comments": "4.7.2",
     "@stylistic/eslint-plugin": "5.10.0",
     "@types/bytes": "3.1.5",
-    "@types/node": "24.13.3",
+    "@types/node": "26.1.1",
     "babel-loader": "10.1.1",
     "babel-plugin-polyfill-corejs3": "1.0.0",
     "browserslist": "4.28.5",
