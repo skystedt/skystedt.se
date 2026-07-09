@@ -14,7 +14,7 @@ on:
 
 permissions:
   id-token: write
-  
+
 env:
   SWA_NAME: "skystedt"
 
@@ -34,7 +34,9 @@ jobs:
         run: |
           DELETE_OUTPUT=$(az staticwebapp environment delete --name ${{ env.SWA_NAME }} --environment-name ${{ inputs.pr_number }} --yes 2>&1) || DELETE_EXIT=$?
           if [ ${DELETE_EXIT:-0} -ne 0 ]; then
-            if echo "$DELETE_OUTPUT" | grep -q "Microsoft.Web/locations/staticSitesOperationStatuses/read"; then
+            if echo "$DELETE_OUTPUT" | grep -q "NotFound"; then
+              echo "Nothing to close"
+            elif echo "$DELETE_OUTPUT" | grep -q "Microsoft.Web/locations/staticSitesOperationStatuses/read"; then
               echo "Ignored error: $DELETE_OUTPUT"
             else
               echo "Error deleting static web app environment:"
