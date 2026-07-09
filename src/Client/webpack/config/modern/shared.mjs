@@ -40,9 +40,9 @@ const HtmlInlineCssWebpackPlugin = /** @type {typeof _HtmlInlineCssWebpackPlugin
   /** @type {any} */ (_HtmlInlineCssWebpackPlugin).default
 );
 
-/** @typedef { import("terser").MinifyOptions } TerserMinifyOptions */
-/** @typedef { import("cssnano").Options } CssnanoOptions */
-/** @typedef { import("html-minifier-terser").Options } HtmlMinifierTerserOptions */
+/** @import { MinifyOptions as TerserMinifyOptions } from 'terser' */
+/** @import { Options as CssnanoOptions } from 'cssnano' */
+/** @import { Options as HtmlMinifierTerserOptions } from 'html-minifier-terser' */
 
 /** @typedef {{ [directive: string]: string | string[] }} CspPolicy */
 let /** @type {CspPolicy | undefined} */ cspPolicy;

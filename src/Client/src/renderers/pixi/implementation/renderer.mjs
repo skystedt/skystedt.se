@@ -4,7 +4,7 @@ import Graphics from './graphics.mjs';
 import Sprite from './sprite.mjs';
 import Texture from './texture.mjs';
 
-/** @typedef {import("../../contract").Renderer} Contract */
+/** @import { Renderer as Contract } from '../../contract' */
 
 /** @implements {Contract} */
 export default class Renderer {

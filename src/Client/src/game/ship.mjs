@@ -3,10 +3,7 @@ import ShipLeftImage from './assets/ship_left.png';
 import ShipRightImage from './assets/ship_right.png';
 import { GamePosition, Size, Uninitialized } from './primitives.mjs';
 
-/** @typedef { import("../renderers/contract").Renderer } Renderer */
-/** @typedef { import("../renderers/contract").Application } Application */
-/** @typedef { import("../renderers/contract").Container } Container */
-/** @typedef { import("../renderers/contract").Sprite } Sprite */
+/** @import { Renderer, Application, Container, Sprite } from '../renderers/contract' */
 
 const TURN_STRAIGHT_DELAY = 10;
 

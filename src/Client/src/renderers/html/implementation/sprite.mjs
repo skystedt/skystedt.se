@@ -1,6 +1,5 @@
-/** @typedef {import("../../contract").Sprite} Contract */
-/** @typedef {import("../../contract").Texture} Texture */
-/** @typedef {import("./texture.mjs").default} ImplementationTexture */
+/** @import { Sprite as Contract, Texture } from '../../contract' */
+/** @import ImplementationTexture from './texture.mjs' */
 
 /** @implements {Contract} */
 export default class Sprite {

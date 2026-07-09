@@ -4,22 +4,23 @@ import crypto from 'node:crypto';
 import { parse } from 'parse5';
 import webpack from 'webpack';
 
-/** @typedef { import('parse5').DefaultTreeAdapterTypes.Node } Parse5Node */
-/** @typedef { import('parse5').DefaultTreeAdapterTypes.Element } Parse5Element */
-/** @typedef { import('parse5').DefaultTreeAdapterTypes.TextNode } Parse5TextNode */
+/** @import { DefaultTreeAdapterTypes } from 'parse5' */
+/** @typedef {DefaultTreeAdapterTypes.Node} Parse5Node */
+/** @typedef {DefaultTreeAdapterTypes.Element} Parse5Element */
+/** @typedef {DefaultTreeAdapterTypes.TextNode} Parse5TextNode */
 
-/** @typedef { 'sha256' | 'sha384' | 'sha512' } HashAlgorithm */
-/** @typedef { 'script' | 'style' } TargetType */
+/** @typedef {'sha256' | 'sha384' | 'sha512'} HashAlgorithm */
+/** @typedef {'script' | 'style'} TargetType */
 /** @typedef {{ [directive: string]: string | string[] }} Policy */
 /**
  * @typedef {{
  *   hashAlgorithm: HashAlgorithm,
  *   metaTag?: boolean,
  *   ignore?: {
- *     inlineScripts?: boolean,
- *     inlineStyles?: boolean,
- *     externalPatterns?: string | string[]
- *   }
+ *   inlineScripts?: boolean,
+ *   inlineStyles?: boolean,
+ *   externalPatterns?: string | string[]
+ * },
  *   callback?: (policy: Policy) => Policy | void
  * }} Options
  */

@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import webpack from 'webpack';
 
-/** @typedef { string | Promise<string> | object | (() => Content) } Content */
+/** @typedef {string | Promise<string> | object | (() => Content)} Content */
 
 export default class CreateFilePlugin {
   /** @type {string} */

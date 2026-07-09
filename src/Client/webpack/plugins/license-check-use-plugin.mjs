@@ -31,7 +31,7 @@ export default class LicenseCheckUsePlugin {
   }
 
   /**
-   * @param {{ errors: Error[]; }} compilation
+   * @param {{ errors: Error[] }} compilation
    * @returns {(message: string) => void}
    */
   #logError(compilation) {
@@ -115,7 +115,10 @@ export default class LicenseCheckUsePlugin {
    * @param {(message: string) => void} logError
    * @param {licenseChecker.ModuleInfos} moduleInfos
    * @param {string[]} acceptableLicenses
-   * @returns { { license: string; modules: string[] }[] }
+   * @returns {{
+   *   license: string,
+   *   modules: string[]
+   * }[]}
    */
   static #validateLicenses(logError, moduleInfos, acceptableLicenses) {
     const groupedLicenses = this.#groupLicenses(moduleInfos);

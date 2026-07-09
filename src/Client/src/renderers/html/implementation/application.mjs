@@ -1,5 +1,5 @@
-/** @typedef {import("../../contract").Application} Contract */
-/** @typedef {import("./container.mjs").default} ImplementationContainer */
+/** @import { Application as Contract } from '../../contract' */
+/** @import ImplementationContainer from './container.mjs' */
 
 /** @implements {Contract} */
 export default class Application {

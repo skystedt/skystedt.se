@@ -1,7 +1,6 @@
 import * as PIXI from 'pixi.js';
 
-/** @typedef {import("../../contract").Texture} Contract */
-/** @typedef {import("../../contract").Renderer} Renderer */
+/** @import { Texture as Contract, Renderer } from '../../contract' */
 
 /** @implements {Contract} */
 export default class Texture extends PIXI.Texture {
@@ -24,7 +23,9 @@ export default class Texture extends PIXI.Texture {
     const context = canvas.getContext('2d');
     context?.drawImage(image, 0, 0);
 
-    const textureOptions = /** @type {PIXI.TextureOptions} */ ({ source: new PIXI.CanvasSource({ resource: canvas }) });
+    const textureOptions = /** @type {PIXI.TextureOptions} */ ({
+      source: new PIXI.CanvasSource({ resource: canvas })
+    });
     return new Texture(textureOptions);
   }
 }

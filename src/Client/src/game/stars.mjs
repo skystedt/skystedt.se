@@ -1,9 +1,6 @@
 import { Size, Uninitialized } from './primitives.mjs';
 
-/** @typedef { import("../renderers/contract").Renderer } Renderer */
-/** @typedef { import("../renderers/contract").Application } Application */
-/** @typedef { import("../renderers/contract").Container } Container */
-/** @typedef { import("../renderers/contract").Graphics } Graphics */
+/** @import { Renderer, Application, Container, Graphics } from '../renderers/contract' */
 
 /**
  * @typedef {{

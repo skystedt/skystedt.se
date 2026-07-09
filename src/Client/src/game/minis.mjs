@@ -1,11 +1,7 @@
 import MiniImage from './assets/mini.png';
 import { Uninitialized } from './primitives.mjs';
 
-/** @typedef { import("../renderers/contract").Renderer } Renderer */
-/** @typedef { import("../renderers/contract").Application } Application */
-/** @typedef { import("../renderers/contract").Container } Container */
-/** @typedef { import("../renderers/contract").Texture } Texture */
-/** @typedef { import("../renderers/contract").Sprite } Sprite */
+/** @import { Renderer, Application, Container, Texture, Sprite } from '../renderers/contract' */
 
 const ALPHA_DELTA = 0.025;
 const SHOWN_DURATION = 20;
@@ -18,7 +14,13 @@ const MiniState = {
   FadeOut: 3
 };
 
-/** @typedef {{ sprite: Sprite, state: number, wait: number }} Item */
+/**
+ * @typedef {{
+ *   sprite: Sprite,
+ *   state: number,
+ *   wait: number
+ * }} Item
+ */
 
 export default class Minis {
   #renderer;
@@ -89,7 +91,11 @@ export default class Minis {
 
   /**
    * @param {Item} item
-   * @returns {{ state: number, wait: number, alpha: number }}
+   * @returns {{
+   *   state: number,
+   *   wait: number,
+   *   alpha: number
+   * }}
    */
   #tickMini({ sprite, state, wait }) {
     const { alpha } = sprite;

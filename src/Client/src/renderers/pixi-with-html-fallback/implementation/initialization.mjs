@@ -1,6 +1,6 @@
 import { initializeRenderer as htmlRenderer } from '../../html/exports.mjs';
 
-/** @typedef {import("../../contract").initializeRenderer} Contract */
+/** @import { initializeRenderer as Contract } from '../../contract' */
 
 /** @type {Contract} */
 const initializeRenderer = async () => {

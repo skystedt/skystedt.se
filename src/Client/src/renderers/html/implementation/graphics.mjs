@@ -1,4 +1,4 @@
-/** @typedef {import("../../contract").Graphics} Contract */
+/** @import { Graphics as Contract } from '../../contract' */
 
 /** @implements {Contract} */
 export default class Graphics {
