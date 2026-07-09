@@ -71,7 +71,7 @@
     "postcss-loader": "8.2.1",
     "postcss-merge-rules": "8.0.1",
     "postcss-preset-env": "11.3.2",
-    "prettier": "3.9.4",
+    "prettier": "3.9.5",
     "regenerator-runtime": "0.14.1",
     "spdx-satisfies": "6.0.0",
     "stylelint": "17.14.0",
