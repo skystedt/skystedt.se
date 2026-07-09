@@ -1,9 +1,9 @@
 import pc from 'picocolors';
 import webpack from 'webpack';
 
-/** @typedef { ReturnType<webpack.Compiler["getInfrastructureLogger"]>["status"] } WebpackLogger */
-/** @typedef { ReturnType<webpack.ProgressPlugin.createDefaultHandler> } ProgressPluginHandler */
-/** @typedef { (compiler: webpack.Compiler, handler: ProgressPluginHandler) => void } ProgressPluginApply  */
+/** @typedef {ReturnType<webpack.Compiler["getInfrastructureLogger"]>["status"]} WebpackLogger */
+/** @typedef {ReturnType<webpack.ProgressPlugin.createDefaultHandler>} ProgressPluginHandler */
+/** @typedef {(compiler: webpack.Compiler, handler: ProgressPluginHandler) => void} ProgressPluginApply  */
 
 export default class ColorProgressPlugin {
   /** @type {string} */ #environment;

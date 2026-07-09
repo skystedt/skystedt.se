@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 
-/** @typedef {import("../../contract").Graphics} Contract */
+/** @import { Graphics as Contract } from '../../contract' */
 
 /** @implements {Contract} */
 export default class Graphics extends PIXI.Graphics {

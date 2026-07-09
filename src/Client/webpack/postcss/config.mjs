@@ -3,7 +3,7 @@ import postcssPresetEnv from 'postcss-preset-env';
 import { browserslistBrowsers } from '../build-info.mjs';
 import postcssRemoveCarriageReturn from './postcss-remove-carriage-return.mjs';
 
-/** @typedef { import("postcss-load-config").Config } PostcssConfig */
+/** @import { Config as PostcssConfig } from 'postcss-load-config' */
 
 /** @type {PostcssConfig} */
 // eslint-disable-next-line import-x/prefer-default-export

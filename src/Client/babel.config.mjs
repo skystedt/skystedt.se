@@ -2,14 +2,11 @@
 import babelRuntime from '@babel/runtime/package.json' with { type: 'json' };
 import corejs from 'core-js/package.json' with { type: 'json' };
 
-/* eslint-disable jsdoc/reject-any-type */
-/** @typedef { import("@babel/core").PluginItem } PluginItem */
-/** @typedef { Extract<PluginItem, [any, any]>[1] } PluginOptions */
-/** @typedef { import("@babel/core").PresetAPI } PresetAPI */
-/** @typedef { (api: PresetAPI) => import("@babel/core").InputOptions } ConfigFunction */
-/* eslint-enable jsdoc/reject-any-type */
-
-/** @typedef { import("@babel/plugin-transform-runtime").Options } BabelPluginTransformRuntimeOptions */
+/** @import { InputOptions, PluginItem, PresetAPI } from '@babel/core' */
+/** @import { Options as BabelPluginTransformRuntimeOptions } from '@babel/plugin-transform-runtime' */
+// eslint-disable-next-line jsdoc/reject-any-type
+/** @typedef {Extract<PluginItem, [any, any]>[1]} PluginOptions */
+/** @typedef {(api: PresetAPI) => InputOptions} ConfigFunction */
 
 // we don't want polyfills in modern, but instead of disabling them, we exclude the ones that would be added (to check that we don't use unwanted functionality)
 /** @type {PluginOptions} */

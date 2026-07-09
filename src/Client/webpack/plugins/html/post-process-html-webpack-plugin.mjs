@@ -3,10 +3,9 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { defaultTreeAdapter, parseFragment, serialize } from 'parse5';
 import webpack from 'webpack';
 
-/** @typedef { import('diff').Change } DiffChange */
-/** @typedef { import('parse5').DefaultTreeAdapterTypes.ChildNode } Parse5ChildNode */
-/** @typedef { import('parse5').DefaultTreeAdapterTypes.TextNode } Parse5TextNode */
-/** @typedef { import('parse5').DefaultTreeAdapterTypes.CommentNode } Parse5CommentNode */
+/** @import { Change as DiffChange } from 'diff' */
+/** @import { DefaultTreeAdapterTypes } from 'parse5' */
+/** @typedef {DefaultTreeAdapterTypes.TextNode} Parse5TextNode */
 
 /* eslint-disable security/detect-unsafe-regex */
 const whitespacesRegExp = /^[ \t]*$/;
@@ -79,14 +78,22 @@ export default class PostProcessHtmlWebpackPlugin {
    * @param {string} html1
    * @param {string} html2
    * @param {RegExp} tagRegExp
-   * @returns {{ index: number, html: string, singleLine: string? }?}
+   * @returns {{
+   *   index: number,
+   *   html: string,
+   *   singleLine: string?
+   * }?}
    */
   #diffHtml(html1, html2, tagRegExp) {
     /**
      * @param {DiffChange} change
      * @param {DiffChange} nextChange
      * @param {RegExp} regExp
-     * @returns {{ startIndex: number, html: string, singleLine: string? }?}
+     * @returns {{
+     *   startIndex: number,
+     *   html: string,
+     *   singleLine: string?
+     * }?}
      */
     const matchInfo = (change, nextChange, regExp) => {
       const match = change.value.match(regExp);

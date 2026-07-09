@@ -1,15 +1,13 @@
-/** @typedef {import("../../contract").Container} Contract */
-/** @typedef {import("../../contract").Sprite} Sprite */
-/** @typedef {import("../../contract").Graphics} Graphics */
-/** @typedef {import("./sprite.mjs").default} ImplementationSprite */
-/** @typedef {import("./graphics.mjs").default} ImplementationGraphics */
+/** @import { Container as Contract, Sprite, Graphics } from '../../contract' */
+/** @import ImplementationSprite from './sprite.mjs' */
+/** @import ImplementationGraphics from './graphics.mjs' */
 
 /** @implements {Contract} */
 export default class Container {
   #element;
-  /** @type { SVGElement? } */ #svg = null;
+  /** @type {SVGElement?} */ #svg = null;
   #position = { x: 0, y: 0 };
-  /** @type { (Sprite | Graphics)[] } */ #items = [];
+  /** @type {(Sprite | Graphics)[]} */ #items = [];
 
   constructor() {
     this.#element = document.createElement('div');

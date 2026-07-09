@@ -9,16 +9,11 @@ import Ship, { ShipDirection } from './ship.mjs';
 import Stars from './stars.mjs';
 import View from './view.mjs';
 
-/** @typedef { number } DOMHighResTimeStamp */
-/** @typedef { ReturnType<RenderingContext.information> } RenderingInformation */
-/** @typedef { import("../renderers/contract").Renderer } Renderer */
-/** @typedef { import("../renderers/contract").Application } Application */
-/** @typedef { import("@microsoft/applicationinsights-web").ApplicationInsights } ApplicationInsights */
-/** @typedef { import("./communication-data").CommunicationData } CommunicationData */
-/** @typedef { import("./communication-data").CommunicationDataInit } CommunicationDataInit */
-/** @typedef { import("./communication-data").CommunicationDataConnect } CommunicationDataConnect */
-/** @typedef { import("./communication-data").CommunicationDataDisconnect } CommunicationDataDisconnect */
-/** @typedef { import("./communication-data").CommunicationDataUpdate } CommunicationDataUpdate */
+/** @import { Renderer, Application } from '../renderers/contract' */
+/** @import { ApplicationInsights } from '@microsoft/applicationinsights-web' */
+/** @import { CommunicationData, CommunicationDataInit, CommunicationDataConnect, CommunicationDataDisconnect, CommunicationDataUpdate } from './communication-data' */
+/** @typedef {number} DOMHighResTimeStamp */
+/** @typedef {ReturnType<typeof RenderingContext.information>} RenderingInformation */
 
 const LOGIC_FPS = 100;
 const BACKGROUND_FPS = 30;

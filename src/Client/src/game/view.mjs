@@ -1,6 +1,6 @@
 import { AbsolutePosition, Borders, GamePosition, Movement, Offset, Size, ViewPosition } from './primitives.mjs';
 
-/** @typedef {import("../renderers/contract").Application} Application */
+/** @import { Application } from '../renderers/contract' */
 
 const WIDTH = 380;
 const HEIGHT = 200;

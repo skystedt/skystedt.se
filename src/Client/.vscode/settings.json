@@ -21,7 +21,18 @@
   },
   "eslint.enable": true,
   "eslint.runtime": "node", // Use system installed node instead of node shipped with vscode
-  "eslint.codeActionsOnSave.rules": ["curly", "no-var", "prefer-const"],
+  "eslint.codeActionsOnSave.rules": [
+    "curly",
+    "no-var",
+    "prefer-const",
+    "jsdoc/type-formatting",
+    "jsdoc/multiline-blocks",
+    "jsdoc/sort-tags",
+    "jsdoc/prefer-import-tag",
+    "jsdoc/require-asterisk-prefix",
+    "jsdoc/check-alignment",
+    "jsdoc/no-multi-asterisks"
+  ],
   "css.validate": false,
   "stylelint.validate": ["css"],
   "cSpell.words": ["pixi", "Skystedt"],

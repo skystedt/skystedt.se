@@ -1,7 +1,10 @@
 export default class RenderingContext {
   /**
    * @param {HTMLElement} element
-   * @returns {{ context: string, information: string }}
+   * @returns {{
+   *   context: string,
+   *   information: string
+   * }}
    */
   static information(element) {
     if (!(element instanceof HTMLCanvasElement)) {
@@ -26,9 +29,12 @@ export default class RenderingContext {
   /**
    * @template {GPUCanvasContext | WebGLRenderingContext | CanvasRenderingContext2D} T
    * @param {HTMLCanvasElement} canvas
-   * @param { "webgpu" | "webgl2" | "webgl" | "experimental-webgl" | "2d" } contextId
+   * @param {'webgpu' | 'webgl2' | 'webgl' | 'experimental-webgl' | '2d'} contextId
    * @param {(context: T) => string} contextInformation
-   * @returns {{ context: string, information: string }?}
+   * @returns {{
+   *   context: string,
+   *   information: string
+   * }?}
    */
   static #info(canvas, contextId, contextInformation) {
     const context = /** @type {T | null} */ (canvas.getContext(contextId));

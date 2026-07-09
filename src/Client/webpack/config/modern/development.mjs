@@ -12,8 +12,8 @@ import PostProcessHtmlWebpackPlugin from '../../plugins/html/post-process-html-w
 
 import csp from '../../../content-security-policy.json' with { type: 'json' };
 
-/** @typedef { import('webpack-dev-server').Configuration } WebpackDevServerConfiguration */
-/** @typedef { Extract<WebpackDevServerConfiguration['client'], object>['overlay'] } WebpackDevServerClientOverlay */
+/** @import { Configuration as WebpackDevServerConfiguration } from 'webpack-dev-server' */
+/** @typedef {Extract<WebpackDevServerConfiguration['client'], object>['overlay']} WebpackDevServerClientOverlay */
 
 /** @typedef {{ [directive: string]: string | string[] }} CspPolicy */
 

@@ -2,8 +2,8 @@
 
 import unfetch from 'unfetch/package.json' with { type: 'json' };
 
-/** @typedef { import('../plugins/license-webpack-plugin-wrapper.mjs').LicenseWebpackPluginWrapperOptions["overrides"] } LicenseOverrides */
-/** @typedef { import('../plugins/license-webpack-plugin-wrapper.mjs').LicenseFormatter } LicenseFormatter */
+/** @import { LicenseWebpackPluginWrapperOptions, LicenseFormatter } from '../plugins/license-webpack-plugin-wrapper.mjs' */
+/** @typedef {LicenseWebpackPluginWrapperOptions["overrides"]} LicenseOverrides */
 
 export const licenseFilename = 'THIRD-PARTY-LICENSES.txt';
 export const licensePreamble = `/*! License information in ${licenseFilename} */`;
@@ -57,6 +57,6 @@ export const licenseOverrides = {
   }
 };
 
-/** @type { LicenseFormatter } */
+/** @type {LicenseFormatter} */
 export const licenseFormatter = (name, version, licenseId, licenseText) =>
   `${name} v${version}\n${licenseId}\n\n${licenseText}\n\n----------\n\n`;

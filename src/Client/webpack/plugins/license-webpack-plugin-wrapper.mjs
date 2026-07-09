@@ -4,8 +4,8 @@ import spdxSatisfies from 'spdx-satisfies';
 import webpack from 'webpack';
 
 /**
- * @typedef { NonNullable<ConstructorParameters<typeof LicenseWebpackPlugin>[0]> } LicenseWebpackPluginOptions
- * @typedef { Parameters<NonNullable<LicenseWebpackPluginOptions["renderLicenses"]>>[0][number] } LicenseIdentifiedModule
+ * @typedef {NonNullable<ConstructorParameters<typeof LicenseWebpackPlugin>[0]>} LicenseWebpackPluginOptions
+ * @typedef {Parameters<NonNullable<LicenseWebpackPluginOptions["renderLicenses"]>>[0][number]} LicenseIdentifiedModule
  */
 /**
  * @typedef {{
@@ -15,14 +15,17 @@ import webpack from 'webpack';
  *   formatter?: LicenseFormatter,
  *   additionals?: string[],
  *   overrides?: {
- *     licenses?: { [sourcePackage: string]: string },
- *     files?: { [sourcePackage: string]: { module: string, file: string }},
- *     versions?: { [sourcePackage: string]: string }
- *   },
+ *   licenses?: { [sourcePackage: string]: string },
+ *   files?: { [sourcePackage: string]: {
+ *   module: string,
+ *   file: string
+ * } },
+ *   versions?: { [sourcePackage: string]: string }
+ * },
  *   callback?: (name: string, version: string, licenseId: string) => void
  * }} LicenseWebpackPluginWrapperOptions
  */
-/** @typedef { (name: string, version: string, licenseId: string, licenseText: string) => string } LicenseFormatter */
+/** @typedef {(name: string, version: string, licenseId: string, licenseText: string) => string} LicenseFormatter */
 
 /** Wraps LicenseWebpackPlugin, manages third-party license compliance for redistributed code */
 export default class LicenseWebpackPluginWrapper {
@@ -106,7 +109,7 @@ export default class LicenseWebpackPluginWrapper {
     return formattedLicense;
   }
 
-  /** @type { LicenseFormatter } */
+  /** @type {LicenseFormatter} */
   static #defaultFormatter(name, _, licenseId, licenseText) {
     return `${name}\n${licenseId}\n\n${licenseText}\n\n\n`;
   }

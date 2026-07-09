@@ -15,11 +15,13 @@ import pluginSonarjs from 'eslint-plugin-sonarjs';
 import pluginUnicorn from 'eslint-plugin-unicorn';
 import globals from 'globals';
 
-/** @typedef { import("eslint").Linter.Config } Config */
-/** @typedef { import("eslint").Linter.RulesRecord } Rules */
-/** @typedef { import("eslint").Linter.RuleEntry } RuleEntry */
+/** @import { Linter } from 'eslint' */
+/** @typedef {Linter.Config} Config */
+/** @typedef {Linter.RulesRecord} Rules */
+/** @typedef {Linter.RuleEntry} RuleEntry */
 
-/** @typedef { keyof import("@stylistic/eslint-plugin").UnprefixedRuleOptions } StylisticRuleKey */
+/** @import { UnprefixedRuleOptions } from '@stylistic/eslint-plugin' */
+/** @typedef {keyof UnprefixedRuleOptions} StylisticRuleKey */
 
 /** @returns {Promise<Rules>} */
 const loadAirbnbRules = async () => {
@@ -40,7 +42,12 @@ const loadAirbnbRules = async () => {
 
 /**
  * @param {Rules} rules
- * @returns {{base: Rules, stylistic: Rules, import: Rules, node: Rules}}
+ * @returns {{
+ *   base: Rules,
+ *   stylistic: Rules,
+ *   import: Rules,
+ *   node: Rules
+ * }}
  */
 const splitAirbnbRules = (rules) => {
   const baseRules = /** @type {Rules} */ ({});
@@ -145,7 +152,7 @@ export default [
     rules: { ...pluginJsdoc.configs['flat/recommended'].rules }
   },
   {
-    .../** @type {{ configs: { [config: string]: Config }}} */
+    .../** @type {{ configs: { [config: string]: Config } }} */
     (/** @type {unknown} */ (pluginPromise)).configs['flat/recommended'],
     name: 'plugin/promise/recommended'
   },
@@ -215,17 +222,30 @@ export default [
       'jsdoc/valid-types': 'off',
       'jsdoc/require-param-description': 'off',
       'jsdoc/require-returns-description': 'off',
-      'jsdoc/check-indentation': ['warn', { excludeTags: ['typedef'] }],
+      'jsdoc/check-indentation': ['warn', { excludeTags: ['typedef', 'type', 'param', 'returns', 'property'] }],
       'jsdoc/check-syntax': 'warn',
       'jsdoc/no-blank-blocks': 'warn',
       'jsdoc/no-blank-block-descriptions': 'warn',
-      'jsdoc/sort-tags': 'warn'
+      'jsdoc/sort-tags': 'warn',
+      'jsdoc/prefer-import-tag': 'warn',
+      'jsdoc/require-asterisk-prefix': 'warn',
+      'jsdoc/check-alignment': 'warn',
+      'jsdoc/no-multi-asterisks': 'warn',
+      'jsdoc/type-formatting': [
+        'warn',
+        {
+          stringQuotes: 'single',
+          typeBracketSpacing: '',
+          objectTypeBracketSpacing: ' ',
+          objectFieldSeparator: 'comma-and-linebreak',
+          objectFieldIndent: '  '
+        }
+      ]
     }
   },
   {
     name: 'overrides/airbnb',
     rules: {
-      curly: ['error', 'all'],
       'no-restricted-syntax': modifyRuleOptions(
         airbnbRules.base['no-restricted-syntax'],
         (option) => option.selector !== 'ForOfStatement'
@@ -296,6 +316,14 @@ export default [
   },
   {
     ...configPrettier, // disables unnecessary/conflicting rules when using prettier, should be last, https://github.com/prettier/eslint-config-prettier#installation
-    name: 'overrides/prettier'
+    name: 'overrides/prettier/recommended'
+  },
+  {
+    // eslint-config-prettier disables curly, but the "all" option is documented as safe with prettier
+    // https://github.com/prettier/eslint-config-prettier/blob/main/README.md#curly
+    name: 'overrides/prettier/specific',
+    rules: {
+      curly: ['error', 'all']
+    }
   }
 ];

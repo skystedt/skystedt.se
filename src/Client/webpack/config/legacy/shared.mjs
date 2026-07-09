@@ -15,8 +15,8 @@ import {
   licensePreamble
 } from '../licenses.mjs';
 
-/** @typedef { import("terser").MinifyOptions } TerserMinifyOptions */
-/** @typedef { import("cssnano").Options } CssnanoOptions */
+/** @import { MinifyOptions as TerserMinifyOptions } from 'terser' */
+/** @import { Options as CssnanoOptions } from 'cssnano' */
 
 /** @type {webpack.Configuration} */
 export default {

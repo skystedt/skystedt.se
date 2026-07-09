@@ -8,7 +8,7 @@ import BrowserslistUpdatePlugin, { BrowserslistUpdateDependency } from './plugin
 
 /**
  * @param {string} environment
- * @returns { string[] }
+ * @returns {string[]}
  */
 export const browserslistBrowsers = (environment) => {
   const browsers = browserslist(null, { env: environment });
@@ -20,7 +20,11 @@ export default class BuildInfo {
 
   /**
    * @template T
-   * @typedef {{ all: T, modern: T, legacy: T }} Environments
+   * @typedef {{
+   *   all: T,
+   *   modern: T,
+   *   legacy: T
+   * }} Environments
    */
   /**
    * @typedef {{ [browser: string]: string[] }} BrowserVersions
@@ -37,8 +41,14 @@ export default class BuildInfo {
    * @typedef {{ [package: string]: string }} LicenseDetails
    * @typedef {{ [license: string]: number }} LicenseSummary
    * @typedef {{
-   *   details: { redistributed: LicenseDetails, used: LicenseDetails },
-   *   summary: { redistributed: LicenseSummary, used: LicenseSummary }
+   *   details: {
+   *   redistributed: LicenseDetails,
+   *   used: LicenseDetails
+   * },
+   *   summary: {
+   *   redistributed: LicenseSummary,
+   *   used: LicenseSummary
+   * }
    * }} Licenses
    */
 
@@ -46,7 +56,14 @@ export default class BuildInfo {
 
   static instance = new BuildInfo();
 
-  /** @type {{ version?: Version, browsers?: Browsers, licenses?: Licenses, sizes?: Sizes }} */
+  /**
+   * @type {{
+   *   version?: Version,
+   *   browsers?: Browsers,
+   *   licenses?: Licenses,
+   *   sizes?: Sizes
+   * }}
+   */
   #resolved = {
     version: undefined,
     browsers: undefined,
@@ -128,7 +145,7 @@ export default class BuildInfo {
   }
 
   /**
-   * @param {"redistributed" | "used"} licenseType
+   * @param {'redistributed' | 'used'} licenseType
    * @param {string} name
    * @param {string} version
    * @param {string} licenseId

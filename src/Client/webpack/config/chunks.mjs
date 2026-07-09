@@ -4,11 +4,11 @@ import path from 'node:path';
 import webpack from 'webpack';
 import { dir } from '../dir.mjs';
 
-/** @typedef { Pick<webpack.RuleSetRule, 'include' | 'exclude'> } SideEffects */
-/** @typedef { NonNullable<Exclude<NonNullable<webpack.Configuration["optimization"]>["splitChunks"], boolean | undefined>["cacheGroups"]> } FullCacheGroups */
+/** @typedef {Pick<webpack.RuleSetRule, 'include' | 'exclude'>} SideEffects */
+/** @typedef {NonNullable<Exclude<NonNullable<webpack.Configuration["optimization"]>["splitChunks"], boolean | undefined>["cacheGroups"]>} FullCacheGroups */
 // eslint-disable-next-line jsdoc/reject-function-type
-/** @typedef { Exclude<Exclude<Extract<FullCacheGroups[string], object>, Function>, RegExp> } CacheGroup */
-/** @typedef {{ [index: string]: false | CacheGroup } } CacheGroups */
+/** @typedef {Exclude<Exclude<Extract<FullCacheGroups[string], object>, Function>, RegExp>} CacheGroup */
+/** @typedef {{ [index: string]: false | CacheGroup }} CacheGroups */
 
 /** @type {(assetFilename: string) => boolean} */
 export const performanceFilter = (assetFilename) => !minimatch(assetFilename, 'pixi.*.*js');

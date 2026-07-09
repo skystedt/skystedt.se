@@ -4,9 +4,23 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import webpack from 'webpack';
 
-/** @typedef { Parameters<Parameters<HtmlWebpackPlugin.Hooks["alterAssetTags"]["tap"]>[1]>[0]["assetTags"] } HtmlWebpackPlugin_AssetTags */
-/** @typedef {{ files: { includeCompiledAssets: boolean, extraFileDirectories?: string[] }, tags: TagOption[] }} Options */
-/** @typedef {{ path: string, tag: string, attributes?: TagAttributes }} TagOption */
+/** @typedef {Parameters<Parameters<HtmlWebpackPlugin.Hooks["alterAssetTags"]["tap"]>[1]>[0]["assetTags"]} HtmlWebpackPlugin_AssetTags */
+/**
+ * @typedef {{
+ *   files: {
+ *   includeCompiledAssets: boolean,
+ *   extraFileDirectories?: string[]
+ * },
+ *   tags: TagOption[]
+ * }} Options
+ */
+/**
+ * @typedef {{
+ *   path: string,
+ *   tag: string,
+ *   attributes?: TagAttributes
+ * }} TagOption
+ */
 /** @typedef {{ [attribute: string]: string | boolean | undefined }} TagAttributes */
 /** @typedef {[AssetTagKey: keyof HtmlWebpackPlugin_AssetTags, tag: HtmlWebpackPlugin.HtmlTagObject, file: string]} CategorizedTag */
 

@@ -1,12 +1,10 @@
 import * as PIXI from 'pixi.js';
 
-/** @typedef {import("../../contract").Container} Contract */
-/** @typedef {import("../../contract").Sprite} Sprite */
-/** @typedef {import("../../contract").Graphics} Graphics */
+/** @import { Container as Contract, Sprite, Graphics } from '../../contract' */
 
 /** @implements {Contract} */
 export default class Container extends PIXI.Container {
-  /** @type { (Sprite | Graphics)[] } */ #items = [];
+  /** @type {(Sprite | Graphics)[]} */ #items = [];
 
   /** @type {Contract["items"]} */
   get items() {
@@ -21,7 +19,7 @@ export default class Container extends PIXI.Container {
   /** @type {Contract["addItem"]} */
   addItem(item) {
     this.#items.push(item);
-    this.addChild(/** @type { PIXI.Sprite | PIXI.Graphics } */ (/** @type {unknown} */ (item)));
+    this.addChild(/** @type {PIXI.Sprite | PIXI.Graphics} */ (/** @type {unknown} */ (item)));
   }
 
   /** @type {Contract["removeItem"]} */
@@ -31,6 +29,6 @@ export default class Container extends PIXI.Container {
       this.#items.splice(index, 1);
     }
     // eslint-disable-next-line unicorn/prefer-dom-node-remove
-    this.removeChild(/** @type { PIXI.Sprite | PIXI.Graphics } */ (/** @type {unknown} */ (item)));
+    this.removeChild(/** @type {PIXI.Sprite | PIXI.Graphics} */ (/** @type {unknown} */ (item)));
   }
 }

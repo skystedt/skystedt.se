@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 import Renderer from './renderer.mjs';
 
-/** @typedef {import("../../contract").initializeRenderer} Contract */
+/** @import { initializeRenderer as Contract } from '../../contract' */
 
 const sideEffects = () => {
   // Pixi runs initialization code upon import, which is optimized away by tree-shaking

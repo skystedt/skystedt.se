@@ -2,7 +2,7 @@ import './input.css';
 import { AbsolutePosition, GamePosition, Movement } from './primitives.mjs';
 import View from './view.mjs';
 
-/** @typedef { number } DOMHighResTimeStamp */
+/** @typedef {number} DOMHighResTimeStamp */
 
 const KEY_CODE_LEFT = 37;
 const KEY_CODE_UP = 38;
@@ -24,7 +24,13 @@ export default class Input {
   #view;
 
   #keys = { up: false, right: false, down: false, left: false };
-  /** @type {{ id: number, timestamp: DOMHighResTimeStamp, position: AbsolutePosition }[]} */
+  /**
+   * @type {{
+   *   id: number,
+   *   timestamp: DOMHighResTimeStamp,
+   *   position: AbsolutePosition
+   * }[]}
+   */
   #touches = [];
   /** @type {AbsolutePosition?} */
   #mouse = null;

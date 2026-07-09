@@ -1,5 +1,4 @@
-/** @typedef { import("./communication-data").CommunicationData } CommunicationData */
-/** @typedef { import("./communication-data").CommunicationDataSend } CommunicationDataSend */
+/** @import { CommunicationData, CommunicationDataSend } from './communication-data' */
 
 const WebsocketNormalClose = 1000;
 
@@ -18,7 +17,15 @@ export default class Communication {
   #updateCallback;
 
   #connectionAttempt = 1;
-  /** @type {{ ws: WebSocket, token: string, expiresAt: Date, intervalId: ReturnType<typeof setInterval>, reconnect: boolean }?} */
+  /**
+   * @type {{
+   *   ws: WebSocket,
+   *   token: string,
+   *   expiresAt: Date,
+   *   intervalId: ReturnType<typeof setInterval>,
+   *   reconnect: boolean
+   * }?}
+   */
   #connection = null;
 
   /**
@@ -52,7 +59,14 @@ export default class Communication {
     navigator.sendBeacon('/api/position/update', JSON.stringify(body));
   }
 
-  /** @returns {Promise<{ token: string, expiresAt: Date, websocketUrl: string, updateInterval: number }?>} */
+  /**
+   * @returns {Promise<{
+   *   token: string,
+   *   expiresAt: Date,
+   *   websocketUrl: string,
+   *   updateInterval: number
+   * }?>}
+   */
   async #negotiate() {
     const response = await fetch(`/api/position/negotiate`);
     if (!response.ok) {

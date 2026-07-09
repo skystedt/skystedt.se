@@ -1,5 +1,4 @@
-/** @typedef {import("../../contract").Texture} Contract */
-/** @typedef {import("../../contract").Renderer} Renderer */
+/** @import { Texture as Contract, Renderer } from '../../contract' */
 
 /** @implements {Contract} */
 export default class Texture {
