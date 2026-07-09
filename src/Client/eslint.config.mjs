@@ -227,7 +227,7 @@ export default [
       'jsdoc/no-blank-blocks': 'warn',
       'jsdoc/no-blank-block-descriptions': 'warn',
       'jsdoc/sort-tags': 'warn',
-      'jsdoc/prefer-import-tag': 'warn',
+      'jsdoc/prefer-import-tag': ['warn', { exemptTypedefs: false, outputType: 'named-import' }],
       'jsdoc/require-asterisk-prefix': 'warn',
       'jsdoc/check-alignment': 'warn',
       'jsdoc/no-multi-asterisks': 'warn',

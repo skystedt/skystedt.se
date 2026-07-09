@@ -170,11 +170,7 @@ export default class BuildInfo {
 
         const fullPath = path.resolve(dir.dist, relativePath);
         const stat = await fs.stat(fullPath);
-        const size =
-          bytes.format(stat.size, {
-            fixedDecimals: /** @type {number} */ (/** @type {unknown} */ (true)),
-            unitSeparator: ' '
-          }) ?? '?';
+        const size = bytes.format(stat.size, { fixedDecimals: true, unitSeparator: ' ' }) ?? '?';
         result[relativePath] = size;
       })
     );
