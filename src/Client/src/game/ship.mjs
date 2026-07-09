@@ -7,12 +7,12 @@ import { GamePosition, Size, Uninitialized } from './primitives.mjs';
 
 const TURN_STRAIGHT_DELAY = 10;
 
-/** @enum {number} */
-export const ShipDirection = {
+/** @typedef {(typeof ShipDirection)[keyof typeof ShipDirection]} ShipDirection */
+export const ShipDirection = /** @type {const} */ ({
   Straight: 0,
   Left: 1,
   Right: 2
-};
+});
 
 export default class Ship {
   #renderer;

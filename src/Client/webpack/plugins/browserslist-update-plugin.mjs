@@ -5,11 +5,11 @@ import pc from 'picocolors';
 import updateDb from 'update-browserslist-db';
 import webpack from 'webpack';
 
-/** @enum {string} */
-export const BrowserslistUpdateDependency = {
+/** @typedef {(typeof BrowserslistUpdateDependency)[keyof typeof BrowserslistUpdateDependency]} BrowserslistUpdateDependency */
+export const BrowserslistUpdateDependency = /** @type {const} */ ({
   CaniuseLite: 'caniuse-lite',
   Baseline: 'baseline-browser-mapping'
-};
+});
 
 export default class BrowserslistUpdatePlugin {
   /** @type {string} */

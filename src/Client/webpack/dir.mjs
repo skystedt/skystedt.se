@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-/** @import RendererImplementation from '../src/renderers/renderer-implementation.mjs' */
+/** @import { RendererImplementation } from '../src/renderers/renderer-implementation.mjs' */
 
 const cwd = process.cwd();
 export const dir = {
