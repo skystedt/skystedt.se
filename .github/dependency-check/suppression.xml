@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <suppress until="2027-07-10Z">
+        <notes><![CDATA[
+            False positive: matched via the generic "opentelemetry:opentelemetry" CPE (LOW confidence), which also covers the Go and
+            C++ OpenTelemetry implementations and unrelated .NET packages (OpenTelemetry.Exporter.Jaeger, OpenTelemetry.Api,
+            OpenTelemetry.Extensions.Propagators). Azure.Monitor.OpenTelemetry.AspNetCore is not affected by any of these.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:nuget/Azure\.Monitor\.OpenTelemetry\.AspNetCore@.*$</packageUrl>
+        <cve>CVE-2026-41078</cve>
+        <cve>CVE-2026-39882</cve>
+        <cve>CVE-2026-40894</cve>
+        <cve>CVE-2026-41178</cve>
+        <cve>CVE-2026-44967</cve>
+    </suppress>
+    <suppress until="2027-07-10Z">
+        <notes><![CDATA[
+            False positive: matched via the generic "opentelemetry:opentelemetry" CPE (LOW confidence), which also covers the Go and
+            C++ OpenTelemetry implementations and unrelated .NET packages (OpenTelemetry.Exporter.Jaeger, OpenTelemetry.Api,
+            OpenTelemetry.Extensions.Propagators). Microsoft.Azure.Functions.Worker.OpenTelemetry is not affected by any of these.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:nuget/Microsoft\.Azure\.Functions\.Worker\.OpenTelemetry@.*$</packageUrl>
+        <cve>CVE-2026-41078</cve>
+        <cve>CVE-2026-39882</cve>
+        <cve>CVE-2026-40894</cve>
+        <cve>CVE-2026-41178</cve>
+        <cve>CVE-2026-44967</cve>
+    </suppress>
+</suppressions>

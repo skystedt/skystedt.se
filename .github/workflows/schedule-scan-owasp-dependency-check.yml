@@ -14,6 +14,8 @@ env:
   SRC_DIR: "src"
   OUTPUT_DIR: "dependency-check-report"
   REPORT_FILE_NAME: "dependency-check-report.json"
+  REPORT_FILE_NAME_HTML: "dependency-check-report.html"
+  SUPPRESSION_FILE: ".github/dependency-check/suppression.xml"
   IMAGE: "owasp/dependency-check-action:latest" # Rebuilt nightly with an updated NVD dataset, so version is not pinned
 
 jobs:
@@ -41,6 +43,7 @@ jobs:
             --format JSON \
             --format HTML \
             --out "/src/$OUTPUT_DIR" \
+            --suppression "/src/$SUPPRESSION_FILE" \
             --noupdate
           cat "$OUTPUT_DIR/$REPORT_FILE_NAME"
 
@@ -48,8 +51,8 @@ jobs:
         id: upload-report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         with:
-          name: dependency-check-report
-          path: ${{ env.OUTPUT_DIR }}
+          path: ${{ env.OUTPUT_DIR }}/${{ env.REPORT_FILE_NAME_HTML }}
+          archive: false
 
       - name: Evaluate Scan Result
         id: evaluate
