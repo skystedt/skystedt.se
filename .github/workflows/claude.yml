@@ -24,14 +24,19 @@ jobs:
           allowed_bots: |
             dependabot[bot]
           claude_args: |
-            --allowedTools "Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"
+            --allowedTools "Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh api repos/*/compare/*:*)"
             --model sonnet
             --effort high
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
 
-            Please review this pull request
+            Please review this pull request.
+            Use `gh pr diff` to see the full set of changes.
 
-            Note: The PR branch is already checked out in the current working directory.
+            ${{ github.event.action == 'synchronize' && 'This run was triggered by updates to an already-reviewed PR.' || '' }}
+            ${{ github.event.action == 'synchronize' && format('Run `gh api repos/{0}/compare/{1}...{2}` to see what changed since the last review.', github.repository, github.event.before, github.event.after) || '' }}
+            ${{ github.event.action == 'synchronize' && 'Check existing PR comments with `gh pr view --comments`.' || '' }}
+
+            The PR branch is already checked out in the current working directory.
             Only post GitHub comments, use `gh pr comment`.
