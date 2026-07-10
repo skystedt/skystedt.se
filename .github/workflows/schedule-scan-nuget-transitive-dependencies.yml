@@ -6,19 +6,25 @@ on:
     - cron: "40 8 * * 6"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+concurrency:
+  group: vulnerability-scan-nuget-transitive-dependencies
+  cancel-in-progress: false
 
 env:
   SRC_DIR: "src"
-  BRANCH_NAME: "vulnerability-scan/nuget-transitive-dependencies"
   OUTPUT_FILE_NAME: "vulnerable.json"
 
 jobs:
   scan:
     name: Scan Nuget Transitive Dependencies
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    outputs:
+      vulnerable: ${{ steps.evaluate.outputs.vulnerable }}
+      summary: ${{ steps.evaluate.outputs.summary }}
 
     defaults:
       run:
@@ -45,48 +51,26 @@ jobs:
         id: evaluate
         run: |
           VULNERABLE=$(jq -r '[.projects[]?.frameworks[]?.transitivePackages[]] | length' ${{ env.OUTPUT_FILE_NAME }})
-          echo "VULNERABLE=$VULNERABLE" >> "$GITHUB_ENV"
+          echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
           echo "Found $VULNERABLE vulnerable transitive dependencies"
 
-      - name: Check For Existing Pull Request
-        id: check-pr
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          EXISTING_PR=$(gh pr list --head "$BRANCH_NAME" --state open --json number --jq '.[0].number')
-          echo "EXISTING_PR=$EXISTING_PR" >> "$GITHUB_ENV"
-          echo "Existing PR: $EXISTING_PR"
+          {
+            echo "summary<<EOF_SUMMARY"
+            echo '```'
+            cat ${{ env.OUTPUT_FILE_NAME }}
+            echo '```'
+            echo "EOF_SUMMARY"
+          } >> "$GITHUB_OUTPUT"
 
-      - name: Create Branch
-        if: env.VULNERABLE != '0' && env.EXISTING_PR == ''
-        run: |
-          git config user.name 'GitHub Actions'
-          git config user.email 'actions@github.com'
-          git checkout -b "$BRANCH_NAME"
-          git commit --allow-empty -m "Vulnerable Nuget transitive dependency [skip ci]"
-          git push origin "$BRANCH_NAME"
-
-      - name: Create Pull Request
-        if: env.VULNERABLE != '0' && env.EXISTING_PR == ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          VULNERABLE_JSON=$(cat ${{ env.OUTPUT_FILE_NAME }})
-          BODY=$'## Vulnerabilities Found in Transitive Dependencies\n```\n'"${VULNERABLE_JSON}"$'\n```'
-          gh pr create --base main --head "$BRANCH_NAME" --title "Vulnerabilities found in transitive dependencies" --body "$BODY"
-
-      - name: Comment on Existing Pull Request
-        if: env.VULNERABLE != '0' && env.EXISTING_PR != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          VULNERABLE_JSON=$(cat ${{ env.OUTPUT_FILE_NAME }})
-          BODY=$'## Updated Vulnerabilities Found in Transitive Dependencies\n```\n'"${VULNERABLE_JSON}"$'\n```'
-          gh pr comment "$EXISTING_PR" --body "$BODY"
-
-      - name: Close Existing Pull Request
-        if: env.VULNERABLE == '0' && env.EXISTING_PR != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh pr close "$EXISTING_PR" --comment "No vulnerabilities found in transitive dependencies. Closing this PR." --delete-branch
+  pull-request:
+    name: Pull Request
+    needs: scan
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/reusable-report-pull-request.yml
+    with:
+      branch-name: "vulnerability-scan/nuget-transitive-dependencies"
+      open: ${{ needs.scan.outputs.vulnerable != '0' }}
+      title: "Vulnerabilities found in Transitive Dependencies"
+      summary: ${{ needs.scan.outputs.summary }}

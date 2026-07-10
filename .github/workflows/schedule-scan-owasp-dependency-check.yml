@@ -1,0 +1,85 @@
+name: Schedule - Scan OWASP Dependency Check
+
+on:
+  schedule:
+    # Run every Saturday at 11:45 UTC: owasp/dependency-check-action:latest is rebuilt daily at 11:30 UTC
+    - cron: "45 11 * * 6"
+  workflow_dispatch:
+
+concurrency:
+  group: vulnerability-scan-owasp-dependency-check
+  cancel-in-progress: false
+
+env:
+  SRC_DIR: "src"
+  OUTPUT_DIR: "dependency-check-report"
+  REPORT_FILE_NAME: "dependency-check-report.json"
+  IMAGE: "owasp/dependency-check-action:latest" # Rebuilt nightly with an updated NVD dataset, so version is not pinned
+
+jobs:
+  scan:
+    name: Scan Dependencies
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    outputs:
+      vulnerable: ${{ steps.evaluate.outputs.vulnerable }}
+      summary: ${{ steps.evaluate.outputs.summary }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
+
+      - name: Scan For Vulnerabilities
+        run: |
+          docker run --rm \
+            -v "${{ github.workspace }}:/src" \
+            "$IMAGE" \
+            --scan "/src/$SRC_DIR" \
+            --format JSON \
+            --format HTML \
+            --out "/src/$OUTPUT_DIR" \
+            --noupdate
+          cat "$OUTPUT_DIR/$REPORT_FILE_NAME"
+
+      - name: Upload Report
+        id: upload-report
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
+        with:
+          name: dependency-check-report
+          path: ${{ env.OUTPUT_DIR }}
+
+      - name: Evaluate Scan Result
+        id: evaluate
+        env:
+          REPORT_URL: ${{ steps.upload-report.outputs.artifact-url }}
+        run: |
+          SUMMARY=$(jq -c '[.dependencies[]? | select(.vulnerabilities) | {fileName, filePath, vulnerabilities: [.vulnerabilities[] | {name, severity}]}]' "$OUTPUT_DIR/$REPORT_FILE_NAME")
+
+          VULNERABLE=$(jq -r '[.[].vulnerabilities[]] | length' <<< "$SUMMARY")
+          echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
+          echo "Found $VULNERABLE vulnerabilities"
+
+          {
+            echo "summary<<EOF_SUMMARY"
+            echo "Full report: $REPORT_URL"
+            echo '```'
+            jq . <<< "$SUMMARY"
+            echo '```'
+            echo "EOF_SUMMARY"
+          } >> "$GITHUB_OUTPUT"
+
+  pull-request:
+    name: Pull Request
+    needs: scan
+    permissions:
+      contents: write
+      pull-requests: write
+    uses: ./.github/workflows/reusable-report-pull-request.yml
+    with:
+      branch-name: "vulnerability-scan/owasp-dependency-check"
+      open: ${{ needs.scan.outputs.vulnerable != '0' }}
+      title: "Vulnerabilities found by OWASP Dependency-Check"
+      summary: ${{ needs.scan.outputs.summary }}
