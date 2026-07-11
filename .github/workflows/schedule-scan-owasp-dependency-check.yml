@@ -12,9 +12,7 @@ concurrency:
 
 env:
   SRC_DIR: "src"
-  OUTPUT_DIR: "dependency-check-report"
-  REPORT_FILE_NAME: "dependency-check-report.json"
-  REPORT_FILE_NAME_HTML: "dependency-check-report.html"
+  REPORT_NAME: "dependency-check-report"
   SUPPRESSION_FILE: ".github/dependency-check/suppression.xml"
   IMAGE: "owasp/dependency-check-action:latest" # Rebuilt nightly with an updated NVD dataset, so version is not pinned
 
@@ -25,6 +23,7 @@ jobs:
 
     permissions:
       contents: read
+      security-events: write
 
     outputs:
       vulnerable: ${{ steps.evaluate.outputs.vulnerable }}
@@ -42,24 +41,31 @@ jobs:
             --scan "/src/$SRC_DIR" \
             --format JSON \
             --format HTML \
-            --out "/src/$OUTPUT_DIR" \
+            --format SARIF \
+            --out "/src/$REPORT_NAME" \
             --suppression "/src/$SUPPRESSION_FILE" \
             --noupdate
-          cat "$OUTPUT_DIR/$REPORT_FILE_NAME"
+          cat "$REPORT_NAME/$REPORT_NAME.json"
 
       - name: Upload Report
         id: upload-report
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         with:
-          path: ${{ env.OUTPUT_DIR }}/${{ env.REPORT_FILE_NAME_HTML }}
+          path: ${{ env.REPORT_NAME }}/${{ env.REPORT_NAME }}.html
           archive: false
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # 4.37.0
+        with:
+          sarif_file: ${{ env.REPORT_NAME }}/${{ env.REPORT_NAME }}.sarif
+          category: owasp-dependency-check
 
       - name: Evaluate Scan Result
         id: evaluate
         env:
           REPORT_URL: ${{ steps.upload-report.outputs.artifact-url }}
         run: |
-          SUMMARY=$(jq -c '[.dependencies[]? | select(.vulnerabilities) | {fileName, filePath, vulnerabilities: [.vulnerabilities[] | {name, severity}]}]' "$OUTPUT_DIR/$REPORT_FILE_NAME")
+          SUMMARY=$(jq -c '[.dependencies[]? | select(.vulnerabilities) | {fileName, filePath, vulnerabilities: [.vulnerabilities[] | {name, severity}]}]' "$REPORT_NAME/$REPORT_NAME.json")
 
           VULNERABLE=$(jq -r '[.[].vulnerabilities[]] | length' <<< "$SUMMARY")
           echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
