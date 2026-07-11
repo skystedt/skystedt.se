@@ -12,7 +12,10 @@ concurrency:
 
 env:
   SRC_DIR: "src"
+  SCRIPTS_DIR: "${{ github.workspace }}/.github/scripts"
   OUTPUT_FILE_NAME: "vulnerable.json"
+  SARIF_FILE_NAME: "vulnerable.sarif"
+  PACKAGE_LEVELS: "transitivePackages" # space-separated dotnet-list-package framework levels to scan
 
 jobs:
   scan:
@@ -21,6 +24,7 @@ jobs:
 
     permissions:
       contents: read
+      security-events: write
 
     outputs:
       vulnerable: ${{ steps.evaluate.outputs.vulnerable }}
@@ -47,12 +51,23 @@ jobs:
           dotnet list package --vulnerable --include-transitive --format json --no-restore > ${{ env.OUTPUT_FILE_NAME }} || true
           cat ${{ env.OUTPUT_FILE_NAME }}
 
+      - name: Convert To SARIF
+        run: |
+          dotnet run ${{ env.SCRIPTS_DIR }}/ConvertNugetVulnerabilitiesToSarif.cs -- ${{ env.OUTPUT_FILE_NAME }} ${{ env.PACKAGE_LEVELS }}
+          cat ${{ env.SARIF_FILE_NAME }}
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@99df26d4f13ea111d4ec1a7dddef6063f76b97e9 # 4.37.0
+        with:
+          sarif_file: ${{ env.SRC_DIR }}/${{ env.SARIF_FILE_NAME }}
+          category: nuget-transitive-dependencies
+
       - name: Evaluate Scan Result
         id: evaluate
         run: |
-          VULNERABLE=$(jq -r '[.projects[]?.frameworks[]?.transitivePackages[]] | length' ${{ env.OUTPUT_FILE_NAME }})
+          VULNERABLE=$(jq -r '[.projects[]?.frameworks[]? as $f | $ARGS.positional[] as $level | ($f[$level] // [])[]] | length' ${{ env.OUTPUT_FILE_NAME }} --args ${{ env.PACKAGE_LEVELS }})
           echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
-          echo "Found $VULNERABLE vulnerable transitive dependencies"
+          echo "Found $VULNERABLE vulnerable dependencies"
 
           {
             echo "summary<<EOF_SUMMARY"
