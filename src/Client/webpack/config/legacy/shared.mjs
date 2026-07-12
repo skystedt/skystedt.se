@@ -7,8 +7,8 @@ import LicenseWebpackPluginWrapper from '../../plugins/license-webpack-plugin-wr
 import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plugin.mjs';
 import { cacheGroups, performanceFilter, sideEffects, transformPackages } from '../chunks.mjs';
 import {
-  licenseAcceptable,
   licenseAdditionals,
+  licenseAllowed,
   licenseFilename,
   licenseFormatter,
   licenseOverrides,
@@ -115,7 +115,7 @@ export default {
     new LicenseWebpackPluginWrapper({
       nodeModulesDirectory: dir.node_modules,
       filename: licenseFilename,
-      acceptableLicenses: licenseAcceptable.redistributed,
+      acceptableLicenses: licenseAllowed.redistributed,
       formatter: licenseFormatter,
       additionals: licenseAdditionals.legacy,
       overrides: licenseOverrides,

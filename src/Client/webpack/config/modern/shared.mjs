@@ -24,8 +24,8 @@ import ThrowOnUnnamedChunkPlugin from '../../plugins/throw-on-unnamed-chunk-plug
 import { postcssOptions } from '../../postcss/config.mjs';
 import { cacheGroups, performanceFilter, sideEffects } from '../chunks.mjs';
 import {
-  licenseAcceptable,
   licenseAdditionals,
+  licenseAllowed,
   licenseFilename,
   licenseFormatter,
   licenseOverrides,
@@ -181,7 +181,7 @@ export default {
     new LicenseWebpackPluginWrapper({
       nodeModulesDirectory: dir.node_modules,
       filename: licenseFilename,
-      acceptableLicenses: licenseAcceptable.redistributed,
+      acceptableLicenses: licenseAllowed.redistributed,
       formatter: licenseFormatter,
       additionals: licenseAdditionals.modern,
       overrides: licenseOverrides,
@@ -189,7 +189,7 @@ export default {
         BuildInfo.instance.addLicense('redistributed', name, version, licenseId);
       }
     }),
-    new LicenseCheckUsePlugin(licenseAcceptable.used, (name, version, licenseId) => {
+    new LicenseCheckUsePlugin(licenseAllowed.used, (name, version, licenseId) => {
       BuildInfo.instance.addLicense('used', name, version, licenseId);
     }),
     new HtmlWebpackPlugin({

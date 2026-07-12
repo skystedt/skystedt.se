@@ -1,6 +1,7 @@
 // cSpell:ignore unfetch, cfgsync
 
 import unfetch from 'unfetch/package.json' with { type: 'json' };
+import licenses from '../../licenses.json' with { type: 'json' };
 
 /** @import { LicenseWebpackPluginWrapperOptions, LicenseFormatter } from '../plugins/license-webpack-plugin-wrapper.mjs' */
 /** @typedef {LicenseWebpackPluginWrapperOptions["overrides"]} LicenseOverrides */
@@ -8,29 +9,27 @@ import unfetch from 'unfetch/package.json' with { type: 'json' };
 export const licenseFilename = 'THIRD-PARTY-LICENSES.txt';
 export const licensePreamble = `/*! License information in ${licenseFilename} */`;
 
-export const licenseAcceptable = {
+export const licenseAllowed = {
   // Results in "ERROR in license-webpack-plugin: unacceptable license found for ..."
-  redistributed: [
-    'MIT', //           https://www.tldrlegal.com/license/mit-license
-    'ISC', //           https://www.tldrlegal.com/license/isc-license                   /* only used for development */
-    'Apache-2.0' //     https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0 /* only used for development when running start */
-  ],
+  // MIT           https://www.tldrlegal.com/license/mit-license
+  // ISC           https://www.tldrlegal.com/license/isc-license                   (only used for development)
+  // Apache-2.0    https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0 (only used for development when running start)
+  redistributed: licenses.allowed.redistributed,
   // Results in "ERROR in LicenseCheckUsePlugin: Unacceptable license used in: ..."
-  used: [
-    'MIT', //           https://www.tldrlegal.com/license/mit-license
-    'MIT-0', //         https://opensource.org/license/mit-0
-    'ISC', //           https://www.tldrlegal.com/license/isc-license
-    'Apache-2.0', //    https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0
-    '0BSD', //          https://www.tldrlegal.com/license/bsd-0-clause-license
-    'BSD-2-Clause', //  https://www.tldrlegal.com/license/bsd-2-clause-license-freebsd
-    'BSD-3-Clause', //  https://www.tldrlegal.com/license/bsd-3-clause-license-revised
-    'CC0-1.0', //       https://www.tldrlegal.com/license/creative-commons-cc0-1-0-universal
-    'CC-BY-3.0', //     https://www.tldrlegal.com/license/creative-commons-attribution-cc
-    'CC-BY-4.0', //     https://www.tldrlegal.com/license/creative-commons-attribution-4-0-international-cc-by-4
-    'Python-2.0', //    https://www.tldrlegal.com/license/python-license-2-0
-    'LGPL-3.0-only', // https://www.tldrlegal.com/license/gnu-lesser-general-public-license-v3-lgpl-3
-    'BlueOak-1.0.0' //  https://opensource.org/license/blue-oak-model-license
-  ]
+  // MIT             https://www.tldrlegal.com/license/mit-license
+  // MIT-0           https://opensource.org/license/mit-0
+  // ISC             https://www.tldrlegal.com/license/isc-license
+  // Apache-2.0      https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0
+  // 0BSD            https://www.tldrlegal.com/license/bsd-0-clause-license
+  // BSD-2-Clause    https://www.tldrlegal.com/license/bsd-2-clause-license-freebsd
+  // BSD-3-Clause    https://www.tldrlegal.com/license/bsd-3-clause-license-revised
+  // CC0-1.0         https://www.tldrlegal.com/license/creative-commons-cc0-1-0-universal
+  // CC-BY-3.0       https://www.tldrlegal.com/license/creative-commons-attribution-cc
+  // CC-BY-4.0       https://www.tldrlegal.com/license/creative-commons-attribution-4-0-international-cc-by-4
+  // Python-2.0      https://www.tldrlegal.com/license/python-license-2-0
+  // LGPL-3.0-only   https://www.tldrlegal.com/license/gnu-lesser-general-public-license-v3-lgpl-3
+  // BlueOak-1.0.0   https://opensource.org/license/blue-oak-model-license
+  used: licenses.allowed.used
 };
 
 // Manually add modules that are not explicitly referenced but used in runtime/added by the build process
