@@ -1,0 +1,20 @@
+{
+  "allowed": {
+    "redistributed": ["MIT", "ISC", "Apache-2.0"],
+    "used": [
+      "MIT",
+      "MIT-0",
+      "ISC",
+      "Apache-2.0",
+      "0BSD",
+      "BSD-2-Clause",
+      "BSD-3-Clause",
+      "CC0-1.0",
+      "CC-BY-3.0",
+      "CC-BY-4.0",
+      "Python-2.0",
+      "LGPL-3.0-only",
+      "BlueOak-1.0.0"
+    ]
+  }
+}
