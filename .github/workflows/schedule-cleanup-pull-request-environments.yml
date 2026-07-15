@@ -8,16 +8,18 @@ on:
 
 permissions:
   id-token: write
-  actions: write
-  
+
 env:
   SWA_NAME: "skystedt"
 
 jobs:
-  cleanup:
-    name: Cleanup PR Environments
+  find_orphaned:
+    name: Find Orphaned Environments
     runs-on: ubuntu-latest
-    
+
+    outputs:
+      orphaned: ${{ steps.orphaned.outputs.orphaned }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
@@ -44,20 +46,26 @@ jobs:
           echo "OPEN_PRS=$OPEN_PRS" >> "$GITHUB_ENV"
           echo "Found open PRs: $OPEN_PRS"
 
-      - name: Cleanup Orphaned Environments
-        if: env.ENVIRONMENTS != '[]'
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Determine Orphaned Environments
+        id: orphaned
         run: |
-          echo "$ENVIRONMENTS" | jq -r '.[]' | while IFS= read -r PR_NUMBER; do
-            if echo "$OPEN_PRS" | grep -Fw "$PR_NUMBER"; then
-              echo "PR #$PR_NUMBER is open, skip cleanup"
-            else
-              echo "Cleaning up PR #$PR_NUMBER"
-              gh workflow run reusable-cleanup.yml -f pr_number=$PR_NUMBER
-            fi
-          done
+          ORPHANED=$(jq -n -c --argjson environments "${ENVIRONMENTS:-[]}" --argjson open_prs "${OPEN_PRS:-[]}" '$environments - $open_prs')
+          echo "orphaned=$ORPHANED" >> "$GITHUB_OUTPUT"
+          echo "Orphaned environments: $ORPHANED"
 
       - name: Azure Logout
         if: always()
         run: az logout
+
+  cleanup:
+    name: Cleanup
+    needs: find_orphaned
+    if: needs.find_orphaned.outputs.orphaned != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        pr_number: ${{ fromJson(needs.find_orphaned.outputs.orphaned) }}
+    uses: ./.github/workflows/reusable-cleanup.yml
+    with:
+      pr_number: ${{ matrix.pr_number }}
+    secrets: inherit
