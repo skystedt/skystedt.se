@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
+        with:
+          fetch-depth: 0 # full history so the review can diff against previously reviewed commits
 
       - name: Claude Code
         uses: anthropics/claude-code-action@f1bd27ca5b54584506e40e17884d90bdaaa1a9b3 # v1.0.173
@@ -28,7 +30,7 @@ jobs:
           allowed_bots: |
             dependabot[bot]
           claude_args: |
-            --allowedTools "Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh api repos/*/compare/*:*)"
+            --allowedTools "Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh api */compare/*),Bash(git fetch:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
             --model sonnet
             --effort high
           prompt: |
