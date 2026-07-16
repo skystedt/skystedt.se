@@ -22,7 +22,11 @@ export default class BrowserslistUpdatePlugin {
 
   /** @param {webpack.Compiler} compiler */
   apply(compiler) {
+    const logger = compiler.getInfrastructureLogger(BrowserslistUpdatePlugin.name);
+
     compiler.hooks.environment.tap(BrowserslistUpdatePlugin.name, () => {
+      logger.info('Checking for Browserslist updates...');
+
       const versionBeforeCaniuse = BrowserslistUpdatePlugin.definitionsVersion(
         this.#nodeModules,
         BrowserslistUpdateDependency.CaniuseLite
@@ -53,11 +57,9 @@ export default class BrowserslistUpdatePlugin {
           )
         );
 
-        console.warn(message);
-
-        compiler.hooks.afterDone.tap(BrowserslistUpdatePlugin.name, () => {
-          console.warn(message);
-        });
+        logger.warn(message);
+      } else {
+        logger.info('Browserslist is up to date');
       }
     });
   }

@@ -2,6 +2,7 @@ import path from 'node:path';
 import webpack from 'webpack';
 import settings from '../../../settings.mjs';
 import { dir } from '../../dir.mjs';
+import ColorLoggerPlugin from '../../plugins/color-logger-plugin.mjs';
 import ColorProgressPlugin from '../../plugins/color-progress-plugin.mjs';
 
 /** @type {webpack.Configuration} */
@@ -19,6 +20,7 @@ export default {
     new webpack.DefinePlugin({
       INSTRUMENTATION_KEY: `"${settings.production.INSTRUMENTATION_KEY}"`
     }),
+    new ColorLoggerPlugin('legacy', true),
     new ColorProgressPlugin('legacy', true)
   ]
 };

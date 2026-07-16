@@ -5,6 +5,7 @@ import webpack from 'webpack';
 import settings from '../../../settings.mjs';
 import { dir } from '../../dir.mjs';
 import BrowserslistUpdatePlugin from '../../plugins/browserslist-update-plugin.mjs';
+import ColorLoggerPlugin from '../../plugins/color-logger-plugin.mjs';
 import ColorProgressPlugin from '../../plugins/color-progress-plugin.mjs';
 import AddInlineStylesHtmlWebpackPlugin from '../../plugins/html/add-inline-styles-html-webpack-plugin.mjs';
 import CspHashesHtmlWebpackPlugin from '../../plugins/html/csp-hashes-html-webpack-plugin.mjs';
@@ -73,6 +74,7 @@ export default {
     new webpack.DefinePlugin({
       INSTRUMENTATION_KEY: `"${settings.development.INSTRUMENTATION_KEY}"`
     }),
+    new ColorLoggerPlugin('modern', false),
     new ColorProgressPlugin('modern', false),
     new BrowserslistUpdatePlugin(dir.node_modules),
     // CSP is added again for development, but as a meta tag instead
