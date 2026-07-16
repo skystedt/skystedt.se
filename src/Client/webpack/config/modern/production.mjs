@@ -6,6 +6,7 @@ import webpack from 'webpack';
 import settings from '../../../settings.mjs';
 import BuildInfo from '../../build-info.mjs';
 import { dir } from '../../dir.mjs';
+import ColorLoggerPlugin from '../../plugins/color-logger-plugin.mjs';
 import ColorProgressPlugin from '../../plugins/color-progress-plugin.mjs';
 import PostCompilationPrintPlugin from '../../plugins/post-compilation-print-plugin.mjs';
 
@@ -23,6 +24,7 @@ export default {
     new webpack.DefinePlugin({
       INSTRUMENTATION_KEY: `"${settings.production.INSTRUMENTATION_KEY}"`
     }),
+    new ColorLoggerPlugin('modern', true),
     new ColorProgressPlugin('modern', true),
     new ESLintPlugin(
       /** @type {ESLintPlugin.Options} */ ({
