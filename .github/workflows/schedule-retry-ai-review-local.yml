@@ -1,0 +1,68 @@
+name: Schedule - Retry AI Review Local
+
+on:
+  schedule:
+    # Run hourly
+    - cron: "25 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: retry-ai-review-local
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  PENDING_MARKER: "ai-review-local:pending"
+
+jobs:
+  find_pending:
+    name: Find Pending Reviews
+    runs-on: ubuntu-latest
+
+    outputs:
+      prs: ${{ steps.pending.outputs.prs }}
+
+    steps:
+      - name: Find PRs Awaiting Review
+        id: pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          PRS=$(gh api graphql \
+            -f owner="${GH_REPO%/*}" \
+            -f repo="${GH_REPO#*/}" \
+            -f query='
+              query($owner: String!, $repo: String!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequests(states: OPEN, first: 100) {
+                    nodes {
+                      number
+                      comments(last: 100) {
+                        nodes { body }
+                      }
+                    }
+                  }
+                }
+              }' \
+            --jq ".data.repository.pullRequests.nodes[] | select(any(.comments.nodes[]; .body | contains(\"<!-- $PENDING_MARKER -->\"))) | .number" | jq -c -s '.')
+          echo "prs=$PRS" >> "$GITHUB_OUTPUT"
+          echo "PRs awaiting review: $PRS"
+
+  retry:
+    name: Retry Review
+    needs: find_pending
+    if: needs.find_pending.outputs.prs != '[]'
+    strategy:
+      fail-fast: false
+      max-parallel: 1 # because of WireGuard
+      matrix:
+        pr_number: ${{ fromJson(needs.find_pending.outputs.prs) }}
+    uses: ./.github/workflows/reusable-ai-review-local.yml
+    with:
+      pr_number: ${{ matrix.pr_number }}
+      notify_offline: false
+    secrets: inherit

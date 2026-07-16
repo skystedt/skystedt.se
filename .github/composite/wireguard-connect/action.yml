@@ -1,0 +1,22 @@
+name: Composite - WireGuard Connect
+description: Connect the runner to a private network using WireGuard
+
+inputs:
+  config:
+    description: Complete wg-quick configuration
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Connect WireGuard
+      shell: bash
+      env:
+        WIREGUARD_CONFIG: ${{ inputs.config }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends wireguard
+        sudo install -m 600 /dev/null /etc/wireguard/wg0.conf
+        printf '%s\n' "$WIREGUARD_CONFIG" | sudo tee /etc/wireguard/wg0.conf > /dev/null
+        # suppress output to hide sensitive information
+        sudo wg-quick up wg0 > /dev/null 2>&1 || { echo "Failed to bring up the WireGuard tunnel"; exit 1; }

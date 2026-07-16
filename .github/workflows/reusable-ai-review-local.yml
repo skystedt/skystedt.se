@@ -1,0 +1,258 @@
+name: Reusable - AI Review Local
+
+on:
+  workflow_call:
+    inputs:
+      pr_number:
+        type: number
+        required: true
+      notify_offline:
+        type: boolean
+        required: true
+
+env:
+  PENDING_MARKER: "ai-review-local:pending"
+  REVIEW_MARKER: "ai-review-local:review"
+  REVIEWED_HEAD_MARKER: "ai-review-local:reviewed-head"
+  MAX_DIFF_CHARS: "120000" # keep the prompt within the local context window
+  MAX_COMMENT_CHARS: "60000" # comments are limited to 65536 characters
+
+jobs:
+  review:
+    name: Local LLM Review
+    runs-on: ubuntu-latest
+    timeout-minutes: &job_timeout_minutes 30 # anchor
+
+    # serialize runs across triggers (pull_request and schedule), they read and write the same comments and share WireGuard configuration
+    concurrency:
+      group: ai-review-local-pr-${{ inputs.pr_number }}
+      cancel-in-progress: false
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      JOB_TIMEOUT_MINUTES: *job_timeout_minutes
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
+
+      - name: Pull Request Info
+        id: pr
+        run: |
+          # get the head commit
+          HEAD_HASH=$(gh pr view "${{ inputs.pr_number }}" --json headRefOid --jq '.headRefOid')
+          echo "head_hash=$HEAD_HASH" >> "$GITHUB_OUTPUT"
+
+          # find last reviewed commit
+          REVIEWED_HASH=$(gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" --paginate --jq '.[].body' | sed -n "s/.*<!-- $REVIEWED_HEAD_MARKER=\([0-9a-f]*\) -->.*/\1/p" | tail -n 1)
+          echo "reviewed_hash=$REVIEWED_HASH" >> "$GITHUB_OUTPUT"
+          echo "Last reviewed: ${REVIEWED_HASH:-none}"
+
+          # find pending comment
+          PENDING_ID=$(gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" --paginate --jq "[.[] | select(.body | contains(\"<!-- $PENDING_MARKER -->\")) | .id] | first // empty")
+          echo "pending_id=$PENDING_ID" >> "$GITHUB_OUTPUT"
+          echo "Pending comment: ${PENDING_ID:-none}"
+
+          # skip when the head commit has already been reviewed and no retry is pending
+          SKIP=false
+          if [ -n "$REVIEWED_HASH" ] && [ "$REVIEWED_HASH" = "$HEAD_HASH" ] && [ -z "$PENDING_ID" ]; then
+            SKIP=true
+            echo "No new commits since the last review, skipping"
+          fi
+          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+
+      - name: Connect WireGuard
+        if: steps.pr.outputs.skip != 'true'
+        # if the tunnel cannot be established the availability check will report offline
+        continue-on-error: true
+        uses: ./.github/composite/wireguard-connect
+        with:
+          config: ${{ secrets.WIREGUARD_CONFIG }}
+
+      - name: Check Availability
+        id: availability
+        if: steps.pr.outputs.skip != 'true'
+        run: |
+          MAX_TIME=15
+          URL=http://${{ secrets.LOCAL_LLM_URL }}/v1/models
+
+          if curl -sf \
+            --max-time "$MAX_TIME" \
+            "$URL" > /dev/null; then
+
+            ONLINE=true
+          else
+            ONLINE=false
+          fi
+          echo "online=$ONLINE" >> "$GITHUB_OUTPUT"
+          echo "Local LLM online: $ONLINE"
+
+      - name: Pull Request Data
+        id: data
+        if: steps.availability.outputs.online == 'true'
+        env:
+          HEAD_HASH: ${{ steps.pr.outputs.head_hash }}
+          REVIEWED_HASH: ${{ steps.pr.outputs.reviewed_hash }}
+        run: |
+          # read title and description
+          gh pr view "${{ inputs.pr_number }}" --json title,body --jq '"# " + .title + "\n\n" + (.body // "")' > pr.md
+
+          # read full diff
+          gh pr diff "${{ inputs.pr_number }}" > full_diff.patch
+
+          # read diff since last review
+          : > change_diff.patch
+          if [ -n "$REVIEWED_HASH" ] && [ "$REVIEWED_HASH" != "$HEAD_HASH" ]; then
+            if gh api -H "Accept: application/vnd.github.diff" "repos/{owner}/{repo}/compare/$REVIEWED_HASH...$HEAD_HASH" > change_diff.patch && [ -s change_diff.patch ]; then
+              echo "update=true" >> "$GITHUB_OUTPUT"
+              echo "This is an update, read the changes since the last review"
+            else
+              : > change_diff.patch
+            fi
+          fi
+
+          # read previous review comments (strip html comments)
+          gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" --paginate --jq "[.[] | select(.body | contains(\"<!-- $REVIEW_MARKER -->\")) | .body | gsub(\"<!--[^>]*-->\"; \"\")] | join(\"\n\n---\n\n\") | select(length > 0)" > comments.md
+
+      - name: Limit Prompt Size
+        if: steps.availability.outputs.online == 'true'
+        run: |
+          # keep the prompt within the size limit, drop content by priority:
+          # 1. skip previous comments
+          # 2. skip full diff (the changes since last review are kept)
+          # 3. truncate the remaining diffs to what is left of the size limit
+          total_size() { echo $(( $(wc -c < full_diff.patch) + $(wc -c < change_diff.patch) + $(wc -c < comments.md) )); }
+
+          if [ "$(total_size)" -gt "$MAX_DIFF_CHARS" ] && [ -s comments.md ]; then
+            : > comments.md
+            echo "Skipped previous comments to fit the size limit"
+          fi
+
+          if [ "$(total_size)" -gt "$MAX_DIFF_CHARS" ] && [ -s change_diff.patch ] && [ -s full_diff.patch ]; then
+            : > full_diff.patch
+            echo "Skipped the full diff to fit the size limit, kept the changes since last review"
+          fi
+
+          for FILE in full_diff.patch change_diff.patch; do
+            EXCESS=$(( $(total_size) - MAX_DIFF_CHARS ))
+            SIZE=$(wc -c < "$FILE")
+            if [ "$EXCESS" -gt 0 ] && [ "$SIZE" -gt 0 ]; then
+              head -c "$(( SIZE > EXCESS ? SIZE - EXCESS : 0 ))" "$FILE" > "$FILE.tmp"
+              mv "$FILE.tmp" "$FILE"
+              printf '\n\n[the diff was truncated here because it exceeded the size limit]\n' >> "$FILE"
+              echo "Truncated $FILE to fit the size limit"
+            fi
+          done
+
+      - name: Build Prompt
+        if: steps.availability.outputs.online == 'true'
+        run: |
+          {
+            echo "Please review this pull request."
+            echo "${{ steps.data.outputs.update == 'true' && 'This run was triggered by updates to an already-reviewed PR.' || '' }}"
+
+            echo ""
+            echo "## PR Description"
+            cat pr.md
+
+            if [ -s full_diff.patch ]; then
+              echo ""
+              echo "## Full diff"
+              echo ""
+              echo '```diff'
+              cat full_diff.patch
+              echo '```'
+            fi
+
+            if [ -s change_diff.patch ]; then
+              echo ""
+              echo "## Changes since last review"
+              echo ""
+              echo '```diff'
+              cat change_diff.patch
+              echo '```'
+            fi
+
+            if [ -s comments.md ]; then
+              echo ""
+              echo "## Previous review comments"
+              echo ""
+              # 4-backtick fence on purpose, the previous comments themselves contain 3-backtick code blocks
+              echo '````markdown'
+              cat comments.md
+              echo '````'
+            fi
+          } > prompt.md
+
+          jq -n --rawfile prompt prompt.md '{ stream: false, messages: [{ role: "user", content: $prompt }] }' > request.json
+
+      - name: Call Local LLM
+        id: llm
+        if: steps.availability.outputs.online == 'true'
+        run: |
+          REVIEWED=false
+          MAX_TIME=$(( (JOB_TIMEOUT_MINUTES - 5) * 60 ))
+          URL=http://${{ secrets.LOCAL_LLM_URL }}/v1/chat/completions
+
+          if curl -sf \
+            --max-time "$MAX_TIME" \
+            -H "Content-Type: application/json" \
+            -d @request.json \
+            "$URL" > response.json; then
+
+            # validate the response, an error response has no content and jq fails on invalid json
+            if CONTENT=$(jq -r '.choices[0].message.content // empty' response.json 2> /dev/null) && [ -n "$CONTENT" ]; then
+              printf '%s' "$CONTENT" | head -c "$MAX_COMMENT_CHARS" > review.md
+              REVIEWED=true
+              MODEL=$(jq -r '.model // "unknown"' response.json | head -n 1)
+              echo "model=$MODEL" >> "$GITHUB_OUTPUT"
+              echo "Review by model: $MODEL"
+            else
+              echo "The LLM returned an invalid or error response:"
+              cat response.json
+            fi
+          else
+            echo "The LLM call failed"
+          fi
+          echo "reviewed=$REVIEWED" >> "$GITHUB_OUTPUT"
+
+      - name: Build Review Comment
+        if: steps.llm.outputs.reviewed == 'true'
+        env:
+          MODEL: ${{ steps.llm.outputs.model }}
+          HEAD_HASH: ${{ steps.pr.outputs.head_hash }}
+        run: |
+          {
+            echo "## 🤖 Local LLM Review${{ steps.data.outputs.update == 'true' && ' _(update)_' || '' }}"
+            echo "_Model: ${MODEL}_"
+            echo ""
+            cat review.md
+            echo ""
+            echo "<!-- $REVIEW_MARKER -->"
+            echo "<!-- $REVIEWED_HEAD_MARKER=$HEAD_HASH -->"
+          } > post.md
+
+      - name: Build Offline Notice
+        if: steps.pr.outputs.skip != 'true' && steps.llm.outputs.reviewed != 'true' && (inputs.notify_offline || steps.pr.outputs.pending_id != '')
+        run: |
+          {
+            echo "🤖 The local LLM reviewer is not available right now. The review will be retried automatically."
+            echo ""
+            echo "_Last checked: $(date -u '+%Y-%m-%d %H:%M UTC')_"
+            echo "<!-- $PENDING_MARKER -->"
+          } > post.md
+
+      - name: Post Comment
+        env:
+          COMMENT_ID: ${{ steps.pr.outputs.pending_id }}
+        run: |
+          if [ ! -f post.md ]; then
+            echo "No comment to post"
+            exit 0
+          fi
+
+          if [ -n "$COMMENT_ID" ]; then
+            gh api -X PATCH "repos/{owner}/{repo}/issues/comments/$COMMENT_ID" -F body=@post.md
+          else
+            gh pr comment "${{ inputs.pr_number }}" --body-file post.md
+          fi
