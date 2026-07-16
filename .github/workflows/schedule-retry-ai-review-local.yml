@@ -1,0 +1,56 @@
+name: Schedule - Retry AI Review Local
+
+on:
+  schedule:
+    # Run hourly
+    - cron: "25 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: retry-ai-review-local
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  PENDING_MARKER: "ai-review-local:pending"
+
+jobs:
+  find_pending:
+    name: Find Pending Reviews
+    runs-on: ubuntu-latest
+
+    outputs:
+      prs: ${{ steps.pending.outputs.prs }}
+
+    steps:
+      - name: Find PRs Awaiting Review
+        id: pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          PRS=$(gh pr list --state open --json number --jq '.[].number' | while read -r PR; do
+            if gh api "repos/$GH_REPO/issues/$PR/comments" --paginate --jq '.[].body' | grep -qF "<!-- $PENDING_MARKER -->"; then
+              echo "$PR"
+            fi
+          done | jq -c -s '.')
+          echo "prs=$PRS" >> "$GITHUB_OUTPUT"
+          echo "PRs awaiting review: $PRS"
+
+  retry:
+    name: Retry Review
+    needs: find_pending
+    if: needs.find_pending.outputs.prs != '[]'
+    strategy:
+      fail-fast: false
+      max-parallel: 1 # because of WireGuard
+      matrix:
+        pr_number: ${{ fromJson(needs.find_pending.outputs.prs) }}
+    uses: ./.github/workflows/reusable-ai-review-local.yml
+    with:
+      pr_number: ${{ matrix.pr_number }}
+      notify_offline: false
+    secrets: inherit
