@@ -14,6 +14,7 @@ runs:
       env:
         WIREGUARD_CONFIG: ${{ inputs.config }}
       run: |
+        sudo apt-get update
         sudo apt-get install -y --no-install-recommends wireguard
         sudo install -m 600 /dev/null /etc/wireguard/wg0.conf
         printf '%s\n' "$WIREGUARD_CONFIG" | sudo tee /etc/wireguard/wg0.conf > /dev/null

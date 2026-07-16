@@ -32,11 +32,23 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          PRS=$(gh pr list --state open --json number --jq '.[].number' | while read -r PR; do
-            if gh api "repos/$GH_REPO/issues/$PR/comments" --paginate --jq '.[].body' | grep -qF "<!-- $PENDING_MARKER -->"; then
-              echo "$PR"
-            fi
-          done | jq -c -s '.')
+          PRS=$(gh api graphql \
+            -f owner="${GH_REPO%/*}" \
+            -f repo="${GH_REPO#*/}" \
+            -f query='
+              query($owner: String!, $repo: String!) {
+                repository(owner: $owner, name: $repo) {
+                  pullRequests(states: OPEN, first: 100) {
+                    nodes {
+                      number
+                      comments(last: 100) {
+                        nodes { body }
+                      }
+                    }
+                  }
+                }
+              }' \
+            --jq ".data.repository.pullRequests.nodes[] | select(any(.comments.nodes[]; .body | contains(\"<!-- $PENDING_MARKER -->\"))) | .number" | jq -c -s '.')
           echo "prs=$PRS" >> "$GITHUB_OUTPUT"
           echo "PRs awaiting review: $PRS"
 
