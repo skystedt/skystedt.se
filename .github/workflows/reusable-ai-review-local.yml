@@ -24,6 +24,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
+    # serialize per PR across triggers (pull_request and schedule), they read and write the same comments
+    concurrency:
+      group: ai-review-local-pr-${{ inputs.pr_number }}
+      cancel-in-progress: false
+
     outputs:
       head_hash: ${{ steps.pr.outputs.head_hash }}
       reviewed_hash: ${{ steps.pr.outputs.reviewed_hash }}
