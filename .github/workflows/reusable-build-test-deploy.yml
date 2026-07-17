@@ -11,7 +11,9 @@ env:
   API_DIR: "Api"
   CLIENT_DIR: "Client"
   DOTNET_CONFIGURATION: "Release"
+  SWA_NAME: "skystedt"
   SCRIPTS_DIR: "${{ github.workspace }}/.github/scripts"
+  DEPLOY_DIR: "${{ github.workspace }}/.github/deploy"
 
 jobs:
   build_api:
@@ -109,6 +111,9 @@ jobs:
     needs: [build_api, build_client]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
+
       - name: Download Config
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # 8.0.1
         with:
@@ -127,15 +132,60 @@ jobs:
           name: client
           path: ${{ github.workspace }}/artifacts/client
 
-      - name: Azure Static Web Apps - Deploy
-        uses: Azure/static-web-apps-deploy@4d27395796ac319302594769cfe812bd207490b1 # 1
+      - name: Install Azure Static Web Apps CLI
+        run: |
+          SWA_CLI_VERSION=$(jq --raw-output '.dependencies["@azure/static-web-apps-cli"]' ${{ env.DEPLOY_DIR }}/package.json)
+          npm install -g "@azure/static-web-apps-cli@$SWA_CLI_VERSION"
+
+      - name: Azure Login
+        uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # 3.0.0
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          config_file_location: ${{ github.workspace }}/artifacts/config
-          app_location: ${{ github.workspace }}/artifacts/client
-          api_location: ${{ github.workspace }}/artifacts/api
-          skip_app_build: true
-          skip_api_build: true
-          production_branch: "main"
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Get Deployment Token
+        run: |
+          SWA_CLI_DEPLOYMENT_TOKEN=$(az staticwebapp secrets list --name ${{ env.SWA_NAME }} --query "properties.apiKey" --output tsv)
+          echo "::add-mask::$SWA_CLI_DEPLOYMENT_TOKEN"
+          echo "SWA_CLI_DEPLOYMENT_TOKEN=$SWA_CLI_DEPLOYMENT_TOKEN" >> "$GITHUB_ENV"
+
+      - name: Azure Static Web Apps - Deploy
+        run: |
+          API_RUNTIME=$(jq --raw-output '.platform.apiRuntime' ${{ github.workspace }}/artifacts/config/staticwebapp.config.json)
+          API_LANGUAGE="${API_RUNTIME%:*}"
+          API_LANGUAGE="${API_LANGUAGE//-/}"
+          API_VERSION="${API_RUNTIME#*:}"
+          DEPLOYMENT_ENVIRONMENT="${{ github.event_name == 'pull_request' && github.event.number || 'production' }}"
+
+          swa deploy \
+            ${{ github.workspace }}/artifacts/client \
+            --api-location ${{ github.workspace }}/artifacts/api \
+            --swa-config-location ${{ github.workspace }}/artifacts/config \
+            --api-language "$API_LANGUAGE" \
+            --api-version "$API_VERSION" \
+            --env "$DEPLOYMENT_ENVIRONMENT"
+
+      - name: Get Preview Environment Url
+        if: github.event_name == 'pull_request'
+        run: |
+          ENVIRONMENT_HOSTNAME=$(az staticwebapp environment show --name ${{ env.SWA_NAME }} --environment-name ${{ github.event.number }} --query "hostname" --output tsv)
+          echo "ENVIRONMENT_URL=https://$ENVIRONMENT_HOSTNAME" >> "$GITHUB_ENV"
+
+      - name: Comment Url On Pull Request
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          MARKER='<!-- deployment-url-comment -->'
+          BODY="$MARKER"$'\n'"Azure Static Web Apps: ${{ env.ENVIRONMENT_URL }}"
+          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" --paginate --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" | head -n 1)
+          if [ -n "$COMMENT_ID" ]; then
+            gh api --method PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" --field body="$BODY"
+          else
+            gh api --method POST "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" --field body="$BODY"
+          fi
+
+      - name: Azure Logout
+        if: always()
+        run: az logout
