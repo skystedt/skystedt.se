@@ -37,7 +37,9 @@ runs:
         # strip other html comments
         {
           printf '%s\n' "$MARKERS" | while IFS= read -r MARKER; do
-            [ -n "$MARKER" ] && echo "<!-- $MARKER -->"
+            if [ -n "$MARKER" ]; then
+              echo "<!-- $MARKER -->"
+            fi
           done
           sed -e 's/<!--[^>]*-->//g' -e 's/<!--/<! --/g' "${{ inputs.body-file }}"
         } > "$RUNNER_TEMP/comment-body.md"
