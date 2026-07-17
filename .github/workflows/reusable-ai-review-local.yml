@@ -12,30 +12,29 @@ on:
 
 env:
   PENDING_MARKER: "ai-review-local:pending"
+  PENDING_HEAD_MARKER: "ai-review-local:pending-head"
   REVIEW_MARKER: "ai-review-local:review"
   REVIEWED_HEAD_MARKER: "ai-review-local:reviewed-head"
   MAX_DIFF_CHARS: "120000" # keep the prompt within the local context window
   MAX_COMMENT_CHARS: "60000" # comments are limited to 65536 characters
 
 jobs:
-  review:
-    name: Local LLM Review
+  prepare:
+    name: Prepare
     runs-on: ubuntu-latest
-    timeout-minutes: &job_timeout_minutes 30 # anchor
+    timeout-minutes: 5
 
-    # serialize runs across triggers (pull_request and schedule), they read and write the same comments and share WireGuard configuration
-    concurrency:
-      group: ai-review-local-pr-${{ inputs.pr_number }}
-      cancel-in-progress: false
+    outputs:
+      head_hash: ${{ steps.pr.outputs.head_hash }}
+      reviewed_hash: ${{ steps.pr.outputs.reviewed_hash }}
+      pending_id: ${{ steps.pending.outputs.pending_id }}
+      skip: ${{ steps.pr.outputs.skip }}
 
     env:
       GH_TOKEN: ${{ github.token }}
-      JOB_TIMEOUT_MINUTES: *job_timeout_minutes
+      GH_REPO: ${{ github.repository }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
-
       - name: Pull Request Info
         id: pr
         run: |
@@ -48,10 +47,13 @@ jobs:
           echo "reviewed_hash=$REVIEWED_HASH" >> "$GITHUB_OUTPUT"
           echo "Last reviewed: ${REVIEWED_HASH:-none}"
 
-          # find pending comment
-          PENDING_ID=$(gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" --paginate --jq "[.[] | select(.body | contains(\"<!-- $PENDING_MARKER -->\")) | .id] | first // empty")
+          # find pending comment and the head commit it was created for
+          PENDING_JSON=$(gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" --paginate --jq "[.[] | select(.body | contains(\"<!-- $PENDING_MARKER -->\"))] | first // {}")
+          PENDING_ID=$(jq -r '.id // empty' <<< "$PENDING_JSON")
+          PENDING_HEAD=$(jq -r '.body // ""' <<< "$PENDING_JSON" | sed -n "s/.*<!-- $PENDING_HEAD_MARKER=\([0-9a-f]*\) -->.*/\1/p")
           echo "pending_id=$PENDING_ID" >> "$GITHUB_OUTPUT"
-          echo "Pending comment: ${PENDING_ID:-none}"
+          echo "pending_head=$PENDING_HEAD" >> "$GITHUB_OUTPUT"
+          echo "Pending comment: ${PENDING_ID:-none} (head: ${PENDING_HEAD:-none})"
 
           # skip when the head commit has already been reviewed and no retry is pending
           SKIP=false
@@ -61,8 +63,60 @@ jobs:
           fi
           echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
 
+      - name: Ensure Pending Comment
+        id: pending
+        env:
+          PENDING_ID: ${{ steps.pr.outputs.pending_id }}
+          PENDING_HEAD: ${{ steps.pr.outputs.pending_head }}
+          HEAD_HASH: ${{ steps.pr.outputs.head_hash }}
+        run: |
+          # pending comment is old, mark it as outdated
+          REPLACED=false
+          if [ -n "$PENDING_ID" ] && [ "$PENDING_HEAD" != "$HEAD_HASH" ]; then
+            {
+              echo "🤖 ~~A local LLM review has been queued~~"
+              echo ""
+              echo "_Superseded by an update to the pull request_"
+            } > superseded.md
+            gh api -X PATCH "repos/{owner}/{repo}/issues/comments/$PENDING_ID" -F body=@superseded.md
+            echo "Marked outdated pending comment as superseded: $PENDING_ID"
+            PENDING_ID=""
+            REPLACED=true
+          fi
+
+          # post the pending marker before the review job runs, in case the review job is not finished
+          if [ -z "$PENDING_ID" ] && [ "${{ steps.pr.outputs.skip }}" != "true" ] && { [ "${{ inputs.notify_offline }}" = "true" ] || [ "$REPLACED" = "true" ]; }; then
+            {
+              echo "🤖 A local LLM review has been queued"
+              echo "<!-- $PENDING_MARKER -->"
+              echo "<!-- $PENDING_HEAD_MARKER=$HEAD_HASH -->"
+            } > queued.md
+            PENDING_ID=$(gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" -F body=@queued.md --jq '.id')
+            echo "Posted queued comment: $PENDING_ID"
+          fi
+          echo "pending_id=$PENDING_ID" >> "$GITHUB_OUTPUT"
+
+  review:
+    name: Local LLM Review
+    needs: prepare
+    if: needs.prepare.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: &job_timeout_minutes 30 # anchor
+
+    # serialize review jobs across all PRs and triggers, they share the same WireGuard configuration
+    concurrency:
+      group: ai-review-local
+      cancel-in-progress: false
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      JOB_TIMEOUT_MINUTES: *job_timeout_minutes
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
+
       - name: Connect WireGuard
-        if: steps.pr.outputs.skip != 'true'
         # if the tunnel cannot be established the availability check will report offline
         continue-on-error: true
         uses: ./.github/composite/wireguard-connect
@@ -71,7 +125,6 @@ jobs:
 
       - name: Check Availability
         id: availability
-        if: steps.pr.outputs.skip != 'true'
         run: |
           MAX_TIME=15
           URL=http://${{ secrets.LOCAL_LLM_URL }}/v1/models
@@ -91,8 +144,8 @@ jobs:
         id: data
         if: steps.availability.outputs.online == 'true'
         env:
-          HEAD_HASH: ${{ steps.pr.outputs.head_hash }}
-          REVIEWED_HASH: ${{ steps.pr.outputs.reviewed_hash }}
+          HEAD_HASH: ${{ needs.prepare.outputs.head_hash }}
+          REVIEWED_HASH: ${{ needs.prepare.outputs.reviewed_hash }}
         run: |
           # read title and description
           gh pr view "${{ inputs.pr_number }}" --json title,body --jq '"# " + .title + "\n\n" + (.body // "")' > pr.md
@@ -220,7 +273,7 @@ jobs:
         if: steps.llm.outputs.reviewed == 'true'
         env:
           MODEL: ${{ steps.llm.outputs.model }}
-          HEAD_HASH: ${{ steps.pr.outputs.head_hash }}
+          HEAD_HASH: ${{ needs.prepare.outputs.head_hash }}
         run: |
           {
             echo "## 🤖 Local LLM Review${{ steps.data.outputs.update == 'true' && ' _(update)_' || '' }}"
@@ -233,18 +286,21 @@ jobs:
           } > post.md
 
       - name: Build Offline Notice
-        if: steps.pr.outputs.skip != 'true' && steps.llm.outputs.reviewed != 'true' && (inputs.notify_offline || steps.pr.outputs.pending_id != '')
+        if: steps.llm.outputs.reviewed != 'true' && (inputs.notify_offline || needs.prepare.outputs.pending_id != '')
+        env:
+          HEAD_HASH: ${{ needs.prepare.outputs.head_hash }}
         run: |
           {
             echo "🤖 The local LLM reviewer is not available right now. The review will be retried automatically."
             echo ""
             echo "_Last checked: $(date -u '+%Y-%m-%d %H:%M UTC')_"
             echo "<!-- $PENDING_MARKER -->"
+            echo "<!-- $PENDING_HEAD_MARKER=$HEAD_HASH -->"
           } > post.md
 
       - name: Post Comment
         env:
-          COMMENT_ID: ${{ steps.pr.outputs.pending_id }}
+          COMMENT_ID: ${{ needs.prepare.outputs.pending_id }}
         run: |
           if [ ! -f post.md ]; then
             echo "No comment to post"
