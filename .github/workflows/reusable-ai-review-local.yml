@@ -110,10 +110,12 @@ jobs:
             echo "pending_id=$KEEP_ID"
           } >> "$GITHUB_OUTPUT"
 
-          echo "🤖 A local LLM review has been queued" > queued.md
+          QUEUED_TEXT="A local LLM review has been queued"
+
+          echo "🤖 $QUEUED_TEXT" > queued.md
 
           {
-            cat queued.md
+            echo "🤖 ~~$QUEUED_TEXT~~"
             echo ""
             echo "_Superseded by an update to the pull request_"
           } > superseded.md
