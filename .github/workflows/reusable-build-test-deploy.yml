@@ -152,11 +152,18 @@ jobs:
 
       - name: Azure Static Web Apps - Deploy
         run: |
+          API_RUNTIME=$(jq --raw-output '.platform.apiRuntime' ${{ github.workspace }}/artifacts/config/staticwebapp.config.json)
+          API_LANGUAGE="${API_RUNTIME%:*}"
+          API_LANGUAGE="${API_LANGUAGE//-/}"
+          API_VERSION="${API_RUNTIME#*:}"
           DEPLOYMENT_ENVIRONMENT="${{ github.event_name == 'pull_request' && github.event.number || 'production' }}"
+
           swa deploy \
             ${{ github.workspace }}/artifacts/client \
             --api-location ${{ github.workspace }}/artifacts/api \
             --swa-config-location ${{ github.workspace }}/artifacts/config \
+            --api-language "$API_LANGUAGE" \
+            --api-version "$API_VERSION" \
             --env "$DEPLOYMENT_ENVIRONMENT"
 
       - name: Get Preview Environment Url
