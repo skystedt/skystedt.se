@@ -2,8 +2,8 @@ name: Schedule - Retry AI Review Local
 
 on:
   schedule:
-    # Run hourly
-    - cron: "25 * * * *"
+    # Run every day at 03:25 UTC (04:25 CET/05:25 CEST)
+    - cron: "25 3 * * *"
   workflow_dispatch:
 
 concurrency:
