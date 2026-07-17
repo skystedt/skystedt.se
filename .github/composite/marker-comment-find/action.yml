@@ -1,0 +1,73 @@
+name: Composite - Marker Comment Find
+description: Find comments on an issue or pull request that were created by this repository's workflows, identified by a marker
+
+inputs:
+  issue:
+    description: Issue or pull request number
+    required: true
+  marker:
+    description: Marker name, matches comments that start with "<!-- marker -->"
+    required: true
+  author:
+    description: Only match comments created by this user
+    required: false
+    default: github-actions[bot]
+  occurrence:
+    description: Which matching comment to output, "first" or "last" (by creation time)
+    required: false
+    default: first
+  value-marker:
+    description: Optional marker name, extracts its value from "<!-- value-marker=value -->" in the matched comment
+    required: false
+    default: ""
+
+outputs:
+  id:
+    description: Comment id of the matched comment, empty when none matched
+    value: ${{ steps.find.outputs.id }}
+  value:
+    description: Value of value-marker in the matched comment, empty when not present
+    value: ${{ steps.find.outputs.value }}
+  file:
+    description: Path to a json file with all matched comments ([{id, body}])
+    value: ${{ steps.find.outputs.file }}
+
+runs:
+  using: composite
+  steps:
+    - name: Find Comment
+      id: find
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        MARKER: ${{ inputs.marker }}
+        AUTHOR: ${{ inputs.author }}
+        OCCURRENCE: ${{ inputs.occurrence }}
+        VALUE_MARKER: ${{ inputs.value-marker }}
+      run: |
+        FILE="$RUNNER_TEMP/comments-${MARKER//[^a-zA-Z0-9]/-}.json"
+
+        # only trust comments created by the expected author and that start with the marker
+        gh api "repos/${{ github.repository }}/issues/${{ inputs.issue }}/comments" --paginate \
+          --jq "[.[] | select(.user.login == \"$AUTHOR\") | select(.body | startswith(\"<!-- $MARKER -->\")) | {id, body}]" \
+          | jq -s 'add // []' > "$FILE"
+
+        SELECT='.[0]'
+        if [ "$OCCURRENCE" = "last" ]; then
+          SELECT='.[-1]'
+        fi
+        ID=$(jq -r "$SELECT.id // empty" "$FILE")
+
+        # extract the value from the marker block at the start of the comment,
+        # a quoted "<!-- value-marker=value -->" later in the text must not match
+        VALUE=""
+        if [ -n "$ID" ] && [ -n "$VALUE_MARKER" ]; then
+          VALUE=$(jq -r "$SELECT.body" "$FILE" | sed -n '/^<!--/!q; p' | sed -n "s/^<!-- $VALUE_MARKER=\([^>]*\) -->$/\1/p" | head -n 1)
+        fi
+
+        {
+          echo "id=$ID"
+          echo "value=$VALUE"
+          echo "file=$FILE"
+        } >> "$GITHUB_OUTPUT"
+        echo "Found comment: ${ID:-none}${VALUE:+ (value: $VALUE)}"

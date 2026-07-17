@@ -30,34 +30,51 @@ jobs:
       cancel-in-progress: false
 
     outputs:
-      head_hash: ${{ steps.pr.outputs.head_hash }}
-      reviewed_hash: ${{ steps.pr.outputs.reviewed_hash }}
-      pending_id: ${{ steps.pending.outputs.pending_id }}
-      skip: ${{ steps.pr.outputs.skip }}
+      head_hash: ${{ steps.head.outputs.hash }}
+      reviewed_hash: ${{ steps.review_comment.outputs.value }}
+      pending_id: ${{ steps.queued.outputs.id || steps.status.outputs.pending_id }}
+      skip: ${{ steps.status.outputs.skip }}
 
     env:
       GH_TOKEN: ${{ github.token }}
-      GH_REPO: ${{ github.repository }}
 
     steps:
-      - name: Pull Request Info
-        id: pr
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
+
+      - name: Get Head Commit
+        id: head
         run: |
-          # get the head commit
           HEAD_HASH=$(gh pr view "${{ inputs.pr_number }}" --json headRefOid --jq '.headRefOid')
-          echo "head_hash=$HEAD_HASH" >> "$GITHUB_OUTPUT"
+          echo "hash=$HEAD_HASH" >> "$GITHUB_OUTPUT"
 
-          # find last reviewed commit
-          REVIEWED_HASH=$(gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" --paginate --jq '.[].body' | sed -n "s/.*<!-- $REVIEWED_HEAD_MARKER=\([0-9a-f]*\) -->.*/\1/p" | tail -n 1)
-          echo "reviewed_hash=$REVIEWED_HASH" >> "$GITHUB_OUTPUT"
+      - name: Find Last Review Comment
+        id: review_comment
+        uses: ./.github/composite/marker-comment-find
+        with:
+          issue: ${{ inputs.pr_number }}
+          marker: ${{ env.REVIEW_MARKER }}
+          occurrence: last
+          value-marker: ${{ env.REVIEWED_HEAD_MARKER }}
+
+      - name: Find Pending Comment
+        id: pending_comment
+        uses: ./.github/composite/marker-comment-find
+        with:
+          issue: ${{ inputs.pr_number }}
+          marker: ${{ env.PENDING_MARKER }}
+          value-marker: ${{ env.PENDING_HEAD_MARKER }}
+
+      - name: Evaluate Status
+        id: status
+        env:
+          HEAD_HASH: ${{ steps.head.outputs.hash }}
+          REVIEWED_HASH: ${{ steps.review_comment.outputs.value }}
+          PENDING_ID: ${{ steps.pending_comment.outputs.id }}
+          PENDING_HEAD: ${{ steps.pending_comment.outputs.value }}
+        run: |
+          echo "Head: $HEAD_HASH"
           echo "Last reviewed: ${REVIEWED_HASH:-none}"
-
-          # find pending comment and the head commit it was created for
-          PENDING_JSON=$(gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" --paginate --jq "[.[] | select(.body | contains(\"<!-- $PENDING_MARKER -->\"))] | first // {}")
-          PENDING_ID=$(jq -r '.id // empty' <<< "$PENDING_JSON")
-          PENDING_HEAD=$(jq -r '.body // ""' <<< "$PENDING_JSON" | sed -n "s/.*<!-- $PENDING_HEAD_MARKER=\([0-9a-f]*\) -->.*/\1/p")
-          echo "pending_id=$PENDING_ID" >> "$GITHUB_OUTPUT"
-          echo "pending_head=$PENDING_HEAD" >> "$GITHUB_OUTPUT"
           echo "Pending comment: ${PENDING_ID:-none} (head: ${PENDING_HEAD:-none})"
 
           # skip when the head commit has already been reviewed and no retry is pending
@@ -66,40 +83,59 @@ jobs:
             SKIP=true
             echo "No new commits since the last review, skipping"
           fi
-          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
 
-      - name: Ensure Pending Comment
-        id: pending
-        env:
-          PENDING_ID: ${{ steps.pr.outputs.pending_id }}
-          PENDING_HEAD: ${{ steps.pr.outputs.pending_head }}
-          HEAD_HASH: ${{ steps.pr.outputs.head_hash }}
-        run: |
-          # pending comment is old, mark it as outdated
-          REPLACED=false
+          # pending comment for an older head, mark it as outdated and post a fresh one at the end
+          OUTDATED=false
           if [ -n "$PENDING_ID" ] && [ "$PENDING_HEAD" != "$HEAD_HASH" ]; then
-            {
-              echo "🤖 ~~A local LLM review has been queued~~"
-              echo ""
-              echo "_Superseded by an update to the pull request_"
-            } > superseded.md
-            gh api -X PATCH "repos/{owner}/{repo}/issues/comments/$PENDING_ID" -F body=@superseded.md
-            echo "Marked outdated pending comment as superseded: $PENDING_ID"
-            PENDING_ID=""
-            REPLACED=true
+            OUTDATED=true
+            echo "The pending comment is outdated"
           fi
 
           # post the pending marker before the review job runs, in case the review job is not finished
-          if [ -z "$PENDING_ID" ] && [ "${{ steps.pr.outputs.skip }}" != "true" ] && { [ "${{ inputs.notify_offline }}" = "true" ] || [ "$REPLACED" = "true" ]; }; then
-            {
-              echo "🤖 A local LLM review has been queued"
-              echo "<!-- $PENDING_MARKER -->"
-              echo "<!-- $PENDING_HEAD_MARKER=$HEAD_HASH -->"
-            } > queued.md
-            PENDING_ID=$(gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" -F body=@queued.md --jq '.id')
-            echo "Posted queued comment: $PENDING_ID"
+          POST_QUEUED=false
+          if [ "$SKIP" != "true" ] && { [ "$OUTDATED" = "true" ] || { [ -z "$PENDING_ID" ] && [ "${{ inputs.notify_offline }}" = "true" ]; }; }; then
+            POST_QUEUED=true
           fi
-          echo "pending_id=$PENDING_ID" >> "$GITHUB_OUTPUT"
+
+          # keep using the pending comment when it is not outdated
+          KEEP_ID=""
+          if [ -n "$PENDING_ID" ] && [ "$OUTDATED" != "true" ]; then
+            KEEP_ID="$PENDING_ID"
+          fi
+
+          {
+            echo "skip=$SKIP"
+            echo "outdated=$OUTDATED"
+            echo "post_queued=$POST_QUEUED"
+            echo "pending_id=$KEEP_ID"
+          } >> "$GITHUB_OUTPUT"
+
+          echo "🤖 A local LLM review has been queued" > queued.md
+
+          {
+            cat queued.md
+            echo ""
+            echo "_Superseded by an update to the pull request_"
+          } > superseded.md
+
+      - name: Supersede Outdated Pending Comment
+        if: steps.status.outputs.outdated == 'true'
+        uses: ./.github/composite/marker-comment-write
+        with:
+          issue: ${{ inputs.pr_number }}
+          comment-id: ${{ steps.pending_comment.outputs.id }}
+          body-file: superseded.md
+
+      - name: Post Queued Comment
+        id: queued
+        if: steps.status.outputs.post_queued == 'true'
+        uses: ./.github/composite/marker-comment-write
+        with:
+          issue: ${{ inputs.pr_number }}
+          markers: |
+            ${{ env.PENDING_MARKER }}
+            ${{ env.PENDING_HEAD_MARKER }}=${{ steps.head.outputs.hash }}
+          body-file: queued.md
 
   review:
     name: Local LLM Review
@@ -145,6 +181,21 @@ jobs:
           echo "online=$ONLINE" >> "$GITHUB_OUTPUT"
           echo "Local LLM online: $ONLINE"
 
+          # the offline notice, posted when no review is produced
+          {
+            echo "🤖 The local LLM reviewer is not available right now. The review will be retried automatically."
+            echo ""
+            echo "_Last checked: $(date -u '+%Y-%m-%d %H:%M UTC')_"
+          } > offline.md
+
+      - name: Find Previous Review Comments
+        id: reviews
+        if: steps.availability.outputs.online == 'true'
+        uses: ./.github/composite/marker-comment-find
+        with:
+          issue: ${{ inputs.pr_number }}
+          marker: ${{ env.REVIEW_MARKER }}
+
       - name: Pull Request Data
         id: data
         if: steps.availability.outputs.online == 'true'
@@ -169,8 +220,8 @@ jobs:
             fi
           fi
 
-          # read previous review comments (strip html comments)
-          gh api "repos/{owner}/{repo}/issues/${{ inputs.pr_number }}/comments" --paginate --jq "[.[] | select(.body | contains(\"<!-- $REVIEW_MARKER -->\")) | .body | gsub(\"<!--[^>]*-->\"; \"\")] | join(\"\n\n---\n\n\") | select(length > 0)" > comments.md
+          # read previous review comments
+          jq -r '[.[].body] | join("\n\n---\n\n") | select(length > 0)' "${{ steps.reviews.outputs.file }}" > comments.md
 
       - name: Limit Prompt Size
         if: steps.availability.outputs.online == 'true'
@@ -260,11 +311,17 @@ jobs:
 
             # validate the response, an error response has no content and jq fails on invalid json
             if CONTENT=$(jq -r '.choices[0].message.content // empty' response.json 2> /dev/null) && [ -n "$CONTENT" ]; then
-              printf '%s' "$CONTENT" | head -c "$MAX_COMMENT_CHARS" > review.md
               REVIEWED=true
               MODEL=$(jq -r '.model // "unknown"' response.json | head -n 1)
-              echo "model=$MODEL" >> "$GITHUB_OUTPUT"
               echo "Review by model: $MODEL"
+
+              # the review comment
+              {
+                echo "## 🤖 Local LLM Review${{ steps.data.outputs.update == 'true' && ' _(update)_' || '' }}"
+                echo "_Model: ${MODEL}_"
+                echo ""
+                printf '%s' "$CONTENT" | head -c "$MAX_COMMENT_CHARS"
+              } > review.md
             else
               echo "The LLM returned an invalid or error response:"
               cat response.json
@@ -274,46 +331,24 @@ jobs:
           fi
           echo "reviewed=$REVIEWED" >> "$GITHUB_OUTPUT"
 
-      - name: Build Review Comment
+      - name: Post Review Comment
         if: steps.llm.outputs.reviewed == 'true'
-        env:
-          MODEL: ${{ steps.llm.outputs.model }}
-          HEAD_HASH: ${{ needs.prepare.outputs.head_hash }}
-        run: |
-          {
-            echo "## 🤖 Local LLM Review${{ steps.data.outputs.update == 'true' && ' _(update)_' || '' }}"
-            echo "_Model: ${MODEL}_"
-            echo ""
-            cat review.md
-            echo ""
-            echo "<!-- $REVIEW_MARKER -->"
-            echo "<!-- $REVIEWED_HEAD_MARKER=$HEAD_HASH -->"
-          } > post.md
+        uses: ./.github/composite/marker-comment-write
+        with:
+          issue: ${{ inputs.pr_number }}
+          comment-id: ${{ needs.prepare.outputs.pending_id }}
+          markers: |
+            ${{ env.REVIEW_MARKER }}
+            ${{ env.REVIEWED_HEAD_MARKER }}=${{ needs.prepare.outputs.head_hash }}
+          body-file: review.md
 
-      - name: Build Offline Notice
+      - name: Post Offline Notice
         if: steps.llm.outputs.reviewed != 'true' && (inputs.notify_offline || needs.prepare.outputs.pending_id != '')
-        env:
-          HEAD_HASH: ${{ needs.prepare.outputs.head_hash }}
-        run: |
-          {
-            echo "🤖 The local LLM reviewer is not available right now. The review will be retried automatically."
-            echo ""
-            echo "_Last checked: $(date -u '+%Y-%m-%d %H:%M UTC')_"
-            echo "<!-- $PENDING_MARKER -->"
-            echo "<!-- $PENDING_HEAD_MARKER=$HEAD_HASH -->"
-          } > post.md
-
-      - name: Post Comment
-        env:
-          COMMENT_ID: ${{ needs.prepare.outputs.pending_id }}
-        run: |
-          if [ ! -f post.md ]; then
-            echo "No comment to post"
-            exit 0
-          fi
-
-          if [ -n "$COMMENT_ID" ]; then
-            gh api -X PATCH "repos/{owner}/{repo}/issues/comments/$COMMENT_ID" -F body=@post.md
-          else
-            gh pr comment "${{ inputs.pr_number }}" --body-file post.md
-          fi
+        uses: ./.github/composite/marker-comment-write
+        with:
+          issue: ${{ inputs.pr_number }}
+          comment-id: ${{ needs.prepare.outputs.pending_id }}
+          markers: |
+            ${{ env.PENDING_MARKER }}
+            ${{ env.PENDING_HEAD_MARKER }}=${{ needs.prepare.outputs.head_hash }}
+          body-file: offline.md
