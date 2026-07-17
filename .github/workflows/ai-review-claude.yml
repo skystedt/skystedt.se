@@ -24,6 +24,7 @@ jobs:
           fetch-depth: 0 # full history so the review can diff against previously reviewed commits
 
       - name: Claude Code
+        id: claude
         uses: anthropics/claude-code-action@f1bd27ca5b54584506e40e17884d90bdaaa1a9b3 # v1.0.173
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -43,6 +44,15 @@ jobs:
             ${{ github.event.action == 'synchronize' && 'This run was triggered by updates to an already-reviewed PR.' || '' }}
             ${{ github.event.action == 'synchronize' && format('Run `gh api repos/{0}/compare/{1}...{2}` to see what changed since the last review.', github.repository, github.event.before, github.event.after) || '' }}
             ${{ github.event.action == 'synchronize' && 'Check existing PR comments with `gh pr view --comments`.' || '' }}
-
+            
             The PR branch is already checked out in the current working directory.
-            Only post GitHub comments, use `gh pr comment`.
+            Always post one GitHub comment with the result, use `gh pr comment`.
+
+      - name: Upload execution transcript
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
+        with:
+          name: claude-execution-transcript
+          path: ${{ steps.claude.outputs.execution_file }}
+          retention-days: 7
+          if-no-files-found: warn
