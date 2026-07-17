@@ -170,21 +170,24 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           ENVIRONMENT_HOSTNAME=$(az staticwebapp environment show --name ${{ env.SWA_NAME }} --environment-name ${{ github.event.number }} --query "hostname" --output tsv)
-          echo "ENVIRONMENT_URL=https://$ENVIRONMENT_HOSTNAME" >> "$GITHUB_ENV"
+          echo "Azure Static Web Apps: https://$ENVIRONMENT_HOSTNAME" > "$RUNNER_TEMP/deployment-url.md"
+
+      - name: Find Url Comment
+        id: url_comment
+        if: github.event_name == 'pull_request'
+        uses: ./.github/composite/marker-comment-find
+        with:
+          issue: ${{ github.event.number }}
+          marker: deployment-url-comment
 
       - name: Comment Url On Pull Request
         if: github.event_name == 'pull_request'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          MARKER='<!-- deployment-url-comment -->'
-          BODY="$MARKER"$'\n'"Azure Static Web Apps: ${{ env.ENVIRONMENT_URL }}"
-          COMMENT_ID=$(gh api "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" --paginate --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" | head -n 1)
-          if [ -n "$COMMENT_ID" ]; then
-            gh api --method PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" --field body="$BODY"
-          else
-            gh api --method POST "repos/${{ github.repository }}/issues/${{ github.event.number }}/comments" --field body="$BODY"
-          fi
+        uses: ./.github/composite/marker-comment-write
+        with:
+          issue: ${{ github.event.number }}
+          comment-id: ${{ steps.url_comment.outputs.id }}
+          markers: deployment-url-comment
+          body-file: ${{ runner.temp }}/deployment-url.md
 
       - name: Azure Logout
         if: always()

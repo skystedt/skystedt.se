@@ -16,6 +16,7 @@ permissions:
 
 env:
   PENDING_MARKER: "ai-review-local:pending"
+  COMMENT_AUTHOR: "github-actions" # graphql does not include [bot]
 
 jobs:
   find_pending:
@@ -42,13 +43,22 @@ jobs:
                     nodes {
                       number
                       comments(last: 100) {
-                        nodes { body }
+                        nodes {
+                          body
+                          author { login }
+                        }
                       }
                     }
                   }
                 }
               }' \
-            --jq ".data.repository.pullRequests.nodes[] | select(any(.comments.nodes[]; .body | contains(\"<!-- $PENDING_MARKER -->\"))) | .number" | jq -c -s '.')
+            --jq "
+              .data.repository.pullRequests.nodes[]
+              | select(any(.comments.nodes[];
+                  .author.login == \"$COMMENT_AUTHOR\" and
+                  (.body | startswith(\"<!-- $PENDING_MARKER -->\"))))
+              | .number
+            " | jq -c -s '.')
           echo "prs=$PRS" >> "$GITHUB_OUTPUT"
           echo "PRs awaiting review: $PRS"
 

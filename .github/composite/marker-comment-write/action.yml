@@ -1,0 +1,54 @@
+name: Composite - Marker Comment Write
+description: Create or update a comment on an issue or pull request, with markers so it can be found later by marker-comment-find. The content is sanitized of html comments, the markers input is the only way to add them.
+
+inputs:
+  issue:
+    description: Issue or pull request number
+    required: true
+  comment-id:
+    description: Existing comment id to update, creates a new comment when empty
+    required: false
+    default: ""
+  markers:
+    description: Marker names, one per line as "name" or "name=value", written as html comments at the start of the comment
+    required: false
+    default: ""
+  body-file:
+    description: Path to a file with the comment content
+    required: true
+
+outputs:
+  id:
+    description: Comment id of the created or updated comment
+    value: ${{ steps.write.outputs.id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Write Comment
+      id: write
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        COMMENT_ID: ${{ inputs.comment-id }}
+        MARKERS: ${{ inputs.markers }}
+      run: |
+        # markers first so comment-find matches on them
+        # strip other html comments
+        {
+          printf '%s\n' "$MARKERS" | while IFS= read -r MARKER; do
+            if [ -n "$MARKER" ]; then
+              echo "<!-- $MARKER -->"
+            fi
+          done
+          sed -e 's/<!--[^>]*-->//g' -e 's/<!--/<! --/g' "${{ inputs.body-file }}"
+        } > "$RUNNER_TEMP/comment-body.md"
+
+        if [ -n "$COMMENT_ID" ]; then
+          ID=$(gh api -X PATCH "repos/${{ github.repository }}/issues/comments/$COMMENT_ID" -F body=@"$RUNNER_TEMP/comment-body.md" --jq '.id')
+          echo "Updated comment: $ID"
+        else
+          ID=$(gh api "repos/${{ github.repository }}/issues/${{ inputs.issue }}/comments" -F body=@"$RUNNER_TEMP/comment-body.md" --jq '.id')
+          echo "Created comment: $ID"
+        fi
+        echo "id=$ID" >> "$GITHUB_OUTPUT"
