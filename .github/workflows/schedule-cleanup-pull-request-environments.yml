@@ -33,7 +33,7 @@ jobs:
 
       - name: Get Azure SWA Preview Environments
         run: |
-          ENVIRONMENTS=$(az staticwebapp environment list --name ${{ env.SWA_NAME }} --query "[?pullRequestTitle!=null].name" | jq -r -c '[.[] | tonumber]')
+          ENVIRONMENTS=$(az staticwebapp environment list --name ${{ env.SWA_NAME }} --query "[].name" | jq -r -c '[.[] | select(test("^[0-9]+$")) | tonumber]')
           echo "ENVIRONMENTS=$ENVIRONMENTS" >> "$GITHUB_ENV"
           echo "Found environments: $ENVIRONMENTS"
 
