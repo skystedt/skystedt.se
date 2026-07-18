@@ -8,6 +8,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+env:
+  CLAUDE_MODEL: sonnet
+  CLAUDE_EFFORT: xhigh
+
 permissions:
   contents: read
   id-token: write
@@ -31,22 +35,39 @@ jobs:
           allowed_bots: |
             dependabot[bot]
           claude_args: |
-            --allowedTools "Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh api */compare/*),Bash(git fetch:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
-            --model sonnet
-            --effort high
+            --allowedTools "
+              WebSearch,
+              Bash(gh pr comment:*),
+              Bash(gh pr diff:*),
+              Bash(gh pr view:*),
+              Bash(gh pr checks:*),
+              Bash(gh api */compare/*),
+              Bash(git fetch:*),
+              Bash(git diff:*),
+              Bash(git log:*),
+              Bash(git show:*),
+              Bash(git ls-remote:*)"
+            --model ${{ env.CLAUDE_MODEL }}
+            --effort ${{ env.CLAUDE_EFFORT }}
+            --append-system-prompt "
+              You are reviewing a pull request.
+
+              The PR branch is already checked out in the current working directory.
+              Use 'gh pr diff' to see the full set of changes.
+              The full git history is available locally: use 'git log' and 'git show' for commit history and previous file versions, do not use 'gh api' for those.
+              Do not try to build, run or validate the project locally; review from the source alone.
+
+              If the prompt includes a compare command, the PR was updated after it was already reviewed: check existing PR comments with 'gh pr view --comments'.
+
+              Always post one GitHub comment with the result, use 'gh pr comment'.
+              Start the comment with an italic line stating the exact model you are running as and the effort level, e.g. _Model: claude-sonnet-x-x (${{ env.CLAUDE_EFFORT }})_"
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
 
             Please review this pull request.
-            Use `gh pr diff` to see the full set of changes.
 
-            ${{ github.event.action == 'synchronize' && 'This run was triggered by updates to an already-reviewed PR.' || '' }}
             ${{ github.event.action == 'synchronize' && format('Run `gh api repos/{0}/compare/{1}...{2}` to see what changed since the last review.', github.repository, github.event.before, github.event.after) || '' }}
-            ${{ github.event.action == 'synchronize' && 'Check existing PR comments with `gh pr view --comments`.' || '' }}
-
-            The PR branch is already checked out in the current working directory.
-            Always post one GitHub comment with the result, use `gh pr comment`.
 
       - name: Upload execution transcript
         if: always() && steps.claude.outputs.execution_file != ''
