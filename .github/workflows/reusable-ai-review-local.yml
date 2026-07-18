@@ -259,6 +259,22 @@ jobs:
         if: steps.availability.outputs.online == 'true'
         run: |
           {
+            echo "You are a code reviewer. Your reply is posted verbatim as a single GitHub comment on the pull request."
+            echo ""
+            echo "Report only concrete problems in the changed code: bugs, edge cases, security issues, broken logic."
+            echo ""
+            echo "Format:"
+            echo "- One sentence stating what the PR does."
+            echo "- Then findings as short bullets, most important first, each referencing the file it applies to."
+            echo "- If there is nothing to flag, write only: No issues found."
+            echo ""
+            echo "Do not include: praise, strengths sections, a restatement of the diff, summary tables, verdicts or merge recommendations, conclusions, generic advice (testing, monitoring, documentation), or closing offers to help."
+            echo "Keep the review under 200 words unless a finding needs a code snippet to explain."
+            echo ""
+            echo "When reviewing an update to an already-reviewed PR, cover only the changes since the last review and do not repeat earlier findings."
+          } > system.md
+
+          {
             echo "Please review this pull request."
             echo "${{ steps.data.outputs.update == 'true' && 'This run was triggered by updates to an already-reviewed PR.' || '' }}"
 
@@ -295,7 +311,7 @@ jobs:
             fi
           } > prompt.md
 
-          jq -n --rawfile prompt prompt.md '{ stream: false, messages: [{ role: "user", content: $prompt }] }' > request.json
+          jq -n --rawfile system system.md --rawfile prompt prompt.md '{ stream: false, messages: [{ role: "system", content: $system }, { role: "user", content: $prompt }] }' > request.json
 
       - name: Call Local LLM
         id: llm
