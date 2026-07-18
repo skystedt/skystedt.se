@@ -1,21 +1,15 @@
-name: AI Review - Claude
-
-concurrency:
-  group: ai-review-claude-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+name: Reusable - AI Review Claude
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_call:
+    inputs:
+      pr_number:
+        type: number
+        required: true
 
 env:
   CLAUDE_MODEL: sonnet
   CLAUDE_EFFORT: xhigh
-
-permissions:
-  contents: read
-  id-token: write
-  pull-requests: write
 
 jobs:
   claude:
@@ -65,7 +59,7 @@ jobs:
               You are running with effort: ${{ env.CLAUDE_EFFORT }}."
           prompt: |
             REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
+            PR NUMBER: ${{ inputs.pr_number }}
 
             Please review this pull request.
 
