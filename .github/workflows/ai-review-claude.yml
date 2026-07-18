@@ -60,7 +60,9 @@ jobs:
               If the prompt includes a compare command, the PR was updated after it was already reviewed: check existing PR comments with 'gh pr view --comments'.
 
               Always post one GitHub comment with the result, use 'gh pr comment'.
-              Start the comment with an italic line stating the exact model you are running as and the effort level, e.g. _Model: claude-sonnet-x-x (${{ env.CLAUDE_EFFORT }})_"
+              Start the comment with an italic line stating the exact model you are running as and the effort level, e.g. _Model: claude-sonnet-x-x (effort)_
+
+              You are running with effort: ${{ env.CLAUDE_EFFORT }}."
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
