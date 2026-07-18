@@ -1,5 +1,6 @@
 ﻿#:package Sarif.Sdk@5.5.0
 
+using System.Text;
 using System.Text.Json.Nodes;
 using Microsoft.CodeAnalysis.Sarif;
 
@@ -30,7 +31,9 @@ var run = CreateRun(results);
 var sarifLog = new SarifLog { Runs = [run] };
 
 var outputPath = Path.ChangeExtension(inputPath, ".sarif");
-sarifLog.Save(outputPath);
+// GitHub's SARIF upload rejects files with a UTF-8 BOM, which SarifLog.Save(string) emits
+using var writer = new StreamWriter(outputPath, append: false, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+sarifLog.Save(writer);
 Console.WriteLine($"Wrote {results.Count} result(s) to {outputPath}");
 
 static Result CreateResult(JsonNode? project, JsonNode? framework, JsonNode? package, JsonNode? vulnerability)
