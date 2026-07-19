@@ -28,7 +28,7 @@ jobs:
     secrets: inherit
 
   ai_review_claude:
-    name: AI Review Claude
+    name: AI Review Claude Test
     uses: ./.github/workflows/reusable-ai-review-claude.yml
     with:
       pr_number: ${{ github.event.pull_request.number }}
