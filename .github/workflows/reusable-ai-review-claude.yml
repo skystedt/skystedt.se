@@ -83,7 +83,7 @@ jobs:
         run: |
           RATE_LIMITED=$(jq -r 'any(.[]; .type == "rate_limit_event" and .rate_limit_info.status == "rejected")' "$EXECUTION_FILE") || true
           if [ "$RATE_LIMITED" = "true" ]; then
-            REASON=$(jq -r '[.[] | select(.type == "result") | .result // empty] | first // "Usage limit reached"' "$EXECUTION_FILE")
+            REASON=$(jq -r '[.[] | select(.type == "result") | .result // empty] | first // "Usage limit reached"' "$EXECUTION_FILE") || true
 
             BODY=$(
               echo ":warning: Claude review did not run, the usage limit was reached."
