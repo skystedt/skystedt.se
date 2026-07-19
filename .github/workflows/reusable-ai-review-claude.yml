@@ -107,7 +107,7 @@ jobs:
           CLAUDE_JOB_NAME: *claude_job_name
         run: |
           JOB_ID=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs" \
-            --jq '[.jobs[] | select((.name | split(" / ") | last) == env.CLAUDE_JOB_NAME)][0].id')
+            --jq '[.jobs[] | select((.name | split(" / ") | last) == env.CLAUDE_JOB_NAME)][0].id') || true
 
           JOB_LOG=$(gh api "repos/$GITHUB_REPOSITORY/actions/jobs/$JOB_ID/logs") || true
 
