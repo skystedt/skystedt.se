@@ -30,10 +30,6 @@ jobs:
     name: Scan NuGet Transitive Dependencies
     runs-on: ubuntu-latest
 
-    outputs:
-      vulnerable: ${{ steps.evaluate.outputs.vulnerable }}
-      summary: ${{ steps.evaluate.outputs.summary }}
-
     defaults:
       run:
         working-directory: ${{ env.SRC_DIR }}
@@ -95,13 +91,11 @@ jobs:
           echo "::error::Found ${{ steps.evaluate.outputs.vulnerable }} vulnerable transitive dependencies"
           exit 1
 
-  pull-request:
-    name: Pull Request
-    needs: scan
-    if: ${{ inputs.report-pull-request }}
-    uses: ./.github/workflows/reusable-report-pull-request.yml
-    with:
-      branch-name: "vulnerability-scan/nuget-transitive-dependencies"
-      open: ${{ needs.scan.outputs.vulnerable != '0' }}
-      title: "Vulnerabilities found in Transitive Dependencies"
-      summary: ${{ needs.scan.outputs.summary }}
+      - name: Report Pull Request
+        if: ${{ inputs.report-pull-request }}
+        uses: ./.github/composite/report-pull-request
+        with:
+          branch-name: "vulnerability-scan/nuget-transitive-dependencies"
+          open: ${{ steps.evaluate.outputs.vulnerable != '0' }}
+          title: "Vulnerabilities found in Transitive Dependencies"
+          summary: ${{ steps.evaluate.outputs.summary }}
