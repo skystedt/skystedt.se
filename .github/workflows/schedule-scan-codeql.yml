@@ -1,0 +1,16 @@
+name: Schedule - Scan CodeQL
+
+on:
+  schedule:
+    # Run daily at 11:45 UTC, to match other scans
+    - cron: "45 11 * * *"
+  workflow_dispatch:
+
+permissions: {} # permissions are specified on each job
+
+jobs:
+  scan:
+    name: Scan CodeQL
+    permissions:
+      security-events: write
+    uses: ./.github/workflows/reusable-scan-codeql.yml

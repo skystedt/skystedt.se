@@ -30,9 +30,7 @@ on:
         type: string
         required: true
 
-permissions:
-  contents: write
-  pull-requests: write
+# permissions are inherited from the caller: this is reached (though skipped) from the read-only pull request scan guard, so declaring write here fails startup validation
 
 jobs:
   pull-request:

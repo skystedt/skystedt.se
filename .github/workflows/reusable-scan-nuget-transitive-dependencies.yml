@@ -1,0 +1,107 @@
+name: Reusable - Scan NuGet Transitive Dependencies
+
+on:
+  workflow_call:
+    inputs:
+      upload-sarif:
+        description: Upload the SARIF result to code scanning
+        type: boolean
+        default: true
+      report-pull-request:
+        description: Open, update, or close the tracking pull request based on the result
+        type: boolean
+        default: true
+      fail-on-vulnerable:
+        description: Fail the workflow when vulnerabilities are found
+        type: boolean
+        default: false
+
+# permissions are inherited from the caller
+
+env:
+  SRC_DIR: "src"
+  SCRIPTS_DIR: "${{ github.workspace }}/.github/scripts"
+  OUTPUT_FILE_NAME: "vulnerable.json"
+  SARIF_FILE_NAME: "vulnerable.sarif"
+  PACKAGE_LEVELS: "transitivePackages" # space-separated dotnet-list-package framework levels to scan
+
+jobs:
+  scan:
+    name: Scan NuGet Transitive Dependencies
+    runs-on: ubuntu-latest
+
+    outputs:
+      vulnerable: ${{ steps.evaluate.outputs.vulnerable }}
+      summary: ${{ steps.evaluate.outputs.summary }}
+
+    defaults:
+      run:
+        working-directory: ${{ env.SRC_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
+
+      - name: Dotnet Setup
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # 6.0.0
+        with:
+          global-json-file: ${{ env.SRC_DIR }}/global.json
+
+      - name: Dotnet Restore
+        run: dotnet restore
+
+      - name: Scan For Vulnerable Packages
+        run: |
+          dotnet list package --vulnerable --include-transitive --format json --no-restore > ${{ env.OUTPUT_FILE_NAME }} || true
+          cat ${{ env.OUTPUT_FILE_NAME }}
+
+      - name: Convert To SARIF
+        if: ${{ inputs.upload-sarif }}
+        run: |
+          dotnet run ${{ env.SCRIPTS_DIR }}/ConvertNugetVulnerabilitiesToSarif.cs -- ${{ env.OUTPUT_FILE_NAME }} ${{ env.PACKAGE_LEVELS }}
+          cat ${{ env.SARIF_FILE_NAME }}
+
+      - name: Upload SARIF
+        if: ${{ inputs.upload-sarif }}
+        uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a # 4.37.1
+        with:
+          sarif_file: ${{ env.SRC_DIR }}/${{ env.SARIF_FILE_NAME }}
+          category: nuget-transitive-dependencies
+
+      - name: Evaluate Scan Result
+        id: evaluate
+        run: |
+          VULNERABLE=$(jq -r '[.projects[]?.frameworks[]? as $f | $ARGS.positional[] as $level | ($f[$level] // [])[]] | length' ${{ env.OUTPUT_FILE_NAME }} --args ${{ env.PACKAGE_LEVELS }})
+          echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
+          echo "Found $VULNERABLE vulnerable dependencies"
+
+          {
+            echo "summary<<EOF_SUMMARY"
+            echo '```'
+            cat ${{ env.OUTPUT_FILE_NAME }}
+            echo '```'
+            echo "EOF_SUMMARY"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Fail If Vulnerable
+        if: ${{ inputs.fail-on-vulnerable && steps.evaluate.outputs.vulnerable != '0' }}
+        env:
+          SUMMARY: ${{ steps.evaluate.outputs.summary }}
+        run: |
+          {
+            echo "## Vulnerabilities found in Transitive Dependencies"
+            echo "$SUMMARY"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::Found ${{ steps.evaluate.outputs.vulnerable }} vulnerable transitive dependencies"
+          exit 1
+
+  pull-request:
+    name: Pull Request
+    needs: scan
+    if: ${{ inputs.report-pull-request }}
+    uses: ./.github/workflows/reusable-report-pull-request.yml
+    with:
+      branch-name: "vulnerability-scan/nuget-transitive-dependencies"
+      open: ${{ needs.scan.outputs.vulnerable != '0' }}
+      title: "Vulnerabilities found in Transitive Dependencies"
+      summary: ${{ needs.scan.outputs.summary }}
