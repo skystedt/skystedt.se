@@ -2,93 +2,20 @@ name: Schedule - Scan OWASP Dependency Check
 
 on:
   schedule:
-    # Run every Saturday at 11:45 UTC: owasp/dependency-check-action:latest is rebuilt daily at 11:30 UTC
-    - cron: "45 11 * * 6"
+    # Run daily at 11:45 UTC: owasp/dependency-check-action:latest is rebuilt daily at 11:30 UTC
+    - cron: "45 11 * * *"
   workflow_dispatch:
 
-concurrency:
-  group: vulnerability-scan-owasp-dependency-check
-  cancel-in-progress: false
-
-env:
-  SRC_DIR: "src"
-  REPORT_NAME: "dependency-check-report"
-  SUPPRESSION_FILE: ".github/dependency-check/suppression.xml"
-  IMAGE: "owasp/dependency-check-action:latest" # Rebuilt nightly with an updated NVD dataset, so version is not pinned
+permissions: {} # permissions are specified on each job
 
 jobs:
   scan:
-    name: Scan Dependencies
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      security-events: write
-
-    outputs:
-      vulnerable: ${{ steps.evaluate.outputs.vulnerable }}
-      summary: ${{ steps.evaluate.outputs.summary }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
-
-      - name: Scan For Vulnerabilities
-        run: |
-          docker run --rm \
-            -v "${{ github.workspace }}:/src" \
-            "$IMAGE" \
-            --scan "/src/$SRC_DIR" \
-            --format JSON \
-            --format HTML \
-            --format SARIF \
-            --out "/src/$REPORT_NAME" \
-            --suppression "/src/$SUPPRESSION_FILE" \
-            --noupdate
-          cat "$REPORT_NAME/$REPORT_NAME.json"
-
-      - name: Upload Report
-        id: upload-report
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
-        with:
-          path: ${{ env.REPORT_NAME }}/${{ env.REPORT_NAME }}.html
-          archive: false
-
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a # 4.37.1
-        with:
-          sarif_file: ${{ env.REPORT_NAME }}/${{ env.REPORT_NAME }}.sarif
-          category: owasp-dependency-check
-
-      - name: Evaluate Scan Result
-        id: evaluate
-        env:
-          REPORT_URL: ${{ steps.upload-report.outputs.artifact-url }}
-        run: |
-          SUMMARY=$(jq -c '[.dependencies[]? | select(.vulnerabilities) | {fileName, filePath, vulnerabilities: [.vulnerabilities[] | {name, severity}]}]' "$REPORT_NAME/$REPORT_NAME.json")
-
-          VULNERABLE=$(jq -r '[.[].vulnerabilities[]] | length' <<< "$SUMMARY")
-          echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
-          echo "Found $VULNERABLE vulnerabilities"
-
-          {
-            echo "summary<<EOF_SUMMARY"
-            echo "Full report: $REPORT_URL"
-            echo '```'
-            jq . <<< "$SUMMARY"
-            echo '```'
-            echo "EOF_SUMMARY"
-          } >> "$GITHUB_OUTPUT"
-
-  pull-request:
-    name: Pull Request
-    needs: scan
+    name: Scan OWASP Dependency Check
     permissions:
       contents: write
+      security-events: write
       pull-requests: write
-    uses: ./.github/workflows/reusable-report-pull-request.yml
+    uses: ./.github/workflows/reusable-scan-owasp-dependency-check.yml
     with:
-      branch-name: "vulnerability-scan/owasp-dependency-check"
-      open: ${{ needs.scan.outputs.vulnerable != '0' }}
-      title: "Vulnerabilities found by OWASP Dependency-Check"
-      summary: ${{ needs.scan.outputs.summary }}
+      upload-sarif: true
+      report-pull-request: true

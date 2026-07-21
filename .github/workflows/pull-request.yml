@@ -7,20 +7,24 @@ concurrency:
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-
-permissions:
-  actions: read
-  contents: read
-  id-token: write
-  pull-requests: write
+    
+permissions: {} # permissions are specified on each job
 
 jobs:
-  dependency_review:
-    name: Dependency Review
-    uses: ./.github/workflows/reusable-dependency-review.yml
+  build_test_and_deploy:
+    name: Build, Test and Deploy
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+    uses: ./.github/workflows/reusable-build-test-deploy.yml
+    secrets: inherit
 
   ai_review_local:
     name: AI Review Local
+    permissions:
+      contents: read
+      pull-requests: write
     uses: ./.github/workflows/reusable-ai-review-local.yml
     with:
       pr_number: ${{ github.event.pull_request.number }}
@@ -29,12 +33,43 @@ jobs:
 
   ai_review_claude:
     name: AI Review Claude
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
     uses: ./.github/workflows/reusable-ai-review-claude.yml
     with:
       pr_number: ${{ github.event.pull_request.number }}
     secrets: inherit
 
-  build_test_and_deploy:
-    name: Build, Test and Deploy
-    uses: ./.github/workflows/reusable-build-test-deploy.yml
-    secrets: inherit
+  scan_codeql:
+    name: Scan CodeQL
+    permissions:
+      security-events: write
+    uses: ./.github/workflows/reusable-scan-codeql.yml
+
+  scan_dependency_review:
+    name: Scan Dependency Review
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-dependency-review.yml
+
+  scan_owasp_dependency_check:
+    name: Scan OWASP Dependency Check
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-scan-owasp-dependency-check.yml
+    with:
+      upload-sarif: false
+      report-pull-request: false
+      fail-on-vulnerable: true
+
+  scan_nuget_transitive_dependencies:
+    name: Scan NuGet Transitive Dependencies
+    permissions:
+      contents: read
+    uses: ./.github/workflows/reusable-scan-nuget-transitive-dependencies.yml
+    with:
+      upload-sarif: false
+      report-pull-request: false
+      fail-on-vulnerable: true

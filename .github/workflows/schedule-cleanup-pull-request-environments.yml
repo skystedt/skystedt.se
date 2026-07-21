@@ -6,8 +6,7 @@ on:
     - cron: "40 3 * * 6"
   workflow_dispatch:
 
-permissions:
-  id-token: write
+permissions: {} # permissions are specified on each job
 
 env:
   SWA_NAME: "skystedt"
@@ -17,13 +16,14 @@ jobs:
     name: Find Orphaned Environments
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write
+      pull-requests: read
+
     outputs:
       orphaned: ${{ steps.orphaned.outputs.orphaned }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
-
       - name: Azure Login
         uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # 3.0.0
         with:
@@ -41,6 +41,7 @@ jobs:
         if: env.ENVIRONMENTS != '[]'
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
           OPEN_PRS=$(gh pr list --state open --json number | jq -r -c '[.[].number]')
           echo "OPEN_PRS=$OPEN_PRS" >> "$GITHUB_ENV"
@@ -61,6 +62,10 @@ jobs:
     name: Cleanup
     needs: find_orphaned
     if: needs.find_orphaned.outputs.orphaned != '[]'
+
+    permissions:
+      id-token: write
+
     strategy:
       fail-fast: false
       matrix:

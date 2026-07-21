@@ -7,6 +7,11 @@ on:
         type: number
         required: true
 
+permissions:
+  actions: read
+  contents: read
+  pull-requests: write
+
 env:
   CLAUDE_MODEL: sonnet
   CLAUDE_EFFORT: xhigh

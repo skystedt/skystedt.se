@@ -9,12 +9,41 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
-  id-token: write
+permissions: {} # permissions are specified on each job
 
 jobs:
   build_test_and_deploy:
     name: Build, Test and Deploy
+    permissions:
+      contents: read
+      id-token: write
     uses: ./.github/workflows/reusable-build-test-deploy.yml
     secrets: inherit
+
+  scan_codeql:
+    name: Scan CodeQL
+    permissions:
+      security-events: write
+    uses: ./.github/workflows/reusable-scan-codeql.yml
+
+  scan_owasp_dependency_check:
+    name: Scan OWASP Dependency Check
+    permissions:
+      contents: write
+      security-events: write
+      pull-requests: write
+    uses: ./.github/workflows/reusable-scan-owasp-dependency-check.yml
+    with:
+      upload-sarif: true
+      report-pull-request: true
+
+  scan_nuget_transitive_dependencies:
+    name: Scan NuGet Transitive Dependencies
+    permissions:
+      contents: write
+      security-events: write
+      pull-requests: write
+    uses: ./.github/workflows/reusable-scan-nuget-transitive-dependencies.yml
+    with:
+      upload-sarif: true
+      report-pull-request: true

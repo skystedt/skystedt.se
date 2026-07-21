@@ -1,91 +1,21 @@
-name: Schedule - Scan Nuget Transitive Dependencies
+name: Schedule - Scan NuGet Transitive Dependencies
 
 on:
   schedule:
-    # Run every Saturday at 08:40 UTC (09:40 CET/10:40 CEST), near in time when Dependabot is scheduled to run
-    - cron: "40 8 * * 6"
+    # Run daily at 11:45 UTC, to match other scans
+    - cron: "45 11 * * *"
   workflow_dispatch:
 
-concurrency:
-  group: vulnerability-scan-nuget-transitive-dependencies
-  cancel-in-progress: false
-
-env:
-  SRC_DIR: "src"
-  SCRIPTS_DIR: "${{ github.workspace }}/.github/scripts"
-  OUTPUT_FILE_NAME: "vulnerable.json"
-  SARIF_FILE_NAME: "vulnerable.sarif"
-  PACKAGE_LEVELS: "transitivePackages" # space-separated dotnet-list-package framework levels to scan
+permissions: {} # permissions are specified on each job
 
 jobs:
   scan:
-    name: Scan Nuget Transitive Dependencies
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      security-events: write
-
-    outputs:
-      vulnerable: ${{ steps.evaluate.outputs.vulnerable }}
-      summary: ${{ steps.evaluate.outputs.summary }}
-
-    defaults:
-      run:
-        working-directory: ${{ env.SRC_DIR }}
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # 7.0.0
-
-      - name: Dotnet Setup
-        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # 6.0.0
-        with:
-          global-json-file: ${{ env.SRC_DIR }}/global.json
-
-      - name: Dotnet Restore
-        run: dotnet restore
-
-      - name: Scan For Vulnerable Packages
-        run: |
-          dotnet list package --vulnerable --include-transitive --format json --no-restore > ${{ env.OUTPUT_FILE_NAME }} || true
-          cat ${{ env.OUTPUT_FILE_NAME }}
-
-      - name: Convert To SARIF
-        run: |
-          dotnet run ${{ env.SCRIPTS_DIR }}/ConvertNugetVulnerabilitiesToSarif.cs -- ${{ env.OUTPUT_FILE_NAME }} ${{ env.PACKAGE_LEVELS }}
-          cat ${{ env.SARIF_FILE_NAME }}
-
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@7188fc363630916deb702c7fdcf4e481b751f97a # 4.37.1
-        with:
-          sarif_file: ${{ env.SRC_DIR }}/${{ env.SARIF_FILE_NAME }}
-          category: nuget-transitive-dependencies
-
-      - name: Evaluate Scan Result
-        id: evaluate
-        run: |
-          VULNERABLE=$(jq -r '[.projects[]?.frameworks[]? as $f | $ARGS.positional[] as $level | ($f[$level] // [])[]] | length' ${{ env.OUTPUT_FILE_NAME }} --args ${{ env.PACKAGE_LEVELS }})
-          echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
-          echo "Found $VULNERABLE vulnerable dependencies"
-
-          {
-            echo "summary<<EOF_SUMMARY"
-            echo '```'
-            cat ${{ env.OUTPUT_FILE_NAME }}
-            echo '```'
-            echo "EOF_SUMMARY"
-          } >> "$GITHUB_OUTPUT"
-
-  pull-request:
-    name: Pull Request
-    needs: scan
+    name: Scan NuGet Transitive Dependencies
     permissions:
       contents: write
+      security-events: write
       pull-requests: write
-    uses: ./.github/workflows/reusable-report-pull-request.yml
+    uses: ./.github/workflows/reusable-scan-nuget-transitive-dependencies.yml
     with:
-      branch-name: "vulnerability-scan/nuget-transitive-dependencies"
-      open: ${{ needs.scan.outputs.vulnerable != '0' }}
-      title: "Vulnerabilities found in Transitive Dependencies"
-      summary: ${{ needs.scan.outputs.summary }}
+      upload-sarif: true
+      report-pull-request: true

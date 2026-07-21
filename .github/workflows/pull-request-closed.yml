@@ -9,12 +9,13 @@ on:
   pull_request:
     types: [closed]
 
-permissions:
-  id-token: write
+permissions: {} # permissions are specified on each job
 
 jobs:
   cleanup:
     name: Cleanup
+    permissions:
+      id-token: write
     uses: ./.github/workflows/reusable-cleanup.yml
     with:
       pr_number: ${{ github.event.number }}
