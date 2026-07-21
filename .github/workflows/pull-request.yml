@@ -36,6 +36,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      id-token: write
       pull-requests: write
     uses: ./.github/workflows/reusable-ai-review-claude.yml
     with:
