@@ -1,0 +1,68 @@
+name: Composite - Report Pull Request
+description: Open, update, or close a tracking pull request for a scan result. Assumes the repository is already checked out.
+
+inputs:
+  branch-name:
+    description: Branch used to track the pull request
+    required: true
+  open:
+    description: Whether the tracking pull request should be open ("true") or closed ("false")
+    required: true
+  title:
+    description: Pull request title
+    required: true
+  summary:
+    description: Pull request body summary
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Check For Existing Pull Request
+      id: check-pr
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        EXISTING_PR=$(gh pr list --head "${{ inputs.branch-name }}" --state open --json number --jq '.[0].number // empty')
+        echo "existing=$EXISTING_PR" >> "$GITHUB_OUTPUT"
+        echo "Existing PR: $EXISTING_PR"
+
+    - name: Create Branch
+      if: steps.check-pr.outputs.existing == '' && inputs.open == 'true'
+      shell: bash
+      run: |
+        git config user.name 'GitHub Actions'
+        git config user.email 'actions@github.com'
+        git checkout -b "${{ inputs.branch-name }}"
+        git commit --allow-empty -m "${{ inputs.title }} [skip ci]"
+        git push origin "${{ inputs.branch-name }}"
+
+    - name: Create Pull Request
+      if: steps.check-pr.outputs.existing == '' && inputs.open == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        SUMMARY: ${{ inputs.summary }} # via env, not inlined: avoids script injection from scan output
+      run: |
+        BODY=$'## ${{ inputs.title }}\n'"$SUMMARY"
+        gh pr create --base main --head "${{ inputs.branch-name }}" --title "${{ inputs.title }}" --body "$BODY"
+
+    - name: Comment on Existing Pull Request
+      if: steps.check-pr.outputs.existing != '' && inputs.open == 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        SUMMARY: ${{ inputs.summary }} # via env, not inlined: avoids script injection from scan output
+      run: |
+        BODY=$'## ${{ inputs.title }} (Updated)\n'"$SUMMARY"
+        gh pr comment "${{ steps.check-pr.outputs.existing }}" --body "$BODY"
+
+    - name: Close Existing Pull Request
+      if: steps.check-pr.outputs.existing != '' && inputs.open != 'true'
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        COMMENT='No longer relevant. Closing this pull request.'
+        gh pr close "${{ steps.check-pr.outputs.existing }}" --comment "$COMMENT" --delete-branch
