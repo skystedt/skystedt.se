@@ -61,7 +61,12 @@ jobs:
 
               If the prompt includes a compare command, the PR was updated after it was already reviewed: check existing PR comments with 'gh pr view --comments'.
 
-              Always post one GitHub comment with the result, use 'gh pr comment'.
+              This is a single, non-interactive run: complete the entire review within this turn.
+              Do not spawn background sub-agents and do not wait for asynchronous notifications, you will not receive them here.
+              If you use the Agent tool, call it synchronously (run_in_background: false).
+              Do not stall on filler commands (sleep, no-ops) waiting for anything, if you are blocked on more information, finish the review with what you have.
+
+              Posting the comment is the required final step and must always happen: always post exactly one GitHub comment with the result, use 'gh pr comment'.
               Start the comment with an italic line stating the exact model you are running as and the effort level, e.g. _Model: claude-sonnet-x-x (effort)_
 
               You are running with effort: ${{ env.CLAUDE_EFFORT }}."
