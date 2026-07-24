@@ -1,0 +1,18 @@
+diff --git a/lib/utils/browser/isMobile.mjs b/lib/utils/browser/isMobile.mjs
+index 58bb00ceef6bb2b9ecb923e04d0a3d9219e23ccf..8be084ad3e35e915f342682e6087ab945e6dfd60 100644
+--- a/lib/utils/browser/isMobile.mjs
++++ b/lib/utils/browser/isMobile.mjs
+@@ -1,8 +1,8 @@
+-import isMobileJs from 'ismobilejs';
+-
+-"use strict";
+-const isMobileCall = isMobileJs.default ?? isMobileJs;
+-const isMobile = isMobileCall(globalThis.navigator);
++const isMobile = {
++  phone: false,
++  tablet: false,
++  android: { device: false }
++}
+ 
+ export { isMobile };
+ //# sourceMappingURL=isMobile.mjs.map
