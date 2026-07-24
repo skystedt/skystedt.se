@@ -13,7 +13,7 @@ env:
   DOTNET_CONFIGURATION: "Release"
   SWA_NAME: "skystedt"
   SCRIPTS_DIR: "${{ github.workspace }}/.github/scripts"
-  DEPLOY_DIR: "${{ github.workspace }}/.github/deploy"
+  SWA_CLI_DIR: "${{ github.workspace }}/src/Client/deploy"
 
 jobs:
   build_api:
@@ -134,7 +134,7 @@ jobs:
 
       - name: Install Azure Static Web Apps CLI
         run: |
-          SWA_CLI_VERSION=$(jq --raw-output '.dependencies["@azure/static-web-apps-cli"]' ${{ env.DEPLOY_DIR }}/package.json)
+          SWA_CLI_VERSION=$(jq --raw-output '.dependencies["@azure/static-web-apps-cli"]' ${{ env.SWA_CLI_DIR }}/package.json)
           npm install -g "@azure/static-web-apps-cli@$SWA_CLI_VERSION"
 
       - name: Azure Login
