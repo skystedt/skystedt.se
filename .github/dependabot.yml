@@ -56,7 +56,7 @@ updates:
           - patch
 
   - package-ecosystem: "npm"
-    directory: "/.github/deploy"
+    directory: "/src/Client/deploy"
     schedule:
       interval: "weekly"
       day: "saturday"
