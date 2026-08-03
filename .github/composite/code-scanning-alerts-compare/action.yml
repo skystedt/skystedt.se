@@ -1,0 +1,96 @@
+name: Composite - Code Scanning Alerts Compare
+description: Compare a scan result against the code scanning alerts of a baseline branch, to find added and removed findings.
+
+inputs:
+  sarif-file:
+    description: SARIF file containing the current scan result
+    required: true
+  tool-name:
+    description: SARIF tool name, used to select which code scanning alerts to compare against
+    required: true
+  baseline-ref:
+    description: Git ref whose code scanning alerts are used as the baseline
+    required: false
+    default: "refs/heads/main"
+
+outputs:
+  added:
+    description: Findings in the scan result that are missing from the baseline, as JSON
+    value: ${{ steps.compare.outputs.added }}
+  removed:
+    description: Findings in the baseline that are missing from the scan result, as JSON
+    value: ${{ steps.compare.outputs.removed }}
+  added-count:
+    description: Number of added findings
+    value: ${{ steps.compare.outputs.added-count }}
+  removed-count:
+    description: Number of removed findings
+    value: ${{ steps.compare.outputs.removed-count }}
+  changed:
+    description: '"true" when anything was added or removed'
+    value: ${{ steps.compare.outputs.changed }}
+  changes:
+    description: Markdown list of the added and removed findings, empty when nothing changed
+    value: ${{ steps.compare.outputs.changes }}
+
+runs:
+  using: composite
+  steps:
+    - name: Compare With Baseline
+      id: compare
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        SARIF_FILE: ${{ inputs.sarif-file }}
+        TOOL_NAME: ${{ inputs.tool-name }}
+        BASELINE_REF: ${{ inputs.baseline-ref }}
+      run: |
+        STATUS=0
+        ALERTS=$(gh api --paginate -X GET "repos/$GITHUB_REPOSITORY/code-scanning/alerts" \
+          -f ref="$BASELINE_REF" \
+          -f tool_name="$TOOL_NAME" \
+          -f per_page=100 \
+          --jq '.[] | select(.state != "fixed") | {rule: .rule.id, path: (.most_recent_instance.location.path // "")}') || STATUS=$?
+        if [ "$STATUS" != "0" ]; then
+          echo "::warning::Unable to read the code scanning alerts of $BASELINE_REF for $TOOL_NAME, treating every finding as new"
+          ALERTS=""
+        fi
+        BASELINE=$(jq -sc 'unique' <<< "$ALERTS")
+
+        CURRENT=$(jq -c '[.runs[]? as $run | $run.results[]? | {rule: (.ruleId // (if .ruleIndex == null then null else $run.tool.driver.rules[.ruleIndex].id end) // ""), path: (.locations[0]?.physicalLocation?.artifactLocation?.uri // "")}] | unique' "$SARIF_FILE")
+
+        ADDED=$(jq -c --argjson baseline "$BASELINE" '. - $baseline' <<< "$CURRENT")
+        REMOVED=$(jq -c --argjson current "$CURRENT" '. - $current' <<< "$BASELINE")
+        ADDED_COUNT=$(jq -r 'length' <<< "$ADDED")
+        REMOVED_COUNT=$(jq -r 'length' <<< "$REMOVED")
+
+        CHANGED="false"
+        if [ "$ADDED_COUNT" != "0" ] || [ "$REMOVED_COUNT" != "0" ]; then
+          CHANGED="true"
+        fi
+
+        echo "Baseline: $BASELINE"
+        echo "Current: $CURRENT"
+        echo "Added $ADDED_COUNT: $ADDED"
+        echo "Removed $REMOVED_COUNT: $REMOVED"
+
+        {
+          echo "added=$ADDED"
+          echo "removed=$REMOVED"
+          echo "added-count=$ADDED_COUNT"
+          echo "removed-count=$REMOVED_COUNT"
+          echo "changed=$CHANGED"
+        } >> "$GITHUB_OUTPUT"
+
+        {
+          echo "changes<<EOF_CHANGES"
+          if [ "$ADDED_COUNT" != "0" ]; then
+            echo "New compared to $BASELINE_REF:"
+            jq -r '.[] | "- \(.rule) `\(.path)`"' <<< "$ADDED"
+          fi
+          if [ "$REMOVED_COUNT" != "0" ]; then
+            echo "Fixed compared to $BASELINE_REF:"
+            jq -r '.[] | "- \(.rule) `\(.path)`"' <<< "$REMOVED"
+          fi
+          echo "EOF_CHANGES"
+        } >> "$GITHUB_OUTPUT"

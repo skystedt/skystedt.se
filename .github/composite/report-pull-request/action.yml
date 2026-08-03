@@ -8,6 +8,10 @@ inputs:
   open:
     description: Whether the tracking pull request should be open ("true") or closed ("false")
     required: true
+  changed:
+    description: Whether the result changed since it was last reported; when "false" an already open pull request is left untouched
+    required: false
+    default: "true"
   title:
     description: Pull request title
     required: true
@@ -49,7 +53,7 @@ runs:
         gh pr create --base main --head "${{ inputs.branch-name }}" --title "${{ inputs.title }}" --body "$BODY"
 
     - name: Comment on Existing Pull Request
-      if: steps.check-pr.outputs.existing != '' && inputs.open == 'true'
+      if: steps.check-pr.outputs.existing != '' && inputs.open == 'true' && inputs.changed == 'true'
       shell: bash
       env:
         GH_TOKEN: ${{ github.token }}

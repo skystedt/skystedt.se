@@ -7,7 +7,7 @@ concurrency:
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    
+
 permissions: {} # permissions are specified on each job
 
 jobs:
@@ -59,6 +59,7 @@ jobs:
     name: Scan OWASP Dependency Check
     permissions:
       contents: read
+      security-events: read
     uses: ./.github/workflows/reusable-scan-owasp-dependency-check.yml
     with:
       upload-sarif: false
@@ -69,6 +70,7 @@ jobs:
     name: Scan NuGet Transitive Dependencies
     permissions:
       contents: read
+      security-events: read
     uses: ./.github/workflows/reusable-scan-nuget-transitive-dependencies.yml
     with:
       upload-sarif: false
