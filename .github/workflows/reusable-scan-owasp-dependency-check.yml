@@ -12,7 +12,7 @@ on:
         type: boolean
         default: true
       fail-on-vulnerable:
-        description: Fail the workflow when vulnerabilities are found
+        description: Fail the workflow when vulnerabilities are found that are not already known on the baseline branch
         type: boolean
         default: false
 
@@ -47,8 +47,16 @@ jobs:
             --noupdate
           cat "$REPORT_NAME/$REPORT_NAME.json"
 
+      - name: Compare With Baseline
+        id: compare
+        uses: ./.github/composite/code-scanning-alerts-compare
+        with:
+          sarif-file: ${{ env.REPORT_NAME }}/${{ env.REPORT_NAME }}.sarif
+          tool-name: "dependency-check"
+
       - name: Upload Report
         id: upload-report
+        if: ${{ steps.compare.outputs.changed == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         with:
           path: ${{ env.REPORT_NAME }}/${{ env.REPORT_NAME }}.html
@@ -65,24 +73,30 @@ jobs:
         id: evaluate
         env:
           REPORT_URL: ${{ steps.upload-report.outputs.artifact-url }}
+          CHANGES: ${{ steps.compare.outputs.changes }}
         run: |
           SUMMARY=$(jq -c '[.dependencies[]? | select(.vulnerabilities) | {fileName, filePath, vulnerabilities: [.vulnerabilities[] | {name, severity}]}]' "$REPORT_NAME/$REPORT_NAME.json")
 
           VULNERABLE=$(jq -r '[.[].vulnerabilities[]] | length' <<< "$SUMMARY")
           echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
-          echo "Found $VULNERABLE vulnerabilities"
+          echo "Found $VULNERABLE vulnerabilities, ${{ steps.compare.outputs.added-count }} of them new"
 
           {
             echo "summary<<EOF_SUMMARY"
-            echo "Full report: $REPORT_URL"
+            if [ -n "$REPORT_URL" ]; then
+              echo "Full report: $REPORT_URL"
+            fi
+            if [ -n "$CHANGES" ]; then
+              echo "$CHANGES"
+            fi
             echo '```'
             jq . <<< "$SUMMARY"
             echo '```'
             echo "EOF_SUMMARY"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Fail If Vulnerable
-        if: ${{ inputs.fail-on-vulnerable && steps.evaluate.outputs.vulnerable != '0' }}
+      - name: Fail If New Vulnerabilities
+        if: ${{ inputs.fail-on-vulnerable && steps.compare.outputs.added-count != '0' }}
         env:
           SUMMARY: ${{ steps.evaluate.outputs.summary }}
         run: |
@@ -90,7 +104,7 @@ jobs:
             echo "## Vulnerabilities found by OWASP Dependency-Check"
             echo "$SUMMARY"
           } >> "$GITHUB_STEP_SUMMARY"
-          echo "::error::OWASP Dependency-Check found ${{ steps.evaluate.outputs.vulnerable }} vulnerabilities"
+          echo "::error::OWASP Dependency-Check found ${{ steps.compare.outputs.added-count }} new vulnerabilities, out of ${{ steps.evaluate.outputs.vulnerable }} in total"
           exit 1
 
       - name: Report Pull Request
@@ -99,5 +113,6 @@ jobs:
         with:
           branch-name: "vulnerability-scan/owasp-dependency-check"
           open: ${{ steps.evaluate.outputs.vulnerable != '0' }}
+          changed: ${{ steps.compare.outputs.changed }}
           title: "Vulnerabilities found by OWASP Dependency-Check"
           summary: ${{ steps.evaluate.outputs.summary }}

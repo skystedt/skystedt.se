@@ -12,7 +12,7 @@ on:
         type: boolean
         default: true
       fail-on-vulnerable:
-        description: Fail the workflow when vulnerabilities are found
+        description: Fail the workflow when vulnerabilities are found that are not already known on the baseline branch
         type: boolean
         default: false
 
@@ -52,10 +52,16 @@ jobs:
           cat ${{ env.OUTPUT_FILE_NAME }}
 
       - name: Convert To SARIF
-        if: ${{ inputs.upload-sarif }}
         run: |
           dotnet run ${{ env.SCRIPTS_DIR }}/ConvertNugetVulnerabilitiesToSarif.cs -- ${{ env.OUTPUT_FILE_NAME }} ${{ env.PACKAGE_LEVELS }}
           cat ${{ env.SARIF_FILE_NAME }}
+
+      - name: Compare With Baseline
+        id: compare
+        uses: ./.github/composite/code-scanning-alerts-compare
+        with:
+          sarif-file: ${{ env.SRC_DIR }}/${{ env.SARIF_FILE_NAME }}
+          tool-name: "dotnet-list-package-vulnerable"
 
       - name: Upload SARIF
         if: ${{ inputs.upload-sarif }}
@@ -66,21 +72,26 @@ jobs:
 
       - name: Evaluate Scan Result
         id: evaluate
+        env:
+          CHANGES: ${{ steps.compare.outputs.changes }}
         run: |
           VULNERABLE=$(jq -r '[.projects[]?.frameworks[]? as $f | $ARGS.positional[] as $level | ($f[$level] // [])[]] | length' ${{ env.OUTPUT_FILE_NAME }} --args ${{ env.PACKAGE_LEVELS }})
           echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
-          echo "Found $VULNERABLE vulnerable dependencies"
+          echo "Found $VULNERABLE vulnerable dependencies, ${{ steps.compare.outputs.added-count }} of them new"
 
           {
             echo "summary<<EOF_SUMMARY"
+            if [ -n "$CHANGES" ]; then
+              echo "$CHANGES"
+            fi
             echo '```'
             cat ${{ env.OUTPUT_FILE_NAME }}
             echo '```'
             echo "EOF_SUMMARY"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Fail If Vulnerable
-        if: ${{ inputs.fail-on-vulnerable && steps.evaluate.outputs.vulnerable != '0' }}
+      - name: Fail If New Vulnerabilities
+        if: ${{ inputs.fail-on-vulnerable && steps.compare.outputs.added-count != '0' }}
         env:
           SUMMARY: ${{ steps.evaluate.outputs.summary }}
         run: |
@@ -88,7 +99,7 @@ jobs:
             echo "## Vulnerabilities found in Transitive Dependencies"
             echo "$SUMMARY"
           } >> "$GITHUB_STEP_SUMMARY"
-          echo "::error::Found ${{ steps.evaluate.outputs.vulnerable }} vulnerable transitive dependencies"
+          echo "::error::Found ${{ steps.compare.outputs.added-count }} new vulnerable transitive dependencies, out of ${{ steps.evaluate.outputs.vulnerable }} in total"
           exit 1
 
       - name: Report Pull Request
@@ -97,5 +108,6 @@ jobs:
         with:
           branch-name: "vulnerability-scan/nuget-transitive-dependencies"
           open: ${{ steps.evaluate.outputs.vulnerable != '0' }}
+          changed: ${{ steps.compare.outputs.changed }}
           title: "Vulnerabilities found in Transitive Dependencies"
           summary: ${{ steps.evaluate.outputs.summary }}
