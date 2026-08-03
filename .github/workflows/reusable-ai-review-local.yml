@@ -162,6 +162,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+        with:
+          fetch-depth: 0 # full history so a rebase can be detected by comparing merge bases
 
       - name: Connect WireGuard
         # if the tunnel cannot be established the availability check will report offline
@@ -218,11 +220,32 @@ jobs:
           # read diff since last review
           : > change_diff.patch
           if [ -n "$REVIEWED_HASH" ] && [ "$REVIEWED_HASH" != "$HEAD_HASH" ]; then
-            if gh api -H "Accept: application/vnd.github.diff" "repos/{owner}/{repo}/compare/$REVIEWED_HASH...$HEAD_HASH" > change_diff.patch && [ -s change_diff.patch ]; then
+            # a rebase moves the branch onto a new base, the reviewed head is then on an abandoned lineage
+            # and comparing the two heads would also pull in everything the base branch gained meanwhile,
+            # when the merge bases cannot be established, assume the comparison is not trustworthy
+            BASE_REF=$(gh pr view "${{ inputs.pr_number }}" --json baseRefName --jq '.baseRefName')
+            SAME_BASE=false
+            if git fetch --no-tags --quiet origin "$BASE_REF" \
+              && BASE_HEAD=$(git rev-parse FETCH_HEAD) \
+              && git fetch --no-tags --quiet origin "$REVIEWED_HASH" "$HEAD_HASH" \
+              && OLD_BASE=$(git merge-base "$BASE_HEAD" "$REVIEWED_HASH") \
+              && NEW_BASE=$(git merge-base "$BASE_HEAD" "$HEAD_HASH") \
+              && [ "$OLD_BASE" = "$NEW_BASE" ]; then
+
+              SAME_BASE=true
+            fi
+
+            if [ "$SAME_BASE" = "true" ] \
+              && gh api -H "Accept: application/vnd.github.diff" "repos/{owner}/{repo}/compare/$REVIEWED_HASH...$HEAD_HASH" > change_diff.patch \
+              && [ -s change_diff.patch ]; then
+
               echo "update=true" >> "$GITHUB_OUTPUT"
               echo "This is an update, read the changes since the last review"
             else
+              # the diff since the last review is missing or cannot be trusted, review the full diff again
               : > change_diff.patch
+              echo "full_review=true" >> "$GITHUB_OUTPUT"
+              echo "No reliable diff since the last review, the full diff will be reviewed again"
             fi
           fi
 
@@ -266,21 +289,35 @@ jobs:
             echo "You are a code reviewer. Your reply is posted verbatim as a single GitHub comment on the pull request."
             echo ""
             echo "Report only concrete problems in the changed code: bugs, edge cases, security issues, broken logic."
+            echo "Do not ask the author to verify, confirm, ensure or double check anything."
+            echo "Report only a defect you can point at in the diff, if you cannot see it in the changed lines, do not report it."
+            echo ""
+            if [ -s full_diff.patch ] && [ -s change_diff.patch ]; then
+              echo "The full diff is the complete set of changes this pull request makes, every change is in it."
+              echo "Only report findings for files that appear in the full diff."
+              echo "If a file appears under the changes since the last review but not in the full diff, this pull request no longer changes it, ignore it."
+              echo ""
+            fi
+            echo "For dependency updates, do not review the mechanics of the diff."
+            echo "Version numbers, hashes, checksums and lockfile entries are generated, they are not where problems come from."
+            echo "Report only an effect the new versions have on this repository that is visible in the diff."
             echo ""
             echo "Format:"
-            echo "- One sentence stating what the PR does."
+            echo "- One sentence stating what the PR does, always, including when there is nothing to flag."
             echo "- Then findings as short bullets, most important first, each referencing the file it applies to."
-            echo "- If there is nothing to flag, write only: No issues found."
+            echo "- If there is nothing to flag, write that sentence followed by: No issues found."
             echo ""
             echo "Do not include: praise, strengths sections, a restatement of the diff, summary tables, verdicts or merge recommendations, conclusions, generic advice (testing, monitoring, documentation), or closing offers to help."
             echo "Keep the review under 200 words unless a finding needs a code snippet to explain."
             echo ""
-            echo "When reviewing an update to an already-reviewed PR, cover only the changes since the last review and do not repeat earlier findings."
+            echo "When reviewing an update to an already-reviewed PR, cover only the changes since the last review, unless the prompt says there is no reliable diff since the last review."
+            echo "If a finding already appears in the previous review comments, do not post it again, even if you still believe it is correct."
           } > system.md
 
           {
             echo "Please review this pull request."
             echo "${{ steps.data.outputs.update == 'true' && 'This run was triggered by updates to an already-reviewed PR.' || '' }}"
+            echo "${{ steps.data.outputs.full_review == 'true' && 'This run was triggered by updates to an already-reviewed PR, but there is no reliable diff since the last review, the branch may have been rebased. Review the full diff again. Anything that came from the base branch is not part of this pull request.' || '' }}"
 
             echo ""
             echo "## PR Description"
@@ -339,7 +376,7 @@ jobs:
 
               # the review comment
               {
-                echo "## 🤖 Local LLM Review${{ steps.data.outputs.update == 'true' && ' _(update)_' || '' }}"
+                echo "## 🤖 Local LLM Review${{ (steps.data.outputs.update == 'true' || steps.data.outputs.full_review == 'true') && ' _(update)_' || '' }}"
                 echo "_Model: ${MODEL}_"
                 echo ""
                 printf '%s' "$CONTENT" | head -c "$MAX_COMMENT_CHARS"
