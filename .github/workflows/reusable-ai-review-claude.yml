@@ -42,7 +42,6 @@ jobs:
               Bash(gh pr comment:*),
               Bash(gh pr diff:*),
               Bash(gh pr view:*),
-              Bash(gh pr checks:*),
               Bash(gh api */compare/*),
               Bash(git fetch:*),
               Bash(git diff:*),
@@ -58,8 +57,15 @@ jobs:
               Use 'gh pr diff' to see the full set of changes.
               The full git history is available locally: use 'git log' and 'git show' for commit history and previous file versions, do not use 'gh api' for those.
               Do not try to build, run or validate the project locally; review from the source alone.
+              Do not look at build, test or CI results.
 
               If the prompt includes a compare command, the PR was updated after it was already reviewed: check existing PR comments with 'gh pr view --comments'.
+              If the compare range contains files that are not in 'gh pr diff', the branch was rebased and those files belong to the base branch: ignore them and review only what 'gh pr diff' shows.
+
+              For dependency updates (lockfiles, version bumps, pinned action SHAs) do not spend the review on the mechanics of the diff.
+              Version numbers, hashes, checksums and lockfile consistency are generated, they are not where problems come from.
+              Review instead how the new versions affect this repository: read the upstream changelog or release notes for what actually changed,
+              then read this repo's own configuration and usage of that package to find what should be acted on.
 
               This is a single, non-interactive run: complete the entire review within this turn.
               Do not spawn background sub-agents and do not wait for asynchronous notifications, you will not receive them here.
@@ -67,7 +73,7 @@ jobs:
               Do not stall on filler commands (sleep, no-ops) waiting for anything, if you are blocked on more information, finish the review with what you have.
 
               Posting the comment is the required final step and must always happen: always post exactly one GitHub comment with the result, use 'gh pr comment'.
-              Start the comment with an italic line stating the exact model you are running as and the effort level, e.g. _Model: claude-sonnet-x-x (effort)_
+              Start the comment with an italic line stating the exact model you are running as and the effort level, e.g. _Model: claude-model-x-x (effort)_
 
               You are running with effort: ${{ env.CLAUDE_EFFORT }}."
           prompt: |
