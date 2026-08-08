@@ -1,0 +1,52 @@
+name: Composite - Scan OWASP Dependency Check
+description: Run OWASP Dependency-Check against a checkout and write the reports into it.
+
+inputs:
+  checkout-dir:
+    description: Absolute path of the checkout to scan
+    required: true
+
+outputs:
+  json-file:
+    description: Path of the JSON report
+    value: ${{ steps.scan.outputs.json-file }}
+  html-file:
+    description: Path of the HTML report
+    value: ${{ steps.scan.outputs.html-file }}
+  sarif-file:
+    description: Path of the SARIF report
+    value: ${{ steps.scan.outputs.sarif-file }}
+
+runs:
+  using: composite
+  steps:
+    - name: Scan For Vulnerabilities
+      id: scan
+      shell: bash
+      env:
+        CHECKOUT_DIR: ${{ inputs.checkout-dir }}
+        SRC_DIR: "src"
+        REPORT_NAME: "dependency-check-report"
+        SUPPRESSION_FILE: ".github/dependency-check/suppression.xml"
+        IMAGE: "owasp/dependency-check-action:latest" # Rebuilt nightly with an updated NVD dataset, so version is not pinned
+      run: |
+        # The checkout is always mounted as /src, so reported paths are the same no matter where it lives
+        docker run --rm \
+          -v "$CHECKOUT_DIR:/src" \
+          "$IMAGE" \
+          --scan "/src/$SRC_DIR" \
+          --format JSON \
+          --format HTML \
+          --format SARIF \
+          --out "/src/$REPORT_NAME" \
+          --suppression "/src/$SUPPRESSION_FILE" \
+          --noupdate
+
+        REPORT_PATH="$CHECKOUT_DIR/$REPORT_NAME/$REPORT_NAME"
+        cat "$REPORT_PATH.json"
+
+        {
+          echo "json-file=$REPORT_PATH.json"
+          echo "html-file=$REPORT_PATH.html"
+          echo "sarif-file=$REPORT_PATH.sarif"
+        } >> "$GITHUB_OUTPUT"

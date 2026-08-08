@@ -1,5 +1,9 @@
 name: Schedule - Scan NuGet Transitive Dependencies
 
+concurrency:
+  group: schedule-scan-nuget-transitive-dependencies
+  cancel-in-progress: false
+
 on:
   schedule:
     # Run daily at 11:45 UTC, to match other scans

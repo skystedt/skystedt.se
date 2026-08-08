@@ -1,0 +1,51 @@
+name: Composite - Scan NuGet Transitive Dependencies
+description: List the vulnerable NuGet dependencies of a checkout and convert the result to SARIF.
+
+inputs:
+  checkout-dir:
+    description: Absolute path of the checkout to scan
+    required: true
+  package-levels:
+    description: Space-separated dotnet-list-package framework levels to scan
+    required: true
+
+outputs:
+  json-file:
+    description: Path of the dotnet-list-package JSON report
+    value: ${{ steps.scan.outputs.json-file }}
+  sarif-file:
+    description: Path of the SARIF report
+    value: ${{ steps.scan.outputs.sarif-file }}
+
+runs:
+  using: composite
+  steps:
+    - name: Scan For Vulnerable Packages
+      id: scan
+      shell: bash
+      env:
+        CHECKOUT_DIR: ${{ inputs.checkout-dir }}
+        PACKAGE_LEVELS: ${{ inputs.package-levels }}
+        SRC_DIR: "src"
+        OUTPUT_FILE_NAME: "vulnerable.json"
+        SARIF_FILE_NAME: "vulnerable.sarif"
+        CONVERT_SCRIPT: ${{ github.workspace }}/.github/scripts/ConvertNugetVulnerabilitiesToSarif.cs
+      run: |
+        SRC_PATH="$CHECKOUT_DIR/$SRC_DIR"
+        cd "$SRC_PATH"
+
+        dotnet restore
+
+        dotnet list package --vulnerable --include-transitive --format json --no-restore > "$OUTPUT_FILE_NAME" || true
+        cat "$OUTPUT_FILE_NAME"
+
+        # The converter makes lock file paths relative to GITHUB_WORKSPACE,
+        # point it at the scanned checkout so reported paths are the same no matter where it lives
+        # PACKAGE_LEVELS is intentionally unquoted, it is a space-separated list of arguments
+        GITHUB_WORKSPACE="$CHECKOUT_DIR" dotnet run "$CONVERT_SCRIPT" -- "$OUTPUT_FILE_NAME" $PACKAGE_LEVELS
+        cat "$SARIF_FILE_NAME"
+
+        {
+          echo "json-file=$SRC_PATH/$OUTPUT_FILE_NAME"
+          echo "sarif-file=$SRC_PATH/$SARIF_FILE_NAME"
+        } >> "$GITHUB_OUTPUT"
