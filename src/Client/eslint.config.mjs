@@ -289,7 +289,8 @@ export default [
       'unicorn/prefer-top-level-await': 'off', // Makes babel give warnings
       'unicorn/prefer-global-this': 'off', // Breaks SplitChunksPlugin with cache group conflict for 'polyfills'
       'unicorn/name-replacements': ['error', { replacements: { application: false } }] /* Opinionated */,
-      'unicorn/default-export-style': ['error', { functions: 'separate' }]
+      'unicorn/default-export-style': ['error', { functions: 'separate' }],
+      'unicorn/single-line-block-comment-style': ['error', 'single-line'] /* Opinionated */
     }
   },
   {

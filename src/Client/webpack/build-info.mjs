@@ -187,7 +187,7 @@ export default class BuildInfo {
     const browsers = browserslistBrowsers(environment);
     const versions = /** @type {BrowserVersions} */ ({});
     for (const browser of browsers) {
-      const [name, version] = browser.split(' ');
+      const [name, version] = browser.split(' ', 2);
       versions[name] = [...(versions[name] || []), version].toSorted((a, b) => a.localeCompare(b));
     }
     return versions;
