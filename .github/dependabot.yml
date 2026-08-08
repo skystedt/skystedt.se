@@ -8,6 +8,8 @@ updates:
       day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
+    cooldown:
+      default-days: 0
     groups:
       github-actions:
         patterns:
@@ -23,6 +25,8 @@ updates:
       day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
+    cooldown:
+      default-days: 0
 
   - package-ecosystem: "nuget"
     directory: "/src"
@@ -31,6 +35,8 @@ updates:
       day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
+    cooldown:
+      default-days: 0
     groups:
       api:
         patterns:
@@ -43,6 +49,8 @@ updates:
       day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
+    cooldown:
+      default-days: 0
     open-pull-requests-limit: 10
     groups:
       babel:
@@ -62,3 +70,5 @@ updates:
       day: "saturday"
       time: "10:00"
       timezone: "Europe/Stockholm"
+    cooldown:
+      default-days: 0
