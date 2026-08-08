@@ -137,7 +137,7 @@ export const cacheGroups = (build) =>
       type: Helpers.wildcardMatch('javascript/*'),
       name: (module) => {
         console.warn(`Using ignored module: ${module.identifier()}`);
-        const [, modulePath] = module.identifier().split('|');
+        const [, modulePath] = module.identifier().split('|', 2);
         const moduleName = path.relative(dir.node_modules, modulePath);
         return mapVendorModuleNameToChunk(moduleName);
       }
