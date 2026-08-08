@@ -19,10 +19,10 @@ on:
 # permissions are inherited from the caller
 
 env:
-  SRC_DIR: "src"
-  REPORT_NAME: "dependency-check-report"
-  SUPPRESSION_FILE: ".github/dependency-check/suppression.xml"
-  IMAGE: "owasp/dependency-check-action:latest" # Rebuilt nightly with an updated NVD dataset, so version is not pinned
+  BASELINE_BRANCH: "main"
+  BASELINE_DIR: "baseline"
+  BASELINE_WORKFLOW: "schedule-scan-owasp-dependency-check.yml"
+  TOOL_NAME: "dependency-check"
 
 jobs:
   scan:
@@ -34,48 +34,84 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
 
       - name: Scan For Vulnerabilities
-        run: |
-          docker run --rm \
-            -v "${{ github.workspace }}:/src" \
-            "$IMAGE" \
-            --scan "/src/$SRC_DIR" \
-            --format JSON \
-            --format HTML \
-            --format SARIF \
-            --out "/src/$REPORT_NAME" \
-            --suppression "/src/$SUPPRESSION_FILE" \
-            --noupdate
-          cat "$REPORT_NAME/$REPORT_NAME.json"
+        id: scan
+        uses: ./.github/composite/scan-owasp-dependency-check
+        with:
+          checkout-dir: ${{ github.workspace }}
+
+      - name: Compare With Baseline Alerts
+        id: alerts
+        uses: ./.github/composite/scan-result-compare
+        with:
+          sarif-file: ${{ steps.scan.outputs.sarif-file }}
+          tool-name: ${{ env.TOOL_NAME }}
+
+      - name: Checkout Baseline
+        id: baseline-checkout
+        if: ${{ inputs.fail-on-vulnerable && steps.alerts.outputs.added-count != '0' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+        with:
+          ref: ${{ env.BASELINE_BRANCH }}
+          path: ${{ env.BASELINE_DIR }}
+
+      - name: Scan Baseline For Vulnerabilities
+        id: baseline-scan
+        if: ${{ steps.baseline-checkout.outcome == 'success' }}
+        uses: ./.github/composite/scan-owasp-dependency-check
+        with:
+          checkout-dir: ${{ github.workspace }}/${{ env.BASELINE_DIR }}
 
       - name: Compare With Baseline
         id: compare
-        uses: ./.github/composite/code-scanning-alerts-compare
+        uses: ./.github/composite/scan-result-compare
         with:
-          sarif-file: ${{ env.REPORT_NAME }}/${{ env.REPORT_NAME }}.sarif
-          tool-name: "dependency-check"
+          sarif-file: ${{ steps.scan.outputs.sarif-file }}
+          baseline-sarif-file: ${{ steps.baseline-scan.outputs.sarif-file }}
+          tool-name: ${{ env.TOOL_NAME }}
+
+      - name: Compare Baseline With Baseline Alerts
+        id: baseline-alerts
+        if: ${{ steps.baseline-scan.outcome == 'success' }}
+        uses: ./.github/composite/scan-result-compare
+        with:
+          sarif-file: ${{ steps.baseline-scan.outputs.sarif-file }}
+          tool-name: ${{ env.TOOL_NAME }}
+
+      - name: Dispatch Baseline Scan
+        if: ${{ steps.baseline-alerts.outputs.changed == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh workflow run "$BASELINE_WORKFLOW" --ref "$BASELINE_BRANCH"; then
+            echo "Dispatched $BASELINE_WORKFLOW on $BASELINE_BRANCH to refresh its code scanning alerts"
+          else
+            echo "::warning::Unable to dispatch $BASELINE_WORKFLOW on $BASELINE_BRANCH, its code scanning alerts stay stale until the next scheduled scan"
+          fi
 
       - name: Upload Report
         id: upload-report
         if: ${{ steps.compare.outputs.changed == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # 7.0.1
         with:
-          path: ${{ env.REPORT_NAME }}/${{ env.REPORT_NAME }}.html
+          path: ${{ steps.scan.outputs.html-file }}
           archive: false
 
       - name: Upload SARIF
         if: ${{ inputs.upload-sarif }}
         uses: github/codeql-action/upload-sarif@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # 4.37.4
         with:
-          sarif_file: ${{ env.REPORT_NAME }}/${{ env.REPORT_NAME }}.sarif
+          sarif_file: ${{ steps.scan.outputs.sarif-file }}
           category: owasp-dependency-check
 
       - name: Evaluate Scan Result
         id: evaluate
         env:
+          JSON_FILE: ${{ steps.scan.outputs.json-file }}
           REPORT_URL: ${{ steps.upload-report.outputs.artifact-url }}
           CHANGES: ${{ steps.compare.outputs.changes }}
         run: |
-          SUMMARY=$(jq -c '[.dependencies[]? | select(.vulnerabilities) | {fileName, filePath, vulnerabilities: [.vulnerabilities[] | {name, severity}]}]' "$REPORT_NAME/$REPORT_NAME.json")
+          SUMMARY=$(jq -c '[.dependencies[]? | select(.vulnerabilities) | {fileName, filePath, vulnerabilities: [.vulnerabilities[] | {name, severity}]}]' "$JSON_FILE")
 
           VULNERABLE=$(jq -r '[.[].vulnerabilities[]] | length' <<< "$SUMMARY")
           echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"

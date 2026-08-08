@@ -20,19 +20,16 @@ on:
 
 env:
   SRC_DIR: "src"
-  SCRIPTS_DIR: "${{ github.workspace }}/.github/scripts"
-  OUTPUT_FILE_NAME: "vulnerable.json"
-  SARIF_FILE_NAME: "vulnerable.sarif"
   PACKAGE_LEVELS: "transitivePackages" # space-separated dotnet-list-package framework levels to scan
+  BASELINE_BRANCH: "main"
+  BASELINE_DIR: "baseline"
+  BASELINE_WORKFLOW: "schedule-scan-nuget-transitive-dependencies.yml"
+  TOOL_NAME: "dotnet-list-package-vulnerable"
 
 jobs:
   scan:
     name: Scan NuGet Transitive Dependencies
     runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: ${{ env.SRC_DIR }}
 
     steps:
       - name: Checkout
@@ -43,39 +40,78 @@ jobs:
         with:
           global-json-file: ${{ env.SRC_DIR }}/global.json
 
-      - name: Dotnet Restore
-        run: dotnet restore
-
       - name: Scan For Vulnerable Packages
-        run: |
-          dotnet list package --vulnerable --include-transitive --format json --no-restore > ${{ env.OUTPUT_FILE_NAME }} || true
-          cat ${{ env.OUTPUT_FILE_NAME }}
+        id: scan
+        uses: ./.github/composite/scan-nuget-transitive-dependencies
+        with:
+          checkout-dir: ${{ github.workspace }}
+          package-levels: ${{ env.PACKAGE_LEVELS }}
 
-      - name: Convert To SARIF
-        run: |
-          dotnet run ${{ env.SCRIPTS_DIR }}/ConvertNugetVulnerabilitiesToSarif.cs -- ${{ env.OUTPUT_FILE_NAME }} ${{ env.PACKAGE_LEVELS }}
-          cat ${{ env.SARIF_FILE_NAME }}
+      - name: Compare With Baseline Alerts
+        id: alerts
+        uses: ./.github/composite/scan-result-compare
+        with:
+          sarif-file: ${{ steps.scan.outputs.sarif-file }}
+          tool-name: ${{ env.TOOL_NAME }}
+
+      - name: Checkout Baseline
+        id: baseline-checkout
+        if: ${{ inputs.fail-on-vulnerable && steps.alerts.outputs.added-count != '0' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+        with:
+          ref: ${{ env.BASELINE_BRANCH }}
+          path: ${{ env.BASELINE_DIR }}
+
+      - name: Scan Baseline For Vulnerable Packages
+        id: baseline-scan
+        if: ${{ steps.baseline-checkout.outcome == 'success' }}
+        uses: ./.github/composite/scan-nuget-transitive-dependencies
+        with:
+          checkout-dir: ${{ github.workspace }}/${{ env.BASELINE_DIR }}
+          package-levels: ${{ env.PACKAGE_LEVELS }}
 
       - name: Compare With Baseline
         id: compare
-        uses: ./.github/composite/code-scanning-alerts-compare
+        uses: ./.github/composite/scan-result-compare
         with:
-          sarif-file: ${{ env.SRC_DIR }}/${{ env.SARIF_FILE_NAME }}
-          tool-name: "dotnet-list-package-vulnerable"
+          sarif-file: ${{ steps.scan.outputs.sarif-file }}
+          baseline-sarif-file: ${{ steps.baseline-scan.outputs.sarif-file }}
+          tool-name: ${{ env.TOOL_NAME }}
+
+      - name: Compare Baseline With Baseline Alerts
+        id: baseline-alerts
+        if: ${{ steps.baseline-scan.outcome == 'success' }}
+        uses: ./.github/composite/scan-result-compare
+        with:
+          sarif-file: ${{ steps.baseline-scan.outputs.sarif-file }}
+          tool-name: ${{ env.TOOL_NAME }}
+
+      - name: Dispatch Baseline Scan
+        if: ${{ steps.baseline-alerts.outputs.changed == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh workflow run "$BASELINE_WORKFLOW" --ref "$BASELINE_BRANCH"; then
+            echo "Dispatched $BASELINE_WORKFLOW on $BASELINE_BRANCH to refresh its code scanning alerts"
+          else
+            echo "::warning::Unable to dispatch $BASELINE_WORKFLOW on $BASELINE_BRANCH, its code scanning alerts stay stale until the next scheduled scan"
+          fi
 
       - name: Upload SARIF
         if: ${{ inputs.upload-sarif }}
         uses: github/codeql-action/upload-sarif@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # 4.37.4
         with:
-          sarif_file: ${{ env.SRC_DIR }}/${{ env.SARIF_FILE_NAME }}
+          sarif_file: ${{ steps.scan.outputs.sarif-file }}
           category: nuget-transitive-dependencies
 
       - name: Evaluate Scan Result
         id: evaluate
         env:
+          JSON_FILE: ${{ steps.scan.outputs.json-file }}
           CHANGES: ${{ steps.compare.outputs.changes }}
         run: |
-          VULNERABLE=$(jq -r '[.projects[]?.frameworks[]? as $f | $ARGS.positional[] as $level | ($f[$level] // [])[]] | length' ${{ env.OUTPUT_FILE_NAME }} --args ${{ env.PACKAGE_LEVELS }})
+          VULNERABLE=$(jq -r '[.projects[]?.frameworks[]? as $f | $ARGS.positional[] as $level | ($f[$level] // [])[]] | length' "$JSON_FILE" --args ${{ env.PACKAGE_LEVELS }})
           echo "vulnerable=$VULNERABLE" >> "$GITHUB_OUTPUT"
           echo "Found $VULNERABLE vulnerable dependencies, ${{ steps.compare.outputs.added-count }} of them new"
 
@@ -85,7 +121,7 @@ jobs:
               echo "$CHANGES"
             fi
             echo '```'
-            cat ${{ env.OUTPUT_FILE_NAME }}
+            cat "$JSON_FILE"
             echo '```'
             echo "EOF_SUMMARY"
           } >> "$GITHUB_OUTPUT"

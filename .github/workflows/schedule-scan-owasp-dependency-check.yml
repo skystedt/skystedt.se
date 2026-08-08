@@ -1,5 +1,9 @@
 name: Schedule - Scan OWASP Dependency Check
 
+concurrency:
+  group: schedule-scan-owasp-dependency-check
+  cancel-in-progress: false
+
 on:
   schedule:
     # Run daily at 11:45 UTC: owasp/dependency-check-action:latest is rebuilt daily at 11:30 UTC

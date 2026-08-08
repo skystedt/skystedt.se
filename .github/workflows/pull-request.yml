@@ -58,6 +58,7 @@ jobs:
   scan_owasp_dependency_check:
     name: Scan OWASP Dependency Check
     permissions:
+      actions: write # to dispatch the scheduled scan when the alerts of the baseline branch are stale
       contents: read
       security-events: read
     uses: ./.github/workflows/reusable-scan-owasp-dependency-check.yml
@@ -69,6 +70,7 @@ jobs:
   scan_nuget_transitive_dependencies:
     name: Scan NuGet Transitive Dependencies
     permissions:
+      actions: write # to dispatch the scheduled scan when the alerts of the baseline branch are stale
       contents: read
       security-events: read
     uses: ./.github/workflows/reusable-scan-nuget-transitive-dependencies.yml
