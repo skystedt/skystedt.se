@@ -358,37 +358,71 @@ jobs:
         id: llm
         if: steps.availability.outputs.online == 'true'
         run: |
-          REVIEWED=false
           MAX_TIME=$(( (JOB_TIMEOUT_MINUTES - 5) * 60 ))
           URL=http://${{ secrets.LOCAL_LLM_URL }}/v1/chat/completions
 
-          if curl -sf \
+          # the LLM answered the availability check, so anything going wrong from here is a failure and not an outage
+          CURL_EXIT=0
+          HTTP_CODE=$(curl -s \
             --max-time "$MAX_TIME" \
+            -w '%{http_code}' \
+            -o response.json \
             -H "Content-Type: application/json" \
             -d @request.json \
-            "$URL" > response.json; then
+            "$URL") || CURL_EXIT=$?
 
-            # validate the response, an error response has no content and jq fails on invalid json
-            if CONTENT=$(jq -r '.choices[0].message.content // empty' response.json 2> /dev/null) && [ -n "$CONTENT" ]; then
-              REVIEWED=true
-              MODEL=$(jq -r '.model // "unknown"' response.json | head -n 1)
-              echo "Review by model: $MODEL"
-
-              # the review comment
-              {
-                echo "## 🤖 Local LLM Review${{ (steps.data.outputs.update == 'true' || steps.data.outputs.full_review == 'true') && ' _(update)_' || '' }}"
-                echo "_Model: ${MODEL}_"
-                echo ""
-                printf '%s' "$CONTENT" | head -c "$MAX_COMMENT_CHARS"
-              } > review.md
-            else
-              echo "The LLM returned an invalid or error response:"
-              cat response.json
-            fi
+          REVIEWED=false
+          if [ "${HTTP_CODE:-000}" -ge 400 ]; then
+            REASON="The server responded with HTTP $HTTP_CODE"
+          elif [ "$CURL_EXIT" -eq 28 ]; then
+            REASON="The request timed out after $(( MAX_TIME / 60 )) minutes"
+          elif [ "$CURL_EXIT" -ne 0 ]; then
+            REASON="The request failed, curl exit code $CURL_EXIT"
+          elif ! CONTENT=$(jq -r '.choices[0].message.content // empty' response.json 2> /dev/null) || [ -z "$CONTENT" ]; then
+            REASON="The response did not contain a review"
           else
-            echo "The LLM call failed"
+            REVIEWED=true
           fi
           echo "reviewed=$REVIEWED" >> "$GITHUB_OUTPUT"
+
+          if [ "$REVIEWED" = "true" ]; then
+            MODEL=$(jq -r '.model // "unknown"' response.json | head -n 1)
+            echo "Review by model: $MODEL"
+
+            # the review comment
+            {
+              echo "## 🤖 Local LLM Review${{ (steps.data.outputs.update == 'true' || steps.data.outputs.full_review == 'true') && ' _(update)_' || '' }}"
+              echo "_Model: ${MODEL}_"
+              echo ""
+              printf '%s' "$CONTENT" | head -c "$MAX_COMMENT_CHARS"
+            } > review.md
+          else
+            echo "The LLM call failed: $REASON"
+            if [ -s response.json ]; then
+              cat response.json
+            fi
+
+            # the failure notice, the job fails after it has been posted
+            {
+              echo "🤖 The local LLM review failed. The review will be retried automatically."
+              echo ""
+              echo "**Reason:** $REASON"
+              if [ -s response.json ]; then
+                echo ""
+                echo "<details><summary>Response</summary>"
+                echo ""
+                # 4-backtick fence on purpose, the response itself may contain 3-backtick code blocks
+                echo '````'
+                head -c "$MAX_COMMENT_CHARS" response.json
+                echo ""
+                echo '````'
+                echo ""
+                echo "</details>"
+              fi
+              echo ""
+              echo "_Failed: $(date -u '+%Y-%m-%d %H:%M UTC') · [Workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})_"
+            } > failure.md
+          fi
 
       - name: Post Review Comment
         if: steps.llm.outputs.reviewed == 'true'
@@ -401,8 +435,9 @@ jobs:
             ${{ env.REVIEWED_HEAD_MARKER }}=${{ needs.prepare.outputs.head_hash }}
           body-file: review.md
 
+      # the reviewer being offline is expected, the pending marker leaves it to the scheduled retry
       - name: Post Offline Notice
-        if: steps.llm.outputs.reviewed != 'true' && (inputs.notify_offline || needs.prepare.outputs.pending_id != '')
+        if: steps.availability.outputs.online != 'true' && (inputs.notify_offline || needs.prepare.outputs.pending_id != '')
         uses: ./.github/composite/marker-comment-write
         with:
           issue: ${{ inputs.pr_number }}
@@ -411,3 +446,21 @@ jobs:
             ${{ env.PENDING_MARKER }}
             ${{ env.PENDING_HEAD_MARKER }}=${{ needs.prepare.outputs.head_hash }}
           body-file: offline.md
+
+      # a failure is always worth surfacing, the pending marker still leaves it to the scheduled retry
+      - name: Post Failure Notice
+        if: steps.availability.outputs.online == 'true' && steps.llm.outputs.reviewed != 'true'
+        uses: ./.github/composite/marker-comment-write
+        with:
+          issue: ${{ inputs.pr_number }}
+          comment-id: ${{ needs.prepare.outputs.pending_id }}
+          markers: |
+            ${{ env.PENDING_MARKER }}
+            ${{ env.PENDING_HEAD_MARKER }}=${{ needs.prepare.outputs.head_hash }}
+          body-file: failure.md
+
+      - name: Fail On Failed Review
+        if: steps.availability.outputs.online == 'true' && steps.llm.outputs.reviewed != 'true'
+        run: |
+          echo "::error::The local LLM review failed"
+          exit 1
