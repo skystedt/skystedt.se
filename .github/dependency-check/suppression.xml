@@ -26,4 +26,16 @@
         <cve>CVE-2026-41178</cve>
         <cve>CVE-2026-44967</cve>
     </suppress>
+    <suppress until="2027-08-08Z">
+        <notes><![CDATA[
+            Not exploitable: image-size is only pulled in transitively by datauri, a devDependency used by the webpack build
+            plugins (data-uri-favicon-html-webpack-plugin, add-inline-styles-html-webpack-plugin) to inline assets that are
+            committed to this repository. Both advisories are denial of service through an infinite loop when parsing a crafted
+            JXL/HEIF/ICNS image, which requires attacker controlled input at runtime. Nothing shipped to the browser depends on
+            image-size, and the build only ever parses our own files. No fixed version exists for either advisory.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:npm/image-size@.*$</packageUrl>
+        <vulnerabilityName>GHSA-5p2g-fcmc-qvqq</vulnerabilityName>
+        <vulnerabilityName>GHSA-w3rx-r6r6-pgpr</vulnerabilityName>
+    </suppress>
 </suppressions>
