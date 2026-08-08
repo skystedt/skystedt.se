@@ -7,6 +7,7 @@ concurrency:
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_call: # silences CodeQL's on.push warning, the default branch is analyzed by push-main.yml
 
 permissions: {} # permissions are specified on each job
 
