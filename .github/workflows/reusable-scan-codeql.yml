@@ -35,6 +35,7 @@ jobs:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
           queries: security-extended
+          trap-caching: false # only javascript exceeds the 10MB upload threshold, and default branch runs can't restore, so re-saving HEAD's key warns every time
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@5595ccaf912efad79be6eef63a5619ff05969be3 # 4.37.6
