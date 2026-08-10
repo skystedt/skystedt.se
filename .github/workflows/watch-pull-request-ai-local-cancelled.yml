@@ -26,9 +26,11 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
       RUN_ID: ${{ github.event.workflow_run.id }}
+      RUN_URL: ${{ github.event.workflow_run.html_url }}
       RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
       HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
       HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+      PR_NUMBER: ${{ github.event.workflow_run.pull_requests[0].number || 'missing' }}
 
     steps:
       - name: Find Cancelled Review Job
@@ -38,12 +40,12 @@ jobs:
           JOB_ID=$(echo "$JOBS" | jq -r --arg name "$REVIEW_JOB_NAME" 'first(.jobs[] | select((.name | endswith($name)) and .conclusion == "cancelled") | .id) // empty')
 
           if [ -z "$JOB_ID" ]; then
-            echo "The review job of run $RUN_ID was not cancelled, nothing to rerun"
+            echo "The review job of PR #$PR_NUMBER was not cancelled, nothing to rerun"
           elif [ "$RUN_ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
             JOB_ID=""
-            echo "Run $RUN_ID has been run $RUN_ATTEMPT times of at most $MAX_ATTEMPTS, giving up"
+            echo "The review of PR #$PR_NUMBER has been run $RUN_ATTEMPT times of at most $MAX_ATTEMPTS, giving up"
           else
-            echo "The review job of run $RUN_ID was cancelled, job id $JOB_ID, run attempt $RUN_ATTEMPT of at most $MAX_ATTEMPTS"
+            echo "The review job of PR #$PR_NUMBER was cancelled, job id $JOB_ID, run attempt $RUN_ATTEMPT of at most $MAX_ATTEMPTS"
           fi
 
           echo "id=$JOB_ID" >> "$GITHUB_OUTPUT"
@@ -52,13 +54,11 @@ jobs:
         if: steps.find.outputs.id != ''
         run: |
           WAIT_SECONDS=$(( RUN_ATTEMPT * WAIT_STEP_MINUTES * 60 ))
-          echo "Run $RUN_ID was cancelled, waiting $(( WAIT_SECONDS / 60 )) minutes before rerunning"
+          echo "The review of PR #$PR_NUMBER was cancelled, waiting $(( WAIT_SECONDS / 60 )) minutes before rerunning"
           sleep "$WAIT_SECONDS"
 
       - name: Rerun Review Job
         if: steps.find.outputs.id != ''
-        env:
-          JOB_ID: ${{ steps.find.outputs.id }}
         run: |
           # the rerun reviews the commit the run was started for, only rerun while that is still the head
           CURRENT_SHA=$(gh api "repos/{owner}/{repo}/commits/$HEAD_BRANCH" --jq '.sha') || CURRENT_SHA=""
@@ -71,8 +71,8 @@ jobs:
             exit 0
           fi
 
-          if gh run rerun "$RUN_ID" --job "$JOB_ID"; then
-            echo "Rerunning the review job of run $RUN_ID"
+          if gh run rerun "$RUN_ID" --failed; then
+            echo "Rerunning the review of PR #$PR_NUMBER at $HEAD_SHA, see $RUN_URL"
           else
-            echo "::warning::Unable to rerun the review job of run $RUN_ID, the review stays pending until the next scheduled retry"
+            echo "::warning::Unable to rerun the review of PR #$PR_NUMBER, it stays pending until the next scheduled retry"
           fi
