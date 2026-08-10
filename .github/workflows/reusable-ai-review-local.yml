@@ -11,6 +11,7 @@ on:
         required: true
 
 permissions:
+  actions: read
   contents: read
   pull-requests: write
 
@@ -21,12 +22,14 @@ env:
   REVIEWED_HEAD_MARKER: "ai-review-local:reviewed-head"
   MAX_DIFF_CHARS: "120000" # keep the prompt within the local context window
   MAX_COMMENT_CHARS: "60000" # comments are limited to 65536 characters
+  REVIEW_JOB_NAME: "Local LLM Review" # the review job name, the caller prefixes its own name
+  CLEARANCE_POLL_SECONDS: "120" # the first check is immediate, every further one waits this long
 
 jobs:
   prepare:
     name: Prepare
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 120
 
     # serialize per PR across triggers (pull_request and schedule), they read and write the same comments
     concurrency:
@@ -142,6 +145,38 @@ jobs:
             ${{ env.PENDING_MARKER }}
             ${{ env.PENDING_HEAD_MARKER }}=${{ steps.head.outputs.hash }}
           body-file: queued.md
+
+      # the review jobs share one WireGuard configuration and serialize on the ai-review-local concurrency group,
+      # that group only ever holds one waiting job and cancels an earlier one when a second arrives,
+      # hold the review back here until the reviewer is free so that the group is left with nothing to do
+      # but absorb the rare case of two runs being released at the same moment
+      - name: Wait For Clearance
+        if: steps.status.outputs.skip != 'true'
+        run: |
+          WORKFLOW="${GITHUB_WORKFLOW_REF%%@*}"
+          WORKFLOW="${WORKFLOW##*/}"
+          echo "Watching runs of $WORKFLOW"
+
+          reviewer_busy() {
+            RUNS=$(gh api "repos/{owner}/{repo}/actions/workflows/$WORKFLOW/runs?status=in_progress&per_page=100" --jq '.workflow_runs[].id') || RUNS=""
+
+            for RUN in $RUNS; do
+              if gh api "repos/{owner}/{repo}/actions/runs/$RUN/jobs" \
+                | jq -e --arg name "$REVIEW_JOB_NAME" 'any(.jobs[]; (.name | endswith($name)) and (.status == "queued" or .status == "in_progress"))' > /dev/null; then
+
+                return 0
+              fi
+            done
+
+            return 1
+          }
+          
+          while reviewer_busy; do
+            echo "The reviewer is busy, checking again in $CLEARANCE_POLL_SECONDS seconds"
+            sleep "$CLEARANCE_POLL_SECONDS"
+          done
+
+          echo "The reviewer is free"
 
   review:
     name: Local LLM Review

@@ -65,6 +65,7 @@ jobs:
     if: needs.find_pending.outputs.prs != '[]'
 
     permissions:
+      actions: read
       contents: read
       pull-requests: write
 
