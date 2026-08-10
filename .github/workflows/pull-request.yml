@@ -24,6 +24,7 @@ jobs:
   ai_review_local:
     name: AI Review Local
     permissions:
+      actions: read
       contents: read
       pull-requests: write
     uses: ./.github/workflows/reusable-ai-review-local.yml
