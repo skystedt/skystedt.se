@@ -464,3 +464,5 @@ jobs:
         run: |
           echo "::error::The local LLM review failed"
           exit 1
+
+# test local ai watcher/rerun
