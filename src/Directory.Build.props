@@ -4,7 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <RestoreLockedMode>true</RestoreLockedMode>
+    <!-- Locked mode only in CI, it blocks Dependabot from regenerating the lock file after a version bump (NU1004) -->
+    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
     <!-- https://learn.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#analysismode -->
     <AnalysisMode>Recommended</AnalysisMode>
   </PropertyGroup>

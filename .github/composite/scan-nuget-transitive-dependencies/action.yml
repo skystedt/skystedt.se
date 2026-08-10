@@ -34,7 +34,7 @@ runs:
         SRC_PATH="$CHECKOUT_DIR/$SRC_DIR"
         cd "$SRC_PATH"
 
-        dotnet restore
+        dotnet restore -p:ContinuousIntegrationBuild=true
 
         dotnet list package --vulnerable --include-transitive --format json --no-restore > "$OUTPUT_FILE_NAME" || true
         cat "$OUTPUT_FILE_NAME"
