@@ -32,7 +32,7 @@ jobs:
           global-json-file: ${{ env.SRC_DIR }}/global.json
 
       - name: Dotnet Restore
-        run: dotnet restore
+        run: dotnet restore -p:ContinuousIntegrationBuild=true
 
       - name: Dotnet Build
         run: dotnet build --configuration ${{ env.DOTNET_CONFIGURATION }} --no-incremental --no-restore
