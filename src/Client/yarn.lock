@@ -5242,9 +5242,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:64.1.0":
-  version: 64.1.0
-  resolution: "eslint-plugin-jsdoc@npm:64.1.0"
+"eslint-plugin-jsdoc@npm:64.2.0":
+  version: 64.2.0
+  resolution: "eslint-plugin-jsdoc@npm:64.2.0"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.95.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -5262,7 +5262,7 @@ __metadata:
     to-valid-identifier: "npm:^1.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10c0/cbde7fa3c3bb70f13c95a371ca85efba62eac4ac322802d58a2127e678959f93f4ce0e13212cd70d3abbb1407eab814afa0590ddaf6723a9b306494d6eb3fabb
+  checksum: 10c0/8c526bf8f29c9cbe6d4be8ebfd1f2d3b995c3871a3066c31159f08bf2f90bda55237c2cab116357b4a3032bb748b872efdd6b4066553141618ded9cdc8dde453
   languageName: node
   linkType: hard
 
@@ -5972,10 +5972,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:17.10.0":
-  version: 17.10.0
-  resolution: "globals@npm:17.10.0"
-  checksum: 10c0/b1035f63a1070ebb4361096bb8d0037d0d6bb5a023618ab6307ac1a635fd8daeafbd161f6ebbcc5e2f25b364919beed66788f374c46b07135a9abf3c7ac9a245
+"globals@npm:17.11.0":
+  version: 17.11.0
+  resolution: "globals@npm:17.11.0"
+  checksum: 10c0/5e1be3d816e04d4d0d01b1cdd40e46b5fb6b5e9f15aece9a5919b060e0fb1b3f1b9e7327dce97ef19e05513a6d65872e0834999ddea251557556dddd0f5fde30
   languageName: node
   linkType: hard
 
@@ -9454,7 +9454,7 @@ __metadata:
     eslint-import-resolver-typescript: "npm:4.4.5"
     eslint-plugin-compat: "npm:7.0.2"
     eslint-plugin-import-x: "npm:4.17.1"
-    eslint-plugin-jsdoc: "npm:64.1.0"
+    eslint-plugin-jsdoc: "npm:64.2.0"
     eslint-plugin-n: "npm:18.3.0"
     eslint-plugin-prettier: "npm:5.5.6"
     eslint-plugin-promise: "npm:7.3.0"
@@ -9462,7 +9462,7 @@ __metadata:
     eslint-plugin-sonarjs: "npm:4.2.0"
     eslint-plugin-unicorn: "npm:73.0.0"
     eslint-webpack-plugin: "npm:6.0.0"
-    globals: "npm:17.10.0"
+    globals: "npm:17.11.0"
     html-inline-css-webpack-plugin: "npm:1.11.2"
     html-webpack-plugin: "npm:5.6.8"
     ignore-loader: "npm:0.1.2"
