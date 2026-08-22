@@ -94,9 +94,6 @@
     "pixi.js": "8.20.0",
     "unfetch": "5.0.0"
   },
-  "resolutions": {
-    "pixi.js": "patch:pixi.js@npm%3A8.19.0#~/.yarn/patches/pixi.js-npm-8.19.0-4f7f4e0fb9.patch"
-  },
   "dependenciesMeta": {
     "core-js": {
       "built": false
