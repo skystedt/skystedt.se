@@ -9474,7 +9474,7 @@ __metadata:
     navigator.sendbeacon: "npm:0.0.20"
     parse5: "npm:8.0.1"
     picocolors: "npm:1.1.1"
-    pixi.js: "npm:8.19.0"
+    pixi.js: "npm:8.20.0"
     postcss: "npm:8.5.26"
     postcss-load-config: "npm:6.0.1"
     postcss-loader: "npm:8.2.1"
