@@ -69,7 +69,7 @@
     "postcss": "8.5.26",
     "postcss-load-config": "6.0.1",
     "postcss-loader": "8.2.1",
-    "postcss-merge-rules": "8.0.5",
+    "postcss-merge-rules": "9.0.1",
     "postcss-preset-env": "11.5.0",
     "prettier": "3.9.6",
     "regenerator-runtime": "0.14.1",
