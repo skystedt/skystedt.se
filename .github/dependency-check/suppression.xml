@@ -15,9 +15,10 @@
     </suppress>
     <suppress until="2027-07-10Z">
         <notes><![CDATA[
-            False positive: matched via the generic "opentelemetry:opentelemetry" CPE (LOW confidence), which also covers the Go and
-            C++ OpenTelemetry implementations and unrelated .NET packages (OpenTelemetry.Exporter.Jaeger, OpenTelemetry.Api,
-            OpenTelemetry.Extensions.Propagators). Microsoft.Azure.Functions.Worker.OpenTelemetry is not affected by any of these.
+            False positive: matched via the generic "opentelemetry:opentelemetry" CPE (LOW confidence), which also covers the Go,
+            C++ and JavaScript OpenTelemetry implementations and unrelated .NET packages (OpenTelemetry.Exporter.Jaeger,
+            OpenTelemetry.Api, OpenTelemetry.Extensions.Propagators). Microsoft.Azure.Functions.Worker.OpenTelemetry is not
+            affected by any of these.
         ]]></notes>
         <packageUrl regex="true">^pkg:nuget/Microsoft\.Azure\.Functions\.Worker\.OpenTelemetry@.*$</packageUrl>
         <cve>CVE-2026-41078</cve>
@@ -25,6 +26,7 @@
         <cve>CVE-2026-40894</cve>
         <cve>CVE-2026-41178</cve>
         <cve>CVE-2026-44967</cve>
+        <cve>CVE-2026-54285</cve>
     </suppress>
     <suppress until="2027-08-08Z">
         <notes><![CDATA[
