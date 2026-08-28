@@ -3745,10 +3745,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmldom/xmldom@npm:^0.8.13":
-  version: 0.8.13
-  resolution: "@xmldom/xmldom@npm:0.8.13"
-  checksum: 10c0/06405ee6fffba631abf715a305ace338420ebcea8baf1317f19f2752f5c505952b7df45159908e7be8451a42faa54326b780616ab4d08242b20477b2973da24b
+"@xmldom/xmldom@npm:^0.8.15":
+  version: 0.8.15
+  resolution: "@xmldom/xmldom@npm:0.8.15"
+  checksum: 10c0/59d09b85824b684fba5a0a224d5b43abea1a0d745e8d8b8136a7013e996eb6da122fdbb3deb32ed1621923a10e1937b1f7917cea43481d9d5b976e8c1ff836c1
   languageName: node
   linkType: hard
 
@@ -7913,21 +7913,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pixi.js@npm:8.20.0":
-  version: 8.20.0
-  resolution: "pixi.js@npm:8.20.0"
+"pixi.js@npm:8.20.1":
+  version: 8.20.1
+  resolution: "pixi.js@npm:8.20.1"
   dependencies:
     "@pixi/colord": "npm:^2.9.6"
     "@types/earcut": "npm:^3.0.0"
     "@webgpu/types": "npm:^0.1.69"
-    "@xmldom/xmldom": "npm:^0.8.13"
+    "@xmldom/xmldom": "npm:^0.8.15"
     earcut: "npm:^3.0.2"
     eventemitter3: "npm:^5.0.1"
     gifuct-js: "npm:^2.1.2"
     ismobilejs: "npm:^1.1.1"
     parse-svg-path: "npm:^0.2.0"
     tiny-lru: "npm:^11.4.7"
-  checksum: 10c0/73fcfa01fa92dde24306e9cb7aa88f6930334cea5dc99e46e42533f25dca2898ffc7acf9054ad37137f3fa00f0830c93cb285e014cfc70445d84c8a99f44c998
+  checksum: 10c0/5bdb21a39009559082aec4e440ea6cd2a66376b5829f14711ed5514389428cc6539607d8538a4dbcd927ce2372ab8c62093c6d58a56d308fb9f0bc715327c0f0
   languageName: node
   linkType: hard
 
@@ -9491,7 +9491,7 @@ __metadata:
     navigator.sendbeacon: "npm:0.0.20"
     parse5: "npm:8.0.1"
     picocolors: "npm:1.1.1"
-    pixi.js: "npm:8.20.0"
+    pixi.js: "npm:8.20.1"
     postcss: "npm:8.5.26"
     postcss-load-config: "npm:6.0.1"
     postcss-loader: "npm:8.2.1"
