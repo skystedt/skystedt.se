@@ -4724,6 +4724,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cssnano-utils@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "cssnano-utils@npm:7.0.0"
+  peerDependencies:
+    postcss: ^8.5.26
+  checksum: 10c0/6d81c654052924342fdadd4d7f6eb73e96f7eb03373b484c995e44375794b9677c8f78c494f112e2a34d02928eaa375f66fe00cf0f5d8de52be5eab6301e4d55
+  languageName: node
+  linkType: hard
+
 "cssnano@npm:8.0.7":
   version: 8.0.7
   resolution: "cssnano@npm:8.0.7"
@@ -8289,7 +8298,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-merge-rules@npm:8.0.5, postcss-merge-rules@npm:^8.0.5":
+"postcss-merge-rules@npm:9.0.1":
+  version: 9.0.1
+  resolution: "postcss-merge-rules@npm:9.0.1"
+  dependencies:
+    browserslist: "npm:^4.28.8"
+    caniuse-api: "npm:^4.0.0"
+    cssnano-utils: "npm:^7.0.0"
+    postcss-selector-parser: "npm:^7.1.5"
+  peerDependencies:
+    postcss: ^8.5.26
+  checksum: 10c0/a9792932124462e2da02c2e5705659879b357ed3d9504ac85211a28929478f717404a98f5bec33cc9fce59157c9a7b4bc07ce523a78bfdccbc5434657da249da
+  languageName: node
+  linkType: hard
+
+"postcss-merge-rules@npm:^8.0.5":
   version: 8.0.5
   resolution: "postcss-merge-rules@npm:8.0.5"
   dependencies:
@@ -9472,7 +9495,7 @@ __metadata:
     postcss: "npm:8.5.26"
     postcss-load-config: "npm:6.0.1"
     postcss-loader: "npm:8.2.1"
-    postcss-merge-rules: "npm:8.0.5"
+    postcss-merge-rules: "npm:9.0.1"
     postcss-preset-env: "npm:11.5.0"
     prettier: "npm:3.9.6"
     regenerator-runtime: "npm:0.14.1"
