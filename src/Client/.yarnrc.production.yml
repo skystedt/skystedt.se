@@ -5,3 +5,5 @@ logFilters:
     level: error
   - code: YN0060 # INCOMPATIBLE_PEER_DEPENDENCY
     level: error
+  - code: YN0086 # EXPLAIN_PEER_DEPENDENCIES_CTA
+    level: error
