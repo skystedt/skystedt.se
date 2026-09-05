@@ -14,7 +14,7 @@ permissions:
   pull-requests: write
 
 env:
-  CLAUDE_MODEL: sonnet
+  CLAUDE_MODEL: opus
   CLAUDE_EFFORT: xhigh
 
 jobs:
