@@ -1,0 +1,47 @@
+name: Composite - AI Review Local Clearance
+description: Wait until no local LLM review job is queued or running
+
+inputs:
+  job-name:
+    description: Review job name, matches jobs whose name ends with it
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Wait For Clearance
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        JOB_NAME: ${{ inputs.job-name }}
+        POLL_SECONDS: "60" # the first check is immediate, every further one waits this long
+      run: |
+        # the review jobs share one WireGuard configuration and can not run more than one at a time (the vpn tunnel does not allow it)
+        # they have a concurrency group but that only allows max one waiting job and cancels an earlier one when a second arrives
+        echo "Watching every queued and running workflow run"
+
+        reviewer_busy() {
+          RUNS=""
+          for STATUS in in_progress queued; do
+            MORE=$(gh api "repos/${{ github.repository }}/actions/runs?status=$STATUS" --jq '.workflow_runs[].id') || MORE=""
+            RUNS="$RUNS $MORE"
+          done
+
+          for RUN in $RUNS; do
+            JOBS=$(gh api "repos/${{ github.repository }}/actions/runs/$RUN/jobs") || JOBS="{}"
+            HOLDS=$(echo "$JOBS" | jq -r --arg name "$JOB_NAME" 'any(.jobs[]?; (.name | endswith($name)) and (.status == "queued" or .status == "in_progress"))')
+
+            if [ "$HOLDS" = "true" ]; then
+              return 0
+            fi
+          done
+
+          return 1
+        }
+
+        while reviewer_busy; do
+          echo "The reviewer is busy, checking again in $POLL_SECONDS seconds"
+          sleep "$POLL_SECONDS"
+        done
+
+        echo "The reviewer is free"

@@ -10,7 +10,9 @@ permissions: {} # permissions are specified on each job
 
 env:
   PENDING_MARKER: "ai-review-local:pending"
+  PENDING_HEAD_MARKER: "ai-review-local:pending-head"
   COMMENT_AUTHOR: "github-actions" # graphql does not include [bot]
+  REVIEW_JOB_NAME: "Local LLM Review" # the review job name, the caller prefixes its own name
 
 jobs:
   find_pending:
@@ -18,17 +20,20 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
+      actions: read
       pull-requests: read
 
     outputs:
-      prs: ${{ steps.pending.outputs.prs }}
+      rerun: ${{ steps.plan.outputs.rerun }}
+      dispatch: ${{ steps.plan.outputs.dispatch }}
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
 
     steps:
       - name: Find PRs Awaiting Review
         id: pending
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
         run: |
           PRS=$(gh api graphql \
             -f owner="${GH_REPO%/*}" \
@@ -51,18 +56,145 @@ jobs:
               }' \
             --jq "
               .data.repository.pullRequests.nodes[]
-              | select(any(.comments.nodes[];
-                  .author.login == \"$COMMENT_AUTHOR\" and
-                  (.body | startswith(\"<!-- $PENDING_MARKER -->\"))))
-              | .number
-            " | jq -c -s '.')
+              | . as \$pr
+              | .comments.nodes[]
+              | select(.author.login == \"$COMMENT_AUTHOR\" and
+                  (.body | startswith(\"<!-- $PENDING_MARKER -->\")))
+              | {
+                  number: \$pr.number,
+                  head: ([.body | capture(\"<!-- $PENDING_HEAD_MARKER=(?<head>[^ >]*) -->\").head] | first // \"\")
+                }
+            " | jq -c -s 'unique_by(.number)')
           echo "prs=$PRS" >> "$GITHUB_OUTPUT"
           echo "PRs awaiting review: $PRS"
 
+      # rerunning the failed jobs of the run that owns the review reports the result on the pull request itself instead of on this workflow,
+      # it only works while there is such a run to rerun, every other pending review is started here as a fresh run
+      - name: Plan Retries
+        id: plan
+        env:
+          PRS: ${{ steps.pending.outputs.prs }}
+        run: |
+          RERUN="[]"
+          DISPATCH="[]"
+
+          for NUMBER in $(echo "$PRS" | jq -r '.[].number'); do
+            PENDING_HEAD=$(echo "$PRS" | jq -r --argjson pr "$NUMBER" 'map(select(.number == $pr)) | .[0].head')
+            HEAD_HASH=$(gh pr view "$NUMBER" --json headRefOid --jq '.headRefOid') || HEAD_HASH=""
+
+            # a rerun does not repeat the jobs that succeeded, so the prepare job that decides what the
+            # review covers is not repeated either, only rerun while it still holds for the current head
+            RUN_ID=""
+            if [ -n "$HEAD_HASH" ] && [ "$PENDING_HEAD" = "$HEAD_HASH" ]; then
+              RUNS=$(gh api "repos/{owner}/{repo}/actions/runs?head_sha=$HEAD_HASH&per_page=100" \
+                --jq '[.workflow_runs[] | select(.status == "completed")] | sort_by(.run_started_at) | reverse | .[].id') || RUNS=""
+
+              for RUN in $RUNS; do
+                JOBS=$(gh api "repos/{owner}/{repo}/actions/runs/$RUN/jobs") || JOBS="{}"
+                FAILED=$(echo "$JOBS" | jq -r --arg name "$REVIEW_JOB_NAME" 'any(.jobs[]?; (.name | endswith($name)) and (.conclusion == "failure" or .conclusion == "cancelled" or .conclusion == "timed_out"))')
+
+                if [ "$FAILED" = "true" ]; then
+                  RUN_ID="$RUN"
+                  break
+                fi
+              done
+            fi
+
+            if [ -n "$RUN_ID" ]; then
+              RERUN=$(echo "$RERUN" | jq -c --argjson pr "$NUMBER" --argjson run "$RUN_ID" '. + [{ pr: $pr, run: $run }]')
+              echo "PR #$NUMBER: rerunning the failed jobs of run $RUN_ID"
+            else
+              DISPATCH=$(echo "$DISPATCH" | jq -c --argjson pr "$NUMBER" '. + [$pr]')
+              echo "PR #$NUMBER: no failed run to rerun, starting a review"
+            fi
+          done
+
+          {
+            echo "rerun=$RERUN"
+            echo "dispatch=$DISPATCH"
+          } >> "$GITHUB_OUTPUT"
+          echo "To rerun: $RERUN"
+          echo "To start: $DISPATCH"
+
+  rerun:
+    name: Rerun Review (${{ matrix.review.pr }})
+    needs: find_pending
+    if: needs.find_pending.outputs.rerun != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    permissions:
+      actions: write
+      contents: read # to use the local composite
+
+    strategy:
+      fail-fast: false
+      max-parallel: 1 # because of WireGuard
+      matrix:
+        review: ${{ fromJson(needs.find_pending.outputs.rerun) }}
+
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      PR_NUMBER: ${{ matrix.review.pr }}
+      RUN_ID: ${{ matrix.review.run }}
+      REGISTER_SECONDS: "60" # how long a rerun gets to register before it is given up on
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+
+      # a rerun only repeats what did not succeed, so the prepare job that normally holds this wait is skipped
+      - name: Wait For Clearance
+        uses: ./.github/composite/ai-review-local-clearance
+        with:
+          job-name: ${{ env.REVIEW_JOB_NAME }}
+
+      - name: Rerun Failed Job
+        id: rerun
+        run: |
+          # a rerun raises the attempt count, remember what it was, to tell the rerun from the run it repeats
+          ATTEMPT=$(gh api "repos/{owner}/{repo}/actions/runs/$RUN_ID" --jq '.run_attempt') || ATTEMPT=""
+
+          STARTED=false
+          if [ -n "$ATTEMPT" ]; then
+            STARTED=true
+            gh run rerun "$RUN_ID" --failed || STARTED=false
+          fi
+
+          if [ "$STARTED" = "true" ]; then
+            echo "Rerunning the review of PR #$PR_NUMBER, see $GITHUB_SERVER_URL/$GH_REPO/actions/runs/$RUN_ID"
+          else
+            echo "::warning::Unable to rerun the review of PR #$PR_NUMBER, it stays pending until the next scheduled retry"
+          fi
+
+          {
+            echo "started=$STARTED"
+            echo "attempt=$ATTEMPT"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Confirm The Rerun Started
+        if: steps.rerun.outputs.started == 'true'
+        env:
+          PREVIOUS_ATTEMPT: ${{ steps.rerun.outputs.attempt }}
+        run: |
+          # the rerun is accepted before it is registered, wait before checking the attempt count
+          sleep "$REGISTER_SECONDS"
+
+          ATTEMPT=$(gh api "repos/{owner}/{repo}/actions/runs/$RUN_ID" --jq '.run_attempt') || ATTEMPT=""
+
+          if [ -z "$ATTEMPT" ]; then
+            echo "::warning::Unable to confirm the rerun of PR #$PR_NUMBER, the next rerun may start while it is still running"
+          elif [ "$ATTEMPT" -le "$PREVIOUS_ATTEMPT" ]; then
+            echo "::warning::The rerun of PR #$PR_NUMBER did not start, it stays pending until the next scheduled retry"
+          else
+            echo "The review of PR #$PR_NUMBER is running"
+          fi
+
   retry:
     name: Retry Review
-    needs: find_pending
-    if: needs.find_pending.outputs.prs != '[]'
+    needs: [find_pending, rerun]
+    if: always() && needs.find_pending.result == 'success' && needs.find_pending.outputs.dispatch != '[]'
 
     permissions:
       actions: read
@@ -73,7 +205,7 @@ jobs:
       fail-fast: false
       max-parallel: 1 # because of WireGuard
       matrix:
-        pr_number: ${{ fromJson(needs.find_pending.outputs.prs) }}
+        pr_number: ${{ fromJson(needs.find_pending.outputs.dispatch) }}
     uses: ./.github/workflows/reusable-ai-review-local.yml
     with:
       pr_number: ${{ matrix.pr_number }}
