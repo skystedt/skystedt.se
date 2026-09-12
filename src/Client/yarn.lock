@@ -1177,10 +1177,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:8.0.0":
-  version: 8.0.0
-  resolution: "@babel/runtime@npm:8.0.0"
-  checksum: 10c0/450857cf52b3a3935d4aad505277201361c86185dad3bdd2ae083d78b76c6265c7fc7610e170c80de1b825d5bfdcfb50697f0853fff922b2661c91cff1fbbd81
+"@babel/runtime@npm:8.0.5":
+  version: 8.0.5
+  resolution: "@babel/runtime@npm:8.0.5"
+  checksum: 10c0/f4a310b6d2839a5350d6282805702040024b490b8456ca58de2abf5b329dba9ef19ece1d89304c39b1538177f311290512f88d7be4cc7925e4a9c9c00adab5b9
   languageName: node
   linkType: hard
 
@@ -4241,11 +4241,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.11.20":
-  version: 2.11.21
-  resolution: "baseline-browser-mapping@npm:2.11.21"
+  version: 2.11.22
+  resolution: "baseline-browser-mapping@npm:2.11.22"
   bin:
     baseline-browser-mapping: dist/cli.cjs
-  checksum: 10c0/1110ca70b60de9fa673e6d71154cbb2752225c28e069266c2f455f5a26367efc0e5b47a52afba22c9ef1e06d56a6c81aa964dda1fbc66c487e65c18a7c1e11c4
+  checksum: 10c0/455905743ccdad6aa50c6e87b99ae17c245ecd60c94c933d2b7ec4e7f9fbbcc5e72ef9985cb11fd7cde600f14803dc41b36d3c2229bcd3e0600b785d66098e99
   languageName: node
   linkType: hard
 
@@ -9666,7 +9666,7 @@ __metadata:
     "@babel/helper-compilation-targets": "npm:8.0.5"
     "@babel/plugin-transform-runtime": "npm:8.0.1"
     "@babel/preset-env": "npm:8.0.5"
-    "@babel/runtime": "npm:8.0.0"
+    "@babel/runtime": "npm:8.0.5"
     "@eslint-community/eslint-plugin-eslint-comments": "npm:4.8.0"
     "@microsoft/applicationinsights-web": "npm:3.4.4"
     "@stylistic/eslint-plugin": "npm:5.10.0"
