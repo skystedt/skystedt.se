@@ -12,7 +12,7 @@ export const licensePreamble = `/*! License information in ${licenseFilename} */
 export const licenseAllowed = {
   // Results in "ERROR in license-webpack-plugin: unacceptable license found for ..."
   // MIT           https://www.tldrlegal.com/license/mit-license
-  // ISC           https://www.tldrlegal.com/license/isc-license                   (only used for development)
+  // ISC           https://www.tldrlegal.com/license/isc-license
   // Apache-2.0    https://www.tldrlegal.com/license/apache-license-2-0-apache-2-0 (only used for development when running start)
   redistributed: licenses.allowed.redistributed,
   // Results in "ERROR in LicenseCheckUsePlugin: Unacceptable license used in: ..."
