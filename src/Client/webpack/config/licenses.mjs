@@ -37,7 +37,7 @@ export const licenseAdditionals = {
   /** @type {string[]} */
   modern: ['webpack'],
   /** @type {string[]} */
-  legacy: ['webpack', '@babel/plugin-transform-regenerator', 'regenerator-runtime']
+  legacy: ['webpack']
 };
 
 /** @type {LicenseOverrides} */
