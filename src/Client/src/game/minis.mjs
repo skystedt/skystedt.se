@@ -57,23 +57,27 @@ export default class Minis {
    */
   update(id, x, y) {
     const item = this.#map.get(id);
-    if (item) {
-      const { sprite } = item;
-      sprite.move(x - sprite.width / 2, y - sprite.height / 2);
-      sprite.alpha = 0;
-      item.state = MiniState.FadeIn;
+    if (!item) {
+      return;
     }
+
+    const { sprite } = item;
+    sprite.move(x - sprite.width / 2, y - sprite.height / 2);
+    sprite.alpha = 0;
+    item.state = MiniState.FadeIn;
   }
 
   /** @param {string} id */
   remove(id) {
     const item = this.#map.get(id);
-    if (item) {
-      const { sprite } = item;
-      this.#container.removeItem(sprite);
-      sprite.destroy();
-      this.#map.delete(id);
+    if (!item) {
+      return;
     }
+
+    const { sprite } = item;
+    this.#container.removeItem(sprite);
+    sprite.destroy();
+    this.#map.delete(id);
   }
 
   clear() {

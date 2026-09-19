@@ -55,11 +55,9 @@ export default class LicenseCheckUsePlugin {
     const packages = await this.#resolvePackageLicenses(logError, baseDirectory);
 
     const invalid = this.#validateLicenses(logError, packages, acceptableLicenses);
-    if (invalid.length > 0) {
-      for (const { license, modules } of invalid) {
-        for (const module of modules) {
-          logError(`Unacceptable license used in: ${module}: ${license}`);
-        }
+    for (const { license, modules } of invalid) {
+      for (const module of modules) {
+        logError(`Unacceptable license used in: ${module}: ${license}`);
       }
     }
 

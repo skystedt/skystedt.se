@@ -125,13 +125,15 @@ export default class Communication {
         }
       }
 
-      if (event.code !== WebsocketNormalClose) {
-        this.#connectionAttempt += 1;
-        const delay = Communication.#retryDelay(this.#connectionAttempt);
-        setTimeout(() => {
-          this.#createWebsocket(token, expiresAt, websocketUrl, updateInterval);
-        }, delay);
+      if (event.code === WebsocketNormalClose) {
+        return;
       }
+
+      this.#connectionAttempt += 1;
+      const delay = Communication.#retryDelay(this.#connectionAttempt);
+      setTimeout(() => {
+        this.#createWebsocket(token, expiresAt, websocketUrl, updateInterval);
+      }, delay);
     };
 
     // eslint-disable-next-line unicorn/prefer-add-event-listener

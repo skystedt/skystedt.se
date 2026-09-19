@@ -283,7 +283,9 @@ export default [
       'unicorn/consistent-class-member-order': 'off', // Opinionated
       'unicorn/comment-content': 'off', // Opinionated
       'unicorn/consistent-boolean-name': 'off', // Opinionated
+      'unicorn/prefer-combined-guards': 'off', // Opinionated
       'unicorn/prefer-continue': 'off', // Opinionated
+      'unicorn/prefer-ternary': 'off', // Opinionated
       'unicorn/no-computed-property-existence-check': 'off', // Unnecessarly complicates code
       'unicorn/prefer-set-has': 'off', // Needs polyfills in some older browsers
       'unicorn/prefer-top-level-await': 'off', // Makes babel give warnings
