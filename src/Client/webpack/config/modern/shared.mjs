@@ -68,6 +68,7 @@ export default {
     filename: '[name].[contenthash].mjs',
     path: dir.dist,
     publicPath: '',
+    module: false, // using modules will force use of import() for loading child scripts, which does not support SRI/integrity
     scriptType: 'module',
     trustedTypes: 'webpack',
     crossOriginLoading: 'anonymous',
@@ -110,9 +111,6 @@ export default {
     realContentHash: true,
     removeAvailableModules: true,
     sideEffects: true
-  },
-  experiments: {
-    outputModule: false // using modules will force use of import() for loading child scripts, which does not support SRI/integrity
   },
   performance: {
     assetFilter: performanceFilter
