@@ -68,11 +68,7 @@ export default class TagsHtmlWebpackPlugin {
       throw new Error('Output path is not defined');
     }
 
-    const files = /** @type {string[]} */ ([]);
-
-    if (this.#options.files.includeCompiledAssets) {
-      files.push(...Object.keys(assets));
-    }
+    const files = /** @type {string[]} */ (this.#options.files.includeCompiledAssets ? Object.keys(assets) : []);
 
     await Promise.all(
       this.#options.files.extraFileDirectories?.map(async (dir) => {

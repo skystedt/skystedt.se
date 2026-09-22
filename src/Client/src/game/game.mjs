@@ -128,6 +128,7 @@ export default class Game {
       this.#updateBackground();
     }
 
+    // eslint-disable-next-line unicorn/prefer-early-return
     if (this.#frameState.fpsCheck && timestamp > this.#frameState.fpsCheck) {
       this.#frameState.fpsCheck = 0;
       this.#checkFps();
