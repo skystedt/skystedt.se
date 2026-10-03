@@ -8075,9 +8075,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pixi.js@npm:8.21.0":
-  version: 8.21.0
-  resolution: "pixi.js@npm:8.21.0"
+"pixi.js@npm:8.22.0":
+  version: 8.22.0
+  resolution: "pixi.js@npm:8.22.0"
   dependencies:
     "@pixi/colord": "npm:^2.9.6"
     "@types/earcut": "npm:^3.0.0"
@@ -8089,7 +8089,7 @@ __metadata:
     ismobilejs: "npm:^1.1.1"
     parse-svg-path: "npm:^0.2.0"
     tiny-lru: "npm:^11.4.7"
-  checksum: 10c0/c21f1d33c489d86163457309d340a164ebaf0c300b2c6749d1a86afba84c4ef783d758c143a57cf22658a5fb31de482c2eaddde15dcaa2cb4242ecb3849c4b58
+  checksum: 10c0/dd3879a994250f4aa4ac27f25c3546feefdca6a3e00f4eba5f5aed72622263feba92275d83f78e508944842e70d3b660a6fdef410379f6f002d12b23ecfd99b6
   languageName: node
   linkType: hard
 
@@ -9641,7 +9641,7 @@ __metadata:
     navigator.sendbeacon: "npm:0.0.20"
     parse5: "npm:8.0.1"
     picocolors: "npm:1.1.1"
-    pixi.js: "npm:8.21.0"
+    pixi.js: "npm:8.22.0"
     postcss: "npm:8.5.28"
     postcss-load-config: "npm:6.0.1"
     postcss-loader: "npm:8.2.1"
