@@ -4792,9 +4792,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cssnano-preset-default@npm:^9.2.0":
-  version: 9.2.1
-  resolution: "cssnano-preset-default@npm:9.2.1"
+"cssnano-preset-default@npm:^9.2.2":
+  version: 9.2.2
+  resolution: "cssnano-preset-default@npm:9.2.2"
   dependencies:
     browserslist: "npm:^4.29.3"
     cssnano-utils: "npm:^8.1.0"
@@ -4806,7 +4806,7 @@ __metadata:
     postcss-discard-empty: "npm:^9.0.5"
     postcss-discard-overridden: "npm:^9.0.5"
     postcss-merge-longhand: "npm:^9.2.0"
-    postcss-merge-rules: "npm:^9.0.7"
+    postcss-merge-rules: "npm:^9.0.8"
     postcss-minify-font-values: "npm:^9.0.7"
     postcss-minify-gradients: "npm:^9.0.6"
     postcss-minify-params: "npm:^9.0.6"
@@ -4827,7 +4827,7 @@ __metadata:
     postcss-unique-selectors: "npm:^9.0.5"
   peerDependencies:
     postcss: ^8.5.28
-  checksum: 10c0/0593ff8ed1c18843f9ce4ea9a3d99ecb121d0df78424fb034320ac0cbe8672ffb2b02ab716d8e6293f3182d3d7a8d87c9d286f2dd953e97627d44a0a543c1c1b
+  checksum: 10c0/d5b848ffa225ab30fd38c38b7b597815b668e0d1d6ddc35e898aa0b9c74c6a208bd482b3c663edc04f0e930cb97b478fdaa237c3a45244ec2bef52944e0d68c2
   languageName: node
   linkType: hard
 
@@ -4842,14 +4842,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cssnano@npm:9.2.0":
-  version: 9.2.0
-  resolution: "cssnano@npm:9.2.0"
+"cssnano@npm:9.2.2":
+  version: 9.2.2
+  resolution: "cssnano@npm:9.2.2"
   dependencies:
-    cssnano-preset-default: "npm:^9.2.0"
+    cssnano-preset-default: "npm:^9.2.2"
   peerDependencies:
     postcss: ^8.5.28
-  checksum: 10c0/657f902164ae55eba2c19e1fe5eeb8a590ae0abec59d11115a9baf2d9643a83421813a78fadcd7431c1e73209d70e835da886b01074a64d0df8726a7e0cfbb9f
+  checksum: 10c0/e4d9c6f52f49528434a3fbb0b6c954a211459fe17dac193740e6aa9c0852bbca51d9152a3e9ac21a2480b4f2d4f02ef97360e6160d0bedeb8eb947f54d89ffa4
   languageName: node
   linkType: hard
 
@@ -5393,9 +5393,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:65.0.2":
-  version: 65.0.2
-  resolution: "eslint-plugin-jsdoc@npm:65.0.2"
+"eslint-plugin-jsdoc@npm:65.1.0":
+  version: 65.1.0
+  resolution: "eslint-plugin-jsdoc@npm:65.1.0"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.98.0"
     "@es-joy/resolve.exports": "npm:1.2.0"
@@ -5418,7 +5418,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/ec4de036b760d92206db2af4c81cdc922253e44e5dad416e5200532e5ef1726c7e979e889a6bc65828e78bce28e937b0085cc5e5fee9e301c05029c8532a124b
+  checksum: 10c0/b0a966ebe70cd1a35eebbec963383f10492eb029854547f5af3cf4d0fbd576e830b9abed0ad87d1bcd61acb22087c49594c883ab7c9da0c02abd378d771ca7b3
   languageName: node
   linkType: hard
 
@@ -8361,18 +8361,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-merge-rules@npm:9.0.7, postcss-merge-rules@npm:^9.0.7":
-  version: 9.0.7
-  resolution: "postcss-merge-rules@npm:9.0.7"
+"postcss-merge-rules@npm:9.0.8, postcss-merge-rules@npm:^9.0.8":
+  version: 9.0.8
+  resolution: "postcss-merge-rules@npm:9.0.8"
   dependencies:
     "@csstools/css-tokenizer": "npm:^4.0.2"
     browserslist: "npm:^4.29.3"
     caniuse-api: "npm:^4.0.0"
-    cssnano-utils: "npm:^8.0.2"
+    cssnano-utils: "npm:^8.1.0"
     postcss-minify-selectors: "npm:^9.0.6"
   peerDependencies:
     postcss: ^8.5.28
-  checksum: 10c0/8f35e98f0901970e2cf6a20f33a9b0af3d68f60bc3f6c0d6d42abed2a016562730530d7c24ed3b5d58292fcedaea6bb384af2350699eeb054837100765dfadf7
+  checksum: 10c0/f7e520cdb3e189ed1dbf670eb0d57e2d9a9f255e272504dc9207536de26e0e8b7be3cef419c67621f024350ab412cb9c9e1173568963d16b3fcebdfc2499e65e
   languageName: node
   linkType: hard
 
@@ -9509,7 +9509,7 @@ __metadata:
     bytes: "npm:3.1.2"
     core-js: "npm:3.50.0"
     css-loader: "npm:7.1.5"
-    cssnano: "npm:9.2.0"
+    cssnano: "npm:9.2.2"
     datauri: "npm:4.1.0"
     diff: "npm:9.0.0"
     element-polyfill: "npm:1.1.0"
@@ -9520,7 +9520,7 @@ __metadata:
     eslint-import-resolver-typescript: "npm:4.4.5"
     eslint-plugin-compat: "npm:7.0.2"
     eslint-plugin-import-x: "npm:4.17.1"
-    eslint-plugin-jsdoc: "npm:65.0.2"
+    eslint-plugin-jsdoc: "npm:65.1.0"
     eslint-plugin-n: "npm:18.4.1"
     eslint-plugin-prettier: "npm:5.5.6"
     eslint-plugin-promise: "npm:7.3.0"
@@ -9544,7 +9544,7 @@ __metadata:
     postcss: "npm:8.5.28"
     postcss-load-config: "npm:6.0.1"
     postcss-loader: "npm:8.2.1"
-    postcss-merge-rules: "npm:9.0.7"
+    postcss-merge-rules: "npm:9.0.8"
     postcss-preset-env: "npm:11.6.0"
     prettier: "npm:3.9.9"
     spdx-satisfies: "npm:6.0.0"
