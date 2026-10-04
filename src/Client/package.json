@@ -53,7 +53,7 @@
     "eslint-plugin-promise": "7.3.0",
     "eslint-plugin-security": "4.2.0",
     "eslint-plugin-sonarjs": "4.2.2",
-    "eslint-plugin-unicorn": "76.0.0",
+    "eslint-plugin-unicorn": "77.0.0",
     "eslint-webpack-plugin": "6.0.0",
     "globals": "17.13.0",
     "html-inline-css-webpack-plugin": "1.11.2",

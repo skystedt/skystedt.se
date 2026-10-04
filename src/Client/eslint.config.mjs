@@ -107,7 +107,7 @@ const modifyRuleOptions = (entry, filterPredicate) => {
 const airbnbUnsplitRules = await loadAirbnbRules();
 const airbnbRules = splitAirbnbRules(airbnbUnsplitRules);
 
-const buildFiles = ['*.mjs', 'webpack/**/*.mjs'];
+const buildFiles = ['*.mjs', 'webpack/**/*.mjs', '.vscode/*.mjs'];
 
 /** @type {Config[]} */
 export default [
@@ -281,7 +281,6 @@ export default [
       'unicorn/no-array-callback-reference': 'off', // Opinionated
       'unicorn/no-zero-fractions': 'off', // Opinionated
       'unicorn/consistent-class-member-order': 'off', // Opinionated
-      'unicorn/comment-content': 'off', // Opinionated
       'unicorn/consistent-boolean-name': 'off', // Opinionated
       'unicorn/prefer-combined-guards': 'off', // Opinionated
       'unicorn/prefer-continue': 'off', // Opinionated
@@ -290,6 +289,7 @@ export default [
       'unicorn/prefer-set-has': 'off', // Needs polyfills in some older browsers
       'unicorn/prefer-top-level-await': 'off', // Makes babel give warnings
       'unicorn/prefer-global-this': 'off', // Breaks SplitChunksPlugin with cache group conflict for 'polyfills'
+      'unicorn/no-asterisk-prefix-in-documentation-comments': 'off', // Conflicts with jsdoc/require-asterisk-prefix
       'unicorn/name-replacements': ['error', { replacements: { application: false } }] /* Opinionated */,
       'unicorn/default-export-style': ['error', { functions: 'separate' }],
       'unicorn/single-line-block-comment-style': ['error', 'single-line'] /* Opinionated */
@@ -299,6 +299,7 @@ export default [
     name: 'overrides/unicorn/build',
     files: buildFiles,
     rules: {
+      'unicorn/no-top-level-side-effects': 'off', // Config modules are meant to be evaluated on import
       'unicorn/name-replacements': /* Opinionated */ [
         'error',
         {
