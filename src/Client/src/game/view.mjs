@@ -86,12 +86,11 @@ export default class View {
 
   /**
    * @param {number} value
-   * @param {number} min
    * @param {number} max
    * @returns {number}
    */
-  static #clamp(value, min, max) {
-    return Math.max(min, Math.min(max, value));
+  static #clamp(value, max) {
+    return Math.max(0, Math.min(max, value));
   }
 
   /**
@@ -103,8 +102,8 @@ export default class View {
   restrictGamePositionToView(gamePosition, movement, objectSize) {
     let viewX = gamePosition.x - this.viewOffset.left + movement.dx;
     let viewY = gamePosition.y - this.viewOffset.top + movement.dy;
-    viewX = View.#clamp(viewX, 0, this.viewSize.width - objectSize.width);
-    viewY = View.#clamp(viewY, 0, this.viewSize.height - objectSize.height);
+    viewX = View.#clamp(viewX, this.viewSize.width - objectSize.width);
+    viewY = View.#clamp(viewY, this.viewSize.height - objectSize.height);
     return new GamePosition(viewX + this.viewOffset.left, viewY + this.viewOffset.top);
   }
 }
