@@ -1095,10 +1095,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:8.0.5":
-  version: 8.0.5
-  resolution: "@babel/runtime@npm:8.0.5"
-  checksum: 10c0/f4a310b6d2839a5350d6282805702040024b490b8456ca58de2abf5b329dba9ef19ece1d89304c39b1538177f311290512f88d7be4cc7925e4a9c9c00adab5b9
+"@babel/runtime@npm:8.0.7":
+  version: 8.0.7
+  resolution: "@babel/runtime@npm:8.0.7"
+  checksum: 10c0/7ff1ca2d452a3359dc63bd36b25ff219ef04dfefbf7186900f1c296e55ade2ccc7f88dd2eb9d58ed253e3bde58fae97b9e40d80220ebfe510c99f7cf54837603
   languageName: node
   linkType: hard
 
@@ -9555,7 +9555,7 @@ __metadata:
     "@babel/helper-compilation-targets": "npm:8.0.7"
     "@babel/plugin-transform-runtime": "npm:8.0.6"
     "@babel/preset-env": "npm:8.0.7"
-    "@babel/runtime": "npm:8.0.5"
+    "@babel/runtime": "npm:8.0.7"
     "@eslint-community/eslint-plugin-eslint-comments": "npm:4.8.1"
     "@microsoft/applicationinsights-web": "npm:3.4.5"
     "@stylistic/eslint-plugin": "npm:5.10.0"
