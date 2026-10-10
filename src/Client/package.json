@@ -86,7 +86,7 @@
   },
   "dependencies": {
     "@babel/runtime": "8.0.5",
-    "@microsoft/applicationinsights-web": "3.4.4",
+    "@microsoft/applicationinsights-web": "3.4.5",
     "core-js": "3.50.0",
     "element-polyfill": "1.1.0",
     "navigator.sendbeacon": "0.0.20",
