@@ -26,6 +26,7 @@ export const licenseAllowed = {
   // CC-BY-3.0       https://www.tldrlegal.com/license/creative-commons-attribution-cc
   // CC-BY-4.0       https://www.tldrlegal.com/license/creative-commons-attribution-4-0-international-cc-by-4
   // Python-2.0      https://www.tldrlegal.com/license/python-license-2-0
+  // PSF-2.0         https://spdx.org/licenses/PSF-2.0.html
   // LGPL-3.0-only   https://www.tldrlegal.com/license/gnu-lesser-general-public-license-v3-lgpl-3
   // BlueOak-1.0.0   https://opensource.org/license/blue-oak-model-license
   used: licenses.allowed.used
