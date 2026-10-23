@@ -27,10 +27,20 @@ export const cspCallback = (/** @type {CspPolicy} */ policy) => {
 
   policy['style-src-attr'] = [
     "'unsafe-hashes'",
-    // Error overlay
-    "'sha256-9i4CO/Nl+gX45HxIVK0YGg311ZbVCsEZzl4uJ47ZNOo='",
-    "'sha256-V4C0IT9aeNBiUnxIeGJONTAiAhnmC5iiZqBiYPLqrb0='",
-    "'sha256-cI6npbLAYrmkX3bdF4enQmhGkRX5+4yR2pVU4vNmPV8='"
+    // Error overlay (webpack-dev-middleware)
+    "'sha256-NTdl32G0vCd3MeZ5GDuyBEldp+Nkc+KtYGjonmzw6UI='", // error badge
+    "'sha256-DtSUKb+aqHSnWngM8nw0CnXKnBKaDiZRjiMZB+anOyg='", // warning badge
+    "'sha256-GAA+gfCml3F8z0wi+zNtaGEoF5zJFtQuseXZ0I2FjoQ='", // link
+    "'sha256-qBiWrcjAEg8oR86PTvUiq+JziLs2wvUhMWNMxFZ4rjE='", // file path
+    "'sha256-7iIeNF2SYhu9Sob+ruIO2geRMQflLIuYroBytXclLm0='", // file path, open in editor
+    "'sha256-Fjw5cur/sIkKvcejgf857077oOB/sGCrxhZc7MJUxzo='", // ansi reset
+    "'sha256-2j+NsrE/qRlmhkADxLdqK0AALIC4Gcc77SVRgwXmYCc='", // ansi bold
+    "'sha256-V4C0IT9aeNBiUnxIeGJONTAiAhnmC5iiZqBiYPLqrb0='", // ansi dim
+    "'sha256-FVwNVLbv8OZplbJdEy8cZ2EYtCudcEnny2Zs1oGNZz0='", // ansi gray
+    "'sha256-yWPJ2QlwBQRjSB2c/x+6WwUc18NcZCzJcicgrAqrsGY='", // ansi red
+    "'sha256-QLH/u7oqW68ivatfL4Uk8/215qAzOMtZDxSir0cXXBA='", // ansi yellow
+    "'sha256-JTre7RTPlrMzny12wzGSZZTdOiWjTrtxVpiW0Yon2og='", // ansi magenta
+    "'sha256-eQRcZYMkezIXredS/HL+WFaiJPy/UAiwGoQAqAw0G6Q='" // ansi cyan
   ];
 
   return policy;

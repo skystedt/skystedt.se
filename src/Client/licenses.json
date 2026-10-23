@@ -1,6 +1,6 @@
 {
   "allowed": {
-    "redistributed": ["MIT", "ISC", "Apache-2.0"],
+    "redistributed": ["MIT", "ISC"],
     "used": [
       "MIT",
       "MIT-0",

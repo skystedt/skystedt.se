@@ -62,7 +62,6 @@ const staticWebAppConfig = () => {
 /** @type {webpack.Configuration} */
 export default {
   name: 'modern',
-  dependencies: ['legacy'], // modern must run after legacy, since index.html is done by modern and it has references to legacy output
   target: 'browserslist:modern',
   output: {
     filename: '[name].[contenthash].mjs',
@@ -225,6 +224,11 @@ export default {
         },
         {
           path: 'legacy/polyfills.*.js',
+          tag: 'script',
+          attributes: { nomodule: true, defer: true, integrity: undefined }
+        },
+        {
+          path: 'legacy/development.*.js', // only in development, webpack-dev-server client which the legacy entrypoints depend on
           tag: 'script',
           attributes: { nomodule: true, defer: true, integrity: undefined }
         },
