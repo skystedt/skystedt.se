@@ -1,6 +1,5 @@
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { minimatch } from 'minimatch';
-import fs from 'node:fs/promises';
 import path from 'node:path';
 import webpack from 'webpack';
 
@@ -23,6 +22,7 @@ import webpack from 'webpack';
  */
 /** @typedef {{ [attribute: string]: string | boolean | undefined }} TagAttributes */
 /** @typedef {[AssetTagKey: keyof HtmlWebpackPlugin_AssetTags, tag: HtmlWebpackPlugin.HtmlTagObject, file: string]} CategorizedTag */
+/** @typedef {{ name: string, isDirectory: () => boolean }} DirectoryEntry */
 
 export default class TagsHtmlWebpackPlugin {
   #options;
@@ -37,7 +37,7 @@ export default class TagsHtmlWebpackPlugin {
     compiler.hooks.compilation.tap(TagsHtmlWebpackPlugin.name, (compilation) => {
       HtmlWebpackPlugin.getHooks(compilation).alterAssetTags.tapPromise(TagsHtmlWebpackPlugin.name, async (data) => {
         const categorizedTags = this.#categorizeAssetTags(data.assetTags);
-        const files = await this.#readFiles(compilation.options.output.path, compilation.assets);
+        const files = await this.#readFiles(compilation);
         this.#addMissingTags(data.assetTags, categorizedTags, files);
         this.#updateTagTypes(data.assetTags, categorizedTags);
         this.#updateAttributes(categorizedTags);
@@ -59,26 +59,65 @@ export default class TagsHtmlWebpackPlugin {
   }
 
   /**
-   * @param {string | undefined} outputPath
-   * @param {webpack.Compilation['assets']} assets
+   * @param {webpack.Compilation} compilation
    * @returns {Promise<string[]>}
    */
-  async #readFiles(outputPath, assets) {
+  async #readFiles(compilation) {
+    const outputPath = compilation.options.output.path;
     if (!outputPath) {
       throw new Error('Output path is not defined');
     }
 
-    const files = /** @type {string[]} */ (this.#options.files.includeCompiledAssets ? Object.keys(assets) : []);
+    // use the output file system, since the files might only exist in memory, e.g. when using webpack-dev-server
+    const { outputFileSystem } = compilation.compiler;
+    if (!outputFileSystem) {
+      throw new Error('Output file system is not defined');
+    }
+
+    const files = /** @type {string[]} */ (
+      this.#options.files.includeCompiledAssets ? Object.keys(compilation.assets) : []
+    );
 
     await Promise.all(
       this.#options.files.extraFileDirectories?.map(async (dir) => {
-        const entries = await fs.readdir(dir, { recursive: true });
+        const entries = await this.#readDirectory(outputFileSystem, dir);
         const relativeEntries = entries.map((entry) => path.join(path.relative(outputPath, dir), entry));
         files.push(...relativeEntries);
       }) || []
     );
 
-    return files;
+    // hot updates (webpack-dev-server) are loaded by the hot module replacement runtime, not by tags
+    const filesWithoutHotUpdates = files.filter((file) => !minimatch(file, '**/*.hot-update.*'));
+    return filesWithoutHotUpdates;
+  }
+
+  /**
+   * @param {webpack.OutputFileSystem} fileSystem
+   * @param {string} dir
+   * @returns {Promise<string[]>} files in the directory and its subdirectories, relative to the directory
+   */
+  async #readDirectory(fileSystem, dir) {
+    const readdir = fileSystem.readdir?.bind(fileSystem);
+    if (!readdir) {
+      throw new Error('Output file system does not support reading directories');
+    }
+
+    /** @type {DirectoryEntry[]} */
+    const entries = await new Promise((resolve, reject) => {
+      readdir(dir, { withFileTypes: true }, (error, result) => (error ? reject(error) : resolve(result ?? [])));
+    });
+
+    const files = await Promise.all(
+      entries.map(async (entry) => {
+        if (!entry.isDirectory()) {
+          return [entry.name];
+        }
+        const subEntries = await this.#readDirectory(fileSystem, path.join(dir, entry.name));
+        return subEntries.map((subEntry) => path.join(entry.name, subEntry));
+      })
+    );
+
+    return files.flat();
   }
 
   /**

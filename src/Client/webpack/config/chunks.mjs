@@ -36,8 +36,7 @@ const mapVendorModuleNameToChunk = (moduleName) => {
   switch (moduleName) {
     case 'webpack':
     case 'webpack-dev-server':
-    case 'ansi-html-community':
-    case 'html-entities':
+    case 'webpack-dev-middleware':
     case 'events':
     case 'mini-css-extract-plugin': {
       return 'development';

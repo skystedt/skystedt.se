@@ -26,6 +26,9 @@ const LogTypes = {
 
 const CLEAR_LINE = '\u{1B}[2K\r';
 
+// The dev server is shared by all compilers of a MultiCompiler
+const SharedLoggers = new Set(['webpack-dev-server', 'webpack-dev-middleware']);
+
 export default class ColorLoggerPlugin {
   /** @type {string} */ #environment;
   /** @type {boolean} */ #append;
@@ -93,14 +96,16 @@ export default class ColorLoggerPlugin {
         ? [`[${name}] ${args[0]}`, ...args.slice(1)]
         : [`[${name}]`, ...args];
 
-    const environment = `[${pc.green(this.#environment)}]`;
+    // shared loggers aren't labeled with an environment
+    const environment = SharedLoggers.has(name) ? '' : `[${pc.green(this.#environment)}] `;
+
     const message = `${logType.prefix}${format(...namedArgs)}`;
 
     // warn/error (and above) always persist, even in non-append mode
     if (this.#append) {
-      stream.write(`${environment} ${message}\n`);
+      stream.write(`${environment}${message}\n`);
     } else {
-      stream.write(`${CLEAR_LINE}${pc.bold(environment)} ${message}`);
+      stream.write(`${CLEAR_LINE}${environment && pc.bold(environment)}${message}`);
       if (logType.threshold >= LogLevels.warn) {
         stream.write('\n');
       }
