@@ -168,9 +168,16 @@ jobs:
 
       - name: Get Preview Environment Url
         if: github.event_name == 'pull_request'
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }} # the pr commit, github.sha is the generated merge commit
         run: |
           ENVIRONMENT_HOSTNAME=$(az staticwebapp environment show --name ${{ env.SWA_NAME }} --environment-name ${{ github.event.number }} --query "hostname" --output tsv)
-          echo "Azure Static Web Apps: https://$ENVIRONMENT_HOSTNAME" > "$RUNNER_TEMP/deployment-url.md"
+          COMMIT_URL="${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.number }}/commits/$HEAD_SHA"
+          {
+            echo "Azure Static Web Apps: https://$ENVIRONMENT_HOSTNAME"
+            echo ""
+            echo "_Deployed: [\`${HEAD_SHA:0:7}\`]($COMMIT_URL) · $(date -u '+%Y-%m-%d %H:%M UTC')_"
+          } > "$RUNNER_TEMP/deployment-url.md"
 
       - name: Find Url Comment
         id: url_comment
