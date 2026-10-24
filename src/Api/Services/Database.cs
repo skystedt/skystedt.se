@@ -18,6 +18,7 @@ public static class DatabaseExtensions
 {
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        Environment.SetEnvironmentVariable("COSMOS_DISABLE_IMDS_ACCESS", "true"); // Static Web Apps blocks the VM metadata endpoint, the SDK's probe of it only fails and gets logged as an exception
         services.Configure<Database.DatabaseConnection>(configuration);
         services.AddSingleton<IDatabase, Database>();
         return services;
