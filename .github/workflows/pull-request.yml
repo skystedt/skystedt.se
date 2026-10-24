@@ -21,30 +21,6 @@ jobs:
     uses: ./.github/workflows/reusable-build-test-deploy.yml
     secrets: inherit
 
-  ai_review_local:
-    name: AI Review Local
-    permissions:
-      actions: read
-      contents: read
-      pull-requests: write
-    uses: ./.github/workflows/reusable-ai-review-local.yml
-    with:
-      pr_number: ${{ github.event.pull_request.number }}
-      notify_offline: true
-    secrets: inherit
-
-  ai_review_claude:
-    name: AI Review Claude
-    permissions:
-      actions: read
-      contents: read
-      id-token: write
-      pull-requests: write
-    uses: ./.github/workflows/reusable-ai-review-claude.yml
-    with:
-      pr_number: ${{ github.event.pull_request.number }}
-    secrets: inherit
-
   scan_codeql:
     name: Scan CodeQL
     permissions:
