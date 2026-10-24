@@ -140,17 +140,14 @@ export default class PostProcessHtmlWebpackPlugin {
 
     const newLine = insertNewLines ? '\n' : '';
 
-    fragment.childNodes = fragment.childNodes
+    fragment.childNodes = fragment.childNodes.flatMap((node) => {
       // remove indentation
-      .filter(
-        (node) => !(node.nodeName === '#text' && whitespacesRegExp.test(/** @type {Parse5TextNode} */ (node).value))
-      )
+      if (node.nodeName === '#text' && whitespacesRegExp.test(/** @type {Parse5TextNode} */ (node).value)) {
+        return [];
+      }
       // add indentation and newlines
-      .flatMap((node) => [
-        defaultTreeAdapter.createTextNode(indentation ?? ''),
-        node,
-        defaultTreeAdapter.createTextNode(newLine)
-      ]);
+      return [defaultTreeAdapter.createTextNode(indentation ?? ''), node, defaultTreeAdapter.createTextNode(newLine)];
+    });
 
     if (previouslySingleLine && insertNewLines) {
       // the start and end tags was previously on a single line
