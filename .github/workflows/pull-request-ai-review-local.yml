@@ -1,0 +1,24 @@
+name: Pull Request - AI Review Local
+
+concurrency:
+  group: pull-request-ai-review-local-${{ github.event.number }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions: {} # permissions are specified on each job
+
+jobs:
+  ai_review_local:
+    name: AI Review Local
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
+    uses: ./.github/workflows/reusable-ai-review-local.yml
+    with:
+      pr_number: ${{ github.event.pull_request.number }}
+      notify_offline: true
+    secrets: inherit

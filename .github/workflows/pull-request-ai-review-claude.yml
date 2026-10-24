@@ -1,0 +1,25 @@
+name: Pull Request - AI Review Claude
+
+# kept out of pull-request.yml, claude-code-action skips the review when any reusable workflow the calling workflow uses differs from the default branch
+concurrency:
+  group: pull-request-ai-review-claude-${{ github.event.number }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions: {} # permissions are specified on each job
+
+jobs:
+  ai_review_claude:
+    name: AI Review Claude
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+      pull-requests: write
+    uses: ./.github/workflows/reusable-ai-review-claude.yml
+    with:
+      pr_number: ${{ github.event.pull_request.number }}
+    secrets: inherit

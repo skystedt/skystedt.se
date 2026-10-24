@@ -141,7 +141,8 @@ jobs:
           JOB_ID=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs" \
             --jq '[.jobs[] | select((.name | split(" / ") | last) == env.CLAUDE_JOB_NAME)][0].id') || true
 
-          JOB_LOG=$(gh api "repos/$GITHUB_REPOSITORY/actions/jobs/$JOB_ID/logs") || true
+          # the log contains color codes, gh refuses to print it without --allow-escape-sequences
+          JOB_LOG=$(gh api --allow-escape-sequences "repos/$GITHUB_REPOSITORY/actions/jobs/$JOB_ID/logs") || true
 
           # warning lines look like: <timestamp> ##[warning]<message>
           REASON=$(echo "$JOB_LOG" | grep -i '##\[warning\].*workflow validation' | head -n1 | sed 's/^[^ ]* ##\[warning\]//' | tr -d '\r') || true
