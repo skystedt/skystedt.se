@@ -90,6 +90,10 @@ jobs:
         run: yarn run typecheck
         working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
 
+      - name: Yarn Lint
+        run: yarn run lint
+        working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}
+
       - name: Yarn Build
         run: yarn run production
         working-directory: ${{ env.SRC_DIR }}/${{ env.CLIENT_DIR }}

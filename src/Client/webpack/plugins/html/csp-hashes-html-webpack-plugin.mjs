@@ -212,7 +212,7 @@ export default class CspHashesHtmlWebpackPlugin {
         return false;
       }
       if (tag.url) {
-        return !externalPatterns.some((pattern) => minimatch(/** @type {string} */ (tag.url), pattern));
+        return externalPatterns.every((pattern) => !minimatch(/** @type {string} */ (tag.url), pattern));
       }
       return true;
     });

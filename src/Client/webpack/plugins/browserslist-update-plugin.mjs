@@ -48,7 +48,9 @@ export default class BrowserslistUpdatePlugin {
         BrowserslistUpdateDependency.Baseline
       );
 
-      if (versionBeforeCaniuse !== versionAfterCaniuse || versionBeforeBaseline !== versionAfterBaseline) {
+      if (versionBeforeCaniuse === versionAfterCaniuse && versionBeforeBaseline === versionAfterBaseline) {
+        logger.info('Browserslist is up to date');
+      } else {
         const message = pc.bold(
           pc.bgYellow(
             pc.black(
@@ -58,8 +60,6 @@ export default class BrowserslistUpdatePlugin {
         );
 
         logger.warn(message);
-      } else {
-        logger.info('Browserslist is up to date');
       }
     });
   }

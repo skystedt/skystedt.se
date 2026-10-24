@@ -1,2 +1,5 @@
 node_modules
 *.lock
+
+# Rewritten in CI by MergeYarnSettings.cs
+.yarnrc.yml
