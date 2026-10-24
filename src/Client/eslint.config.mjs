@@ -299,7 +299,6 @@ export default [
     name: 'overrides/unicorn/build',
     files: buildFiles,
     rules: {
-      'unicorn/no-top-level-side-effects': 'off', // Config modules are meant to be evaluated on import
       'unicorn/name-replacements': /* Opinionated */ [
         'error',
         {
