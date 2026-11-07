@@ -100,5 +100,18 @@
     "unrs-resolver": {
       "built": false
     }
+  },
+  "resolutions": {
+    "@npmcli/map-workspaces/glob": "14.x",
+    "@npmcli/package-json/glob": "14.x",
+    "cacache/glob": "14.x",
+    "@eslint/config-array/minimatch": "11.x",
+    "@npmcli/arborist/minimatch": "11.x",
+    "@npmcli/map-workspaces/minimatch": "11.x",
+    "@tufjs/models/minimatch": "11.x",
+    "@typescript-eslint/typescript-estree/minimatch": "11.x",
+    "eslint/minimatch": "11.x",
+    "eslint-plugin-sonarjs/minimatch": "11.x",
+    "ignore-walk/minimatch": "11.x"
   }
 }
