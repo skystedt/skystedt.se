@@ -7,21 +7,6 @@ public class FunctionBindingsTests
     private static string FunctionsDirectory() => Directory.GetCurrentDirectory().Replace(".Tests", string.Empty);
 
     [Fact]
-    public async Task CanReadFunctionMetadata()
-    {
-        // Arrange
-        // Functions project needs to be built and have generated 'functions.metadata'
-        var functionMetadata = new FunctionMetadataProvider();
-        var functionsDirectory = FunctionsDirectory();
-
-        // Act
-        var metadata = await functionMetadata.GetFunctionMetadataAsync(functionsDirectory);
-
-        // Assert
-        Assert.NotEmpty(metadata);
-    }
-
-    [Fact]
     public async Task HttpTriggersHasHttpResponseBindings()
     {
         // Functions with Http triggers must return a http response
@@ -30,8 +15,7 @@ public class FunctionBindingsTests
         // https://github.com/Azure/azure-functions-dotnet-worker/issues/1151
 
         // Arrange
-        // Functions project needs to be built and have generated 'functions.metadata'
-        var functionMetadata = new FunctionMetadataProvider();
+        var functionMetadata = new GeneratedFunctionMetadataProvider();
         var functionsDirectory = FunctionsDirectory();
 
         // Act

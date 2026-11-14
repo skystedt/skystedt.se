@@ -41,7 +41,7 @@ public class CallbackPubSub(
         {
             connections.Remove(connectionId);
             await disconnectedCallback(CreateRequest(userId, connectionId));
-            if (!connections.Any())
+            if (connections.Count == 0)
             {
                 _users.Remove(userId);
             }
@@ -104,7 +104,7 @@ public class CallbackPubSub(
                 connections.Remove(connectionId);
                 await disconnectedCallback(CreateRequest(userId, connectionId));
             }
-            if (!connections.Any())
+            if (connections.Count == 0)
             {
                 _users.Remove(userId);
             }
