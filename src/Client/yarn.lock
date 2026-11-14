@@ -2948,13 +2948,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pixi/colord@npm:^2.9.6":
-  version: 2.9.6
-  resolution: "@pixi/colord@npm:2.9.6"
-  checksum: 10c0/513636a67140b8bb3292eb4a7a3a5303a394525410fe972ebfe1e5db3749f27f7c0f176e4c84fcb9ab0fa22ee1d8ce2a15b3e32db7021e65ac0561941d2933a3
-  languageName: node
-  linkType: hard
-
 "@sigstore/bundle@npm:^4.0.0":
   version: 4.0.0
   resolution: "@sigstore/bundle@npm:4.0.0"
@@ -4466,6 +4459,13 @@ __metadata:
   version: 2.10.0
   resolution: "colord@npm:2.10.0"
   checksum: 10c0/2f5d1d1759124f593deca17bbbab8a88bdc3ab68bbcc88db76c1192d9a5d575db202badde044bf61789561fa0ed7a9eb895382becad1af27ec65934c216e9e04
+  languageName: node
+  linkType: hard
+
+"colord@npm:^2.11.0":
+  version: 2.12.0
+  resolution: "colord@npm:2.12.0"
+  checksum: 10c0/baaab44ebfff402c14a253a6a9eaeeec2bf1c620e00ebead1276d8b6c4eec2c4e56c9d2a8cddfd7049a582068c1dfacaf11bb531d066567bd53f389c915e23b4
   languageName: node
   linkType: hard
 
@@ -7901,21 +7901,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pixi.js@npm:8.22.0":
-  version: 8.22.0
-  resolution: "pixi.js@npm:8.22.0"
+"pixi.js@npm:8.23.0":
+  version: 8.23.0
+  resolution: "pixi.js@npm:8.23.0"
   dependencies:
-    "@pixi/colord": "npm:^2.9.6"
     "@types/earcut": "npm:^3.0.0"
     "@webgpu/types": "npm:^0.1.69"
     "@xmldom/xmldom": "npm:^0.8.15"
+    colord: "npm:^2.11.0"
     earcut: "npm:^3.0.2"
     eventemitter3: "npm:^5.0.1"
     gifuct-js: "npm:^2.1.2"
     ismobilejs: "npm:^1.1.1"
     parse-svg-path: "npm:^0.2.0"
     tiny-lru: "npm:^11.4.7"
-  checksum: 10c0/dd3879a994250f4aa4ac27f25c3546feefdca6a3e00f4eba5f5aed72622263feba92275d83f78e508944842e70d3b660a6fdef410379f6f002d12b23ecfd99b6
+  checksum: 10c0/5a7c7f89156f079785ec72b50ff6f625b8c336b84fa14f75c2e3fa3d7fffadd601f218cad3fe1b8d3d4db1d0a5d50303d7e263d4f141c5bd4e32ba047695a5c8
   languageName: node
   linkType: hard
 
@@ -9135,7 +9135,7 @@ __metadata:
     navigator.sendbeacon: "npm:0.0.20"
     parse5: "npm:8.1.0"
     picocolors: "npm:1.1.1"
-    pixi.js: "npm:8.22.0"
+    pixi.js: "npm:8.23.0"
     postcss: "npm:8.5.32"
     postcss-load-config: "npm:6.0.1"
     postcss-loader: "npm:8.2.1"
