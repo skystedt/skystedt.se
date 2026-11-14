@@ -45,7 +45,7 @@ const mapVendorModuleNameToChunk = (moduleName) => {
       return 'babel_runtime';
     }
     case 'pixi.js':
-    case '@pixi/colord':
+    case 'colord':
     case 'earcut':
     case 'eventemitter3':
     case 'parse-svg-path': {

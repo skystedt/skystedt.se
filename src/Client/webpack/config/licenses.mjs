@@ -48,8 +48,7 @@ export const licenseOverrides = {
   files: {
     'unfetch-polyfill': { module: '.', file: 'LICENSE.md' },
     '@microsoft/applicationinsights-cfgsync-js': { module: '@microsoft/applicationinsights-web', file: 'LICENSE' },
-    '@microsoft/dynamicproto-js': { module: '@microsoft/applicationinsights-web', file: 'LICENSE' },
-    '@pixi/colord': { module: 'pixi.js', file: 'LICENSE' }
+    '@microsoft/dynamicproto-js': { module: '@microsoft/applicationinsights-web', file: 'LICENSE' }
   },
   versions: {
     'unfetch-polyfill': unfetch.version
