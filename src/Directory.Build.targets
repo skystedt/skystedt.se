@@ -1,0 +1,15 @@
+﻿<Project>
+  <!-- Clean keeps the restored Functions extensions project like other restore output, otherwise a rebuild (no-incremental) has to restore it during build (AZFW0108) -->
+  <Target Name="HideFunctionsExtensionsProjectFromClean" BeforeTargets="_CleanFunctionsExtensions">
+    <ItemGroup>
+      <_HiddenAzureFunctionsTargetFramework Include="@(_AzureFunctionsTargetFramework)" />
+      <_AzureFunctionsTargetFramework Remove="@(_AzureFunctionsTargetFramework)" />
+    </ItemGroup>
+  </Target>
+  <Target Name="UnhideFunctionsExtensionsProjectAfterClean" AfterTargets="_CleanFunctionsExtensions">
+    <ItemGroup>
+      <_AzureFunctionsTargetFramework Include="@(_HiddenAzureFunctionsTargetFramework)" />
+      <_HiddenAzureFunctionsTargetFramework Remove="@(_HiddenAzureFunctionsTargetFramework)" />
+    </ItemGroup>
+  </Target>
+</Project>

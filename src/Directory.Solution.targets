@@ -1,0 +1,6 @@
+﻿<Project>
+  <!-- Solution restores skip the Azure.Functions.Sdk post-restore hook, https://github.com/Azure/azure-functions-dotnet-worker/blob/main/docs/sdk-rules/AZFW0108.md -->
+  <Target Name="GenerateFunctionsExtensionProjects" AfterTargets="Restore">
+    <MSBuild Projects="@(ProjectReference)" Targets="GenerateFunctionsExtensionProject" SkipNonexistentProjects="true" SkipNonexistentTargets="true" />
+  </Target>
+</Project>
