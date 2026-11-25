@@ -149,7 +149,6 @@ export default class Communication {
    * @returns {number}
    */
   static #random(min, max) {
-    // eslint-disable-next-line sonarjs/pseudo-random
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
 

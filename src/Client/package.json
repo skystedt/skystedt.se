@@ -52,7 +52,7 @@
     "eslint-plugin-n": "18.5.0",
     "eslint-plugin-promise": "7.3.0",
     "eslint-plugin-security": "4.2.1",
-    "eslint-plugin-sonarjs": "4.2.2",
+    "eslint-plugin-sonarjs": "4.2.3",
     "eslint-plugin-unicorn": "80.0.0",
     "eslint-webpack-plugin": "6.0.0",
     "globals": "17.14.0",
@@ -104,7 +104,6 @@
   "resolutions": {
     "license-checker-rseidelsohn/@npmcli/arborist": "10.x",
     "license-checker-rseidelsohn/@npmcli/package-json": "8.x",
-    "@npmcli/arborist/minimatch": "11.x",
-    "eslint-plugin-sonarjs/minimatch": "11.x"
+    "@npmcli/arborist/minimatch": "11.x"
   }
 }

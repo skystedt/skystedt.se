@@ -1969,7 +1969,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint-community/regexpp@npm:^4.11.0, @eslint-community/regexpp@npm:^4.12.2, @eslint-community/regexpp@npm:^4.8.0":
+"@eslint-community/regexpp@npm:^4.11.0, @eslint-community/regexpp@npm:^4.12.2, @eslint-community/regexpp@npm:^4.12.3, @eslint-community/regexpp@npm:^4.8.0":
   version: 4.12.3
   resolution: "@eslint-community/regexpp@npm:4.12.3"
   checksum: 10c0/9b123d7298be2935097a1dc620373b4e9b3861123ba542de86bc4e941428bfb10a0a8dd1ae236b853c5b704f263faf318f8b5e23563b9f70405c7a388fcdf42f
@@ -4035,6 +4035,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"aria-query@npm:^5.3.2":
+  version: 5.3.2
+  resolution: "aria-query@npm:5.3.2"
+  checksum: 10c0/003c7e3e2cff5540bf7a7893775fc614de82b0c5dde8ae823d47b7a28a9d4da1f7ed85f340bdb93d5649caa927755f0e31ecc7ab63edfdfc00c8ef07e505e03e
+  languageName: node
+  linkType: hard
+
 "array-find-index@npm:^1.0.2":
   version: 1.0.2
   resolution: "array-find-index@npm:1.0.2"
@@ -5346,27 +5353,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-sonarjs@npm:4.2.2":
-  version: 4.2.2
-  resolution: "eslint-plugin-sonarjs@npm:4.2.2"
+"eslint-plugin-sonarjs@npm:4.2.3":
+  version: 4.2.3
+  resolution: "eslint-plugin-sonarjs@npm:4.2.3"
   dependencies:
-    "@eslint-community/regexpp": "npm:^4.12.2"
+    "@eslint-community/regexpp": "npm:^4.12.3"
     "@sonarsource/analyzer-commons-configurations": "npm:^2.31.0-5284"
+    aria-query: "npm:^5.3.2"
     builtin-modules: "npm:^3.3.0"
     bytes: "npm:^3.1.2"
     functional-red-black-tree: "npm:^1.0.1"
-    globals: "npm:^17.12.0"
+    globals: "npm:^17.14.0"
     jsx-ast-utils-x: "npm:^0.1.0"
     lodash.merge: "npm:^4.6.2"
-    minimatch: "npm:^10.2.6"
+    minimatch: "npm:^11.0.9"
     scslre: "npm:^0.3.0"
-    semver: "npm:^7.8.5"
+    semver: "npm:^7.8.6"
     ts-api-utils: "npm:^2.5.0"
     typescript: "npm:>=5 <6.1.0"
     yaml: "npm:^2.9.1"
   peerDependencies:
     eslint: ^8.0.0 || ^9.0.0 || ^10.0.0
-  checksum: 10c0/045ce3aab95a317e1a878a03b3299d81ce71e9ba521c4f71ca7dafeea802272173363aeb7a631abd86bf8a35086b8948033d3f3cb4b81f009ad3111c6b52ea27
+  checksum: 10c0/75e30dbfec6c45a6d4852144d499f4ec097264c8c44ceabdcf0c6dc1782de728ae9f85bdfcaf2d74e12f263bfc60b28d7f2478b71248833c6413b45b9f70e68d
   languageName: node
   linkType: hard
 
@@ -5898,7 +5906,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:17.14.0, globals@npm:^17.12.0":
+"globals@npm:17.14.0, globals@npm:^17.12.0, globals@npm:^17.14.0":
   version: 17.14.0
   resolution: "globals@npm:17.14.0"
   checksum: 10c0/422d17c24e87170d4aa566b97a53339ae451c2f4d78512594a7ca951cdb939bc4a85c10071e6dcf77ca63de48713a77f2e71eb9214e44880233dff2090e92731
@@ -8862,7 +8870,7 @@ __metadata:
     eslint-plugin-n: "npm:18.5.0"
     eslint-plugin-promise: "npm:7.3.0"
     eslint-plugin-security: "npm:4.2.1"
-    eslint-plugin-sonarjs: "npm:4.2.2"
+    eslint-plugin-sonarjs: "npm:4.2.3"
     eslint-plugin-unicorn: "npm:80.0.0"
     eslint-webpack-plugin: "npm:6.0.0"
     globals: "npm:17.14.0"
