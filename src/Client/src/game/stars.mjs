@@ -125,7 +125,6 @@ export default class Stars {
 
   /** @returns {number} */
   static #random() {
-    // eslint-disable-next-line sonarjs/pseudo-random
     return Math.random();
   }
 }
