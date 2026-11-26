@@ -30,6 +30,7 @@
     "@babel/plugin-transform-runtime": "8.1.2",
     "@babel/preset-env": "8.0.7",
     "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",
+    "@npmcli/arborist": "10.0.5",
     "@stylistic/eslint-plugin": "6.0.1",
     "@types/bytes": "3.1.6",
     "@types/node": "26.6.6",
@@ -59,7 +60,6 @@
     "html-inline-css-webpack-plugin": "1.11.2",
     "html-webpack-plugin": "5.6.8",
     "ignore-loader": "0.1.2",
-    "license-checker-rseidelsohn": "5.0.1",
     "license-webpack-plugin": "4.0.2",
     "mini-css-extract-plugin": "2.10.2",
     "minimatch": "11.0.9",
@@ -102,8 +102,6 @@
     }
   },
   "resolutions": {
-    "license-checker-rseidelsohn/@npmcli/arborist": "10.x",
-    "license-checker-rseidelsohn/@npmcli/package-json": "8.x",
     "@npmcli/arborist/minimatch": "11.x"
   }
 }

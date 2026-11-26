@@ -1,18 +1,23 @@
-import * as licenseChecker from 'license-checker-rseidelsohn';
+import Arborist from '@npmcli/arborist';
 import spdxSatisfies from 'spdx-satisfies';
 import webpack from 'webpack';
+
+/** @typedef {{ name: string, version: string, license: string }} UsedPackage */
 
 /** Check licenses from all used packages, including development and transitive dependencies */
 export default class LicenseCheckUsePlugin {
   #acceptableLicenses;
+  #licenseOverrides;
   #callback;
 
   /**
    * @param {string[]} acceptableLicenses
+   * @param {Record<string, string> | undefined} licenseOverrides License by package name, used instead of the package.json license field
    * @param {(name: string, version: string, licenseId: string) => void} [callback]
    */
-  constructor(acceptableLicenses, callback) {
+  constructor(acceptableLicenses, licenseOverrides, callback) {
     this.#acceptableLicenses = acceptableLicenses;
+    this.#licenseOverrides = new Map(Object.entries(licenseOverrides ?? {}));
     this.#callback = callback;
   }
 
@@ -24,6 +29,7 @@ export default class LicenseCheckUsePlugin {
           this.#logError(compilation),
           compiler.options.context,
           this.#acceptableLicenses,
+          this.#licenseOverrides,
           this.#callback
         );
       });
@@ -44,15 +50,16 @@ export default class LicenseCheckUsePlugin {
    * @param {(message: string) => void} logError
    * @param {string | undefined} baseDirectory
    * @param {string[]} acceptableLicenses
+   * @param {Map<string, string>} licenseOverrides
    * @param {(name: string, version: string, licenseId: string) => void} [callback]
    */
-  static async #checkLicenses(logError, baseDirectory, acceptableLicenses, callback) {
+  static async #checkLicenses(logError, baseDirectory, acceptableLicenses, licenseOverrides, callback) {
     if (!baseDirectory) {
       logError('Webpack context was not found');
       return;
     }
 
-    const packages = await this.#resolvePackageLicenses(logError, baseDirectory);
+    const packages = await this.#resolvePackages(baseDirectory, licenseOverrides);
 
     const invalid = this.#validateLicenses(logError, packages, acceptableLicenses);
     for (const { license, modules } of invalid) {
@@ -62,64 +69,61 @@ export default class LicenseCheckUsePlugin {
     }
 
     if (callback) {
-      for (const [module, moduleInfo] of Object.entries(packages)) {
-        const licenses = this.#simplifyLicense(moduleInfo.licenses);
-        const index = module.lastIndexOf('@');
-        const name = module.slice(0, index);
-        const version = module.slice(index + 1);
-        callback(name, version, licenses);
+      for (const { name, version, license } of packages) {
+        callback(name, version, license);
       }
     }
   }
 
   /**
-   * @param {licenseChecker.ModuleInfo["licenses"]} licenses
+   * @param {string} baseDirectory
+   * @param {Map<string, string>} licenseOverrides
+   * @returns {Promise<UsedPackage[]>}
+   */
+  static async #resolvePackages(baseDirectory, licenseOverrides) {
+    const arborist = new Arborist({ path: baseDirectory });
+    const tree = await arborist.loadActual();
+
+    /** @type {Map<string, UsedPackage>} */
+    const packages = new Map();
+    for (const node of tree.inventory.values()) {
+      if (!node.isRoot) {
+        const { name, version, license } = node.package;
+        packages.set(`${name}@${version}`, { name, version, license: this.#license(name, license, licenseOverrides) });
+      }
+    }
+
+    return [...packages].toSorted(([a], [b]) => a.localeCompare(b)).map(([, usedPackage]) => usedPackage);
+  }
+
+  /**
+   * @param {string} name
+   * @param {unknown} license
+   * @param {Map<string, string>} licenseOverrides
    * @returns {string}
    */
-  static #simplifyLicense(licenses) {
-    if (!licenses) {
-      return 'UNKNOWN';
+  static #license(name, license, licenseOverrides) {
+    const override = licenseOverrides.get(name);
+    if (override) {
+      return override;
     }
-    if (Array.isArray(licenses)) {
-      return licenses.join(',');
+    if (typeof license === 'string') {
+      return license;
     }
-    if (licenses.endsWith('*')) {
-      return licenses.slice(0, -1);
-    }
-    return licenses;
+    return 'UNKNOWN';
   }
 
   /**
    * @param {(message: string) => void} logError
-   * @param {string} baseDirectory
-   * @returns {Promise<licenseChecker.ModuleInfos>}
-   */
-  static async #resolvePackageLicenses(logError, baseDirectory) {
-    // license-checker is only used to resolve packages and their licenses
-    // Some of it's methods don't do proper SPDX validation, so we do it ourselves
-    return new Promise((resolve, reject) => {
-      licenseChecker.init({ start: baseDirectory }, (error, packages) => {
-        if (error) {
-          logError(`License checker failed: ${error}`);
-          reject();
-        } else {
-          resolve(packages);
-        }
-      });
-    });
-  }
-
-  /**
-   * @param {(message: string) => void} logError
-   * @param {licenseChecker.ModuleInfos} moduleInfos
+   * @param {UsedPackage[]} packages
    * @param {string[]} acceptableLicenses
    * @returns {{
    *   license: string,
    *   modules: string[]
    * }[]}
    */
-  static #validateLicenses(logError, moduleInfos, acceptableLicenses) {
-    const groupedLicenses = this.#groupLicenses(moduleInfos);
+  static #validateLicenses(logError, packages, acceptableLicenses) {
+    const groupedLicenses = this.#groupLicenses(packages);
     const invalidLicenses = [];
     for (const [license, modules] of groupedLicenses.entries()) {
       const valid = this.#validateLicense(logError, license, acceptableLicenses);
@@ -131,17 +135,16 @@ export default class LicenseCheckUsePlugin {
   }
 
   /**
-   * @param {licenseChecker.ModuleInfos} moduleInfos
+   * @param {UsedPackage[]} packages
    * @returns {Map<string, string[]>}
    */
-  static #groupLicenses(moduleInfos) {
+  static #groupLicenses(packages) {
     const grouped = new Map();
-    for (const [module, { licenses }] of Object.entries(moduleInfos)) {
-      const key = this.#simplifyLicense(licenses);
-      if (!grouped.has(key)) {
-        grouped.set(key, []);
+    for (const { name, version, license } of packages) {
+      if (!grouped.has(license)) {
+        grouped.set(license, []);
       }
-      grouped.get(key)?.push(module);
+      grouped.get(license)?.push(`${name}@${version}`);
     }
     return grouped;
   }

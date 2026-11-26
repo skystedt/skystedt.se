@@ -186,7 +186,7 @@ export default {
         BuildInfo.instance.addLicense('redistributed', name, version, licenseId);
       }
     }),
-    new LicenseCheckUsePlugin(licenseAllowed.used, (name, version, licenseId) => {
+    new LicenseCheckUsePlugin(licenseAllowed.used, licenseOverrides.licenses, (name, version, licenseId) => {
       BuildInfo.instance.addLicense('used', name, version, licenseId);
     }),
     new HtmlWebpackPlugin({
