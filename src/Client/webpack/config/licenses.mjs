@@ -4,7 +4,7 @@ import unfetch from 'unfetch/package.json' with { type: 'json' };
 import licenses from '../../licenses.json' with { type: 'json' };
 
 /** @import { LicenseWebpackPluginWrapperOptions, LicenseFormatter } from '../plugins/license-webpack-plugin-wrapper.mjs' */
-/** @typedef {LicenseWebpackPluginWrapperOptions["overrides"]} LicenseOverrides */
+/** @typedef {NonNullable<LicenseWebpackPluginWrapperOptions["overrides"]>} LicenseOverrides */
 
 export const licenseFilename = 'THIRD-PARTY-LICENSES.txt';
 export const licensePreamble = `/*! License information in ${licenseFilename} */`;
@@ -43,7 +43,8 @@ export const licenseAdditionals = {
 /** @type {LicenseOverrides} */
 export const licenseOverrides = {
   licenses: {
-    'unfetch-polyfill': unfetch.license
+    'unfetch-polyfill': unfetch.license,
+    'ignore-loader': 'MIT' // No license field in package.json, the LICENSE file is MIT
   },
   files: {
     'unfetch-polyfill': { module: '.', file: 'LICENSE.md' },
