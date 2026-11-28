@@ -326,9 +326,7 @@ export default [
     // https://github.com/prettier/eslint-config-prettier/blob/main/README.md#curly
     name: 'overrides/prettier/specific',
     rules: {
-      curly: ['error', 'all'],
-      // eslint-config-prettier doesn't cover list-style yet, and it conflicts with how prettier hugs a last arrow argument
-      '@stylistic/list-style': 'off'
+      curly: ['error', 'all']
     }
   }
 ];
