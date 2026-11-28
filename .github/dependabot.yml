@@ -58,6 +58,8 @@ updates:
           - "@babel/*"
           - "babel-*"
       client-development:
+        patterns:
+          - "*" # dependabot gives an overlapping dependency to the most specific group, not the first one, without patterns this group would outrank other groups
         dependency-type: "development"
         update-types:
           - minor
