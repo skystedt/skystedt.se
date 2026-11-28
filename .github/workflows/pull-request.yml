@@ -56,3 +56,12 @@ jobs:
       upload-sarif: false
       report-pull-request: false
       fail-on-vulnerable: true
+
+  approve_dependabot:
+    name: Approve Dependabot
+    needs: [build_test_and_deploy, scan_codeql, scan_dependency_review, scan_owasp_dependency_check, scan_nuget_transitive_dependencies]
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: ./.github/workflows/reusable-approve-dependabot.yml
