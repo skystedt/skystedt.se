@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@yarnpkg/cli-dist": "4.18.1"
+  }
+}
