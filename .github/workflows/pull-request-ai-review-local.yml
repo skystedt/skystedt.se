@@ -11,8 +11,27 @@ on:
 permissions: {} # permissions are specified on each job
 
 jobs:
+  dependabot_group:
+    name: Dependabot Group
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      approve: ${{ steps.group.outputs.approve }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # 7.0.1
+
+      - name: Dependabot Group
+        id: group
+        uses: ./.github/composite/dependabot-group
+
   ai_review_local:
     name: AI Review Local
+    needs: dependabot_group
+    if: ${{ !cancelled() && needs.dependabot_group.outputs.approve != 'true' }} # groups tagged for approval are not reviewed
     permissions:
       actions: read
       contents: read

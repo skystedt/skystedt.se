@@ -1,0 +1,31 @@
+name: Composite - Dependabot Group
+description: Read the Dependabot group of the pull request, and whether .github/dependabot.yml tags the group for approval with the "-approve" suffix
+
+outputs:
+  group:
+    description: Dependabot group of the pull request, empty when it has none or contains commits not made by Dependabot
+    value: ${{ steps.metadata.outputs.dependency-group }}
+  approve:
+    description: '"true" when the group name ends with "-approve", the pull request is then approved after CI and not reviewed by AI'
+    value: ${{ steps.approve.outputs.approve }}
+
+runs:
+  using: composite
+  steps:
+    - name: Fetch Metadata
+      id: metadata
+      continue-on-error: true # fails on a pull request that is not from Dependabot or contains commits not made by Dependabot, the group is then empty
+      uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # 3.1.0
+
+    - name: Check Approve Suffix
+      id: approve
+      shell: bash
+      env:
+        GROUP: ${{ steps.metadata.outputs.dependency-group }}
+      run: |
+        APPROVE=false
+        case "$GROUP" in
+          *-approve) APPROVE=true ;;
+        esac
+        echo "approve=$APPROVE" >> "$GITHUB_OUTPUT"
+        echo "Dependabot group: ${GROUP:-none}, approve: $APPROVE"

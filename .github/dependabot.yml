@@ -11,12 +11,25 @@ updates:
     cooldown:
       default-days: 0
     groups:
-      github-actions:
+      github-actions-approve:
         patterns:
           - "actions/*"
-      codeql:
+          - "dependabot/fetch-metadata"
+        update-types:
+          - minor
+          - patch
+      codeql-approve:
         patterns:
           - "github/codeql-action/*"
+        update-types:
+          - minor
+          - patch
+      claude-code-action-approve:
+        patterns:
+          - "anthropics/claude-code-action"
+        update-types:
+          - minor
+          - patch
 
   - package-ecosystem: "dotnet-sdk"
     directory: "/src"
